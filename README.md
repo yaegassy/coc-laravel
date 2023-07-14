@@ -21,13 +21,13 @@ Plug 'yaegassy/coc-laravel', {'do': 'yarn install --frozen-lockfile'}
 This coc-extension will provide various completion features and more features for Laravel projects.
 
 - Completions
-  - Config completion
-  - Env completion
-  - Validation completion
-  - Route completion
-  - View completion
-  - Middleware completion
-  - Guard completion
+  - Config completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635266998)
+  - Env completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635267885)
+  - Validation completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635268664)
+  - Route completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635269933)
+  - View completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635271315)
+  - Middleware completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635271630)
+  - Guard completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635272378)
 
 - [TODO]
   - Completions
