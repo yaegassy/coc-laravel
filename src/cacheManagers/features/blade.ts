@@ -29,8 +29,8 @@ export class BladeCacheManager {
 
   set(files: string[]) {
     for (const file of files) {
-      // TODO: リソースの場所は絶対指定ではなく、可変できるようにしたい
-      // TODO: Windows 対応 (ディレクトリセパレーターとか正規表現での置換とか)
+      // TODO: Resource locations are taken from the project state, not from absolute specification
+      // TODO: Windows check (check if you need to be careful with directory separators, regular expression replacement, etc.)
       const pathName = this.getPathName(file);
       this.bladeMapStore.set(pathName, file);
     }
