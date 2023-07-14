@@ -1,0 +1,131 @@
+{
+  "name": "@yaegassy/coc-laravel",
+  "version": "0.0.1",
+  "description": "Laravel extension for coc.nvim",
+  "author": "yaegassy <yosstools@gmail.com>",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "keywords": [
+    "coc.nvim",
+    "php",
+    "laravel",
+    "blade",
+    "laravel-blade",
+    "vim",
+    "neovim"
+  ],
+  "engines": {
+    "coc": "^0.0.80"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yaegassy/coc-laravel"
+  },
+  "scripts": {
+    "lint": "eslint src --ext ts",
+    "clean": "rimraf lib",
+    "watch": "node esbuild.js --watch",
+    "build": "node esbuild.js",
+    "prepare": "node esbuild.js"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "printWidth": 120,
+    "semi": true
+  },
+  "devDependencies": {
+    "@types/node": "^18.16.19",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "coc.nvim": "^0.0.82",
+    "esbuild": "^0.16.17",
+    "eslint": "^8.44.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.8",
+    "rimraf": "^3.0.2",
+    "typescript": "~5.0.4",
+    "vitest": "^0.32.4"
+  },
+  "activationEvents": [
+    "onLanguage:php",
+    "onLanguage:blade"
+  ],
+  "contributes": {
+    "rootPatterns": [
+      {
+        "filetype": "php",
+        "patterns": [
+          "artisan"
+        ]
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "coc-laravel configuration",
+      "properties": {
+        "laravel.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable coc-laravel extension."
+        },
+        "laravel.completion.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable completion."
+        },
+        "laravel.completion.configEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable config completion."
+        },
+        "laravel.completion.envEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable env completion."
+        },
+        "laravel.completion.validationEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable validation completion."
+        },
+        "laravel.completion.routeEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable route completion."
+        },
+        "laravel.completion.viewEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable view completion."
+        },
+        "laravel.completion.middlewareEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable middleware completion."
+        },
+        "laravel.completion.guardEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable guard completion."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "laravel.stats",
+        "title": "Show stats"
+      },
+      {
+        "command": "laravel.cache.regenerate",
+        "title": "Cache regenerate"
+      }
+    ]
+  },
+  "dependencies": {
+    "fast-glob": "^3.3.0",
+    "php-parser": "3.1.5",
+    "stillat-blade-parser": "^1.1.11",
+    "web-tree-sitter": "^0.20.8"
+  }
+}
