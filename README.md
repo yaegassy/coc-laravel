@@ -6,9 +6,7 @@ Laravel extension for [coc.nvim](https://github.com/neoclide/coc.nvim).
 
 **CocInstall**:
 
-```vim
-:CocInstall https://github.com/yaegassy/coc-laravel
-```
+> ...TODO
 
 **vim-plug**:
 
