@@ -90,8 +90,8 @@ For more information, check this coc.nvim's wiki.
 
 ## Commands
 
-- `laravel.stats`: Show stats
-- `laravel.cache.regenerate`: Cache regenerate
+- `laravel.project.stats`: Show project stats
+- `laravel.project.restart`: Run project restart
 
 ## Recommended coc-extensions for php
 
