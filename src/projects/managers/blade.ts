@@ -1,6 +1,9 @@
-import path from 'path';
+import { workspace } from 'coc.nvim';
 
 import fg from 'fast-glob';
+import path from 'path';
+
+import { getArtisanPath, runTinker } from '../../common/shared';
 
 export class BladeProjectsManager {
   bladeMapStore: Map<string, string>;
@@ -14,7 +17,16 @@ export class BladeProjectsManager {
   }
 
   async initialize() {
-    const files = await fg('**/resources/views/**/*.blade.php', {
+    const artisanPath = getArtisanPath();
+    if (!artisanPath) return;
+
+    const getViewPathPHPCode = `echo json_encode(app()->viewPath(), JSON_PRETTY_PRINT)`;
+    const resViewPath = await runTinker(getViewPathPHPCode, artisanPath);
+    const viewPath = resViewPath.replace(/["']/g, '').replace(/\\/g, '').replace('\n', '');
+
+    const globPattern = path.join('**', viewPath.replace(workspace.root, ''), '**/*.blade.php');
+
+    const files = await fg(globPattern, {
       ignore: ['**/.git/**', '**/vendor/**', '**/node_modules/**'],
       absolute: true,
     });
@@ -41,11 +53,6 @@ export class BladeProjectsManager {
       const pathName = this.getPathName(file);
       this.bladeMapStore.delete(pathName);
     }
-  }
-
-  async regenerate() {
-    this.bladeMapStore.clear();
-    await this.initialize();
   }
 
   async restart() {
