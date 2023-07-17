@@ -108,6 +108,12 @@ For more information, check this coc.nvim's wiki.
 - [Laravel Idea](https://laravel-idea.com/)
 - and More...
 
+## Thanks
+
+- [glayzzle/php-parser](https://github.com/glayzzle/php-parser)
+- [Stillat/blade-parser-typescript](https://github.com/Stillat/blade-parser-typescript)
+- [web-tree-sitter](https://www.npmjs.com/package/web-tree-sitter)
+
 ## License
 
 MIT
