@@ -5,8 +5,8 @@ import { type ProjectManagerType } from '../projects/types';
 export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
   context.subscriptions.push(
     commands.registerCommand('laravel.project.restart', async () => {
-      await projectManager.bladeProjectManager.regenerate();
-      await projectManager.translationProjectManager.regenerate();
+      await projectManager.bladeProjectManager.restart();
+      await projectManager.translationProjectManager.restart();
       window.showInformationMessage('SUCCESS');
     })
   );
