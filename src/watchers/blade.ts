@@ -1,5 +1,4 @@
 import { ExtensionContext, workspace } from 'coc.nvim';
-////import { BladeCacheManagerType } from '../cacheManagers/managerTypes';
 import { type ProjectManagerType } from '../projects/types';
 
 import { SUPPORTED_LANGUAGE } from '../constant';

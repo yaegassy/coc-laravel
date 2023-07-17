@@ -36,13 +36,11 @@ export async function register(context: ExtensionContext, projectManager: Projec
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   watcher.onDidChange(async (_e) => {
-    //projectManager.translationProjectManager.set([e.fsPath]);
     await projectManager.translationProjectManager.restart();
   });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   watcher.onDidDelete(async (_e) => {
-    ////projectManager.translationProjectManager.delete([e.fsPath]);
     await projectManager.translationProjectManager.restart();
   });
 

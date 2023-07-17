@@ -52,7 +52,6 @@ function collectChildNodes(node: Node) {
 }
 
 export function walk(callback: (node: Node, parent: Node | undefined) => void, node: Node, parent?: Node) {
-  //callback(node, parent);
   const children = collectChildNodes(node);
   for (const child of children) {
     walk(callback, child, node);
