@@ -1,4 +1,5 @@
 import { CompletionItem, CompletionItemKind, LinesTextDocument, Position, workspace } from 'coc.nvim';
+
 import fs from 'fs';
 import path from 'path';
 

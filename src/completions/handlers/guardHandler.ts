@@ -1,6 +1,6 @@
 import { CompletionItem, CompletionItemKind, LinesTextDocument, Position, TextEdit, workspace } from 'coc.nvim';
 
-import { getArtisanPath, runTinker } from '../common/shared';
+import { getArtisanPath, runTinker } from '../../common/shared';
 import * as guardService from '../services/guardService';
 
 type AuthGuardsJsonType = {

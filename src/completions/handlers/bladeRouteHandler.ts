@@ -1,6 +1,6 @@
 import { CompletionItem, CompletionItemKind, LinesTextDocument, Position, TextEdit, workspace } from 'coc.nvim';
 
-import { getArtisanPath, runRouteListJson } from '../common/shared';
+import { getArtisanPath, runRouteListJson } from '../../common/shared';
 
 type RouteListJsonType = {
   domain: string | null;

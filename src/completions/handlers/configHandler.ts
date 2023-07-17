@@ -1,6 +1,6 @@
 import { CompletionItem, CompletionItemKind, LinesTextDocument, Position, TextEdit, workspace } from 'coc.nvim';
 
-import { runTinker, getArtisanPath } from '../common/shared';
+import { getArtisanPath, runTinker } from '../../common/shared';
 
 export async function doCompletion(document: LinesTextDocument, position: Position) {
   const items: CompletionItem[] = [];

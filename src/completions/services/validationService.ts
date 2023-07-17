@@ -1,4 +1,5 @@
 import {
+  Class as ClassNode,
   Entry,
   Expression,
   Identifier,
@@ -6,7 +7,6 @@ import {
   Node,
   Location as ParserLocation,
   Return,
-  Class as ClassNode,
 } from 'php-parser';
 
 import * as parser from '../../parsers/php/parser';

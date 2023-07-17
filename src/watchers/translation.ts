@@ -2,9 +2,8 @@ import { ExtensionContext, workspace } from 'coc.nvim';
 
 import path from 'path';
 
+import { getArtisanPath, runTinker } from '../common/shared';
 import { type ProjectManagerType } from '../projects/types';
-
-import { getArtisanPath, runTinker } from '../completions/common/shared';
 
 import { SUPPORTED_LANGUAGE } from '../constant';
 

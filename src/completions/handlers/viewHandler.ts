@@ -1,7 +1,7 @@
 import { CompletionItem, CompletionItemKind, LinesTextDocument, Position, TextEdit, workspace } from 'coc.nvim';
 
-import * as viewService from '../services/viewService';
 import { type BladeProjectsManagerType } from '../../projects/types';
+import * as viewService from '../services/viewService';
 
 export async function doCompletion(
   document: LinesTextDocument,
