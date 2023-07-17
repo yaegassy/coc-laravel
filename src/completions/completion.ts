@@ -12,10 +12,10 @@ import {
 } from 'coc.nvim';
 
 import { DOCUMENT_SELECTOR, SUPPORTED_LANGUAGE } from '../constant';
-
 import { type ProjectManagerType } from '../projects/types';
 import * as bladeGuardCompletionHandler from './handlers/bladeGuardHandler';
 import * as bladeRouteCompletionHandler from './handlers/bladeRouteHandler';
+import * as bladeTranslationCompletionHandler from './handlers/bladeTranslationHandler';
 import * as bladeViewCompletionHanlder from './handlers/bladeViewHandler';
 import * as configCompletionHandler from './handlers/configHandler';
 import * as envCompletionHandler from './handlers/envHandler';
@@ -24,7 +24,6 @@ import * as middlewareCompletionHandler from './handlers/middlewareHandler';
 import * as routeCompletionHandler from './handlers/routeHandler';
 import * as validationCompletionHandler from './handlers/validationHandler';
 import * as viewCompletionHandler from './handlers/viewHandler';
-import * as bladeTranslationCompletionHandler from './handlers/bladeTranslationHandler';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
