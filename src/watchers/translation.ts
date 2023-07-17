@@ -4,7 +4,7 @@ import path from 'path';
 
 import { type ProjectManagerType } from '../projects/types';
 
-import { runTinker, getArtisanPath } from '../completions/common/shared';
+import { getArtisanPath, runTinker } from '../completions/common/shared';
 
 import { SUPPORTED_LANGUAGE } from '../constant';
 

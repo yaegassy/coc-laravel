@@ -1,9 +1,9 @@
 import { ExtensionContext, workspace } from 'coc.nvim';
 
-import * as projectManagerFeature from './projects/manager';
 import * as projectRestartCommandFeature from './commands/projectRestart';
 import * as projectStatsCommandFeature from './commands/projectStats';
 import * as completionFeature from './completions/completion';
+import * as projectManagerFeature from './projects/manager';
 import * as bladeWatcherFeature from './watchers/blade';
 import * as tranlationWatcherFeature from './watchers/translation';
 

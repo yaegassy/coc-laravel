@@ -3,11 +3,11 @@ import path from 'path';
 import fg from 'fast-glob';
 import fs from 'node:fs/promises';
 
-import { Return, Array as ArrayNode, Entry, String as StringNode } from 'php-parser';
+import { Array as ArrayNode, Entry, Return, String as StringNode } from 'php-parser';
 
 import * as parser from '../../parsers/php/parser';
 
-import { runTinker, getArtisanPath } from '../../completions/common/shared';
+import { getArtisanPath, runTinker } from '../../completions/common/shared';
 
 export class TranslationProjectManager {
   mapStore: Map<string, string>;
