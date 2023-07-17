@@ -54,7 +54,7 @@ If you have difficulty installing `watchman`, you can use `coc-laravel` without 
 
 In this case, please manually enter the following command.
 
-- `:CocCommand laravel.cache.regenerate`
+- `:CocCommand laravel.project.restart`
 
 or
 
