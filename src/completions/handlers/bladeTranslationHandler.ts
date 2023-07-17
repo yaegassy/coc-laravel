@@ -1,11 +1,11 @@
 import { CompletionItem, CompletionItemKind, LinesTextDocument, Position, TextEdit, workspace } from 'coc.nvim';
 
-import { type BladeProjectsManagerType } from '../../projects/types';
+import { type TranslationProjectManagerType } from '../../projects/types';
 
 export async function doCompletion(
   document: LinesTextDocument,
   position: Position,
-  bladeProjectManager: BladeProjectsManagerType
+  translationProjectManager: TranslationProjectManagerType
 ) {
   if (document.languageId !== 'blade') return [];
 
@@ -16,7 +16,7 @@ export async function doCompletion(
 
   const canCompletionWordRange = doc.getWordRangeAtPosition(
     Position.create(position.line, position.character - 1),
-    '(\'".-@:'
+    '(\'".-@:_'
   );
   if (!canCompletionWordRange) return [];
 
@@ -26,16 +26,16 @@ export async function doCompletion(
   let wordWithExtraChars: string | undefined = undefined;
   const wordWithExtraCharsRange = doc.getWordRangeAtPosition(
     Position.create(position.line, position.character - 1),
-    '.-'
+    '.-_'
   );
   if (wordWithExtraCharsRange) {
     wordWithExtraChars = document.getText(wordWithExtraCharsRange);
   }
 
   try {
-    const viewList = Array.from(bladeProjectManager.list());
+    const translationList = Array.from(translationProjectManager.list());
 
-    for (const view of viewList) {
+    for (const view of translationList) {
       const adjustStartCharacter = wordWithExtraChars
         ? position.character - wordWithExtraChars.length
         : position.character;
@@ -69,16 +69,7 @@ function canCompletion(word: string) {
   const slicedWord = word.slice(unnecessaryWordCount);
   const evalWord = slicedWord.replace('"', "'");
 
-  // TODO: More support
-  // @includeWhen
-  // @includeUnless
-  // @includeFirst
-  if (
-    !evalWord.startsWith("@include('") &&
-    !evalWord.startsWith("@includeIf('") &&
-    !evalWord.startsWith("@extends('") &&
-    !evalWord.startsWith("@each('")
-  ) {
+  if (!evalWord.startsWith("@lang('") && !evalWord.startsWith("__('")) {
     return false;
   }
 

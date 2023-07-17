@@ -1,9 +1,10 @@
 import { ExtensionContext, workspace } from 'coc.nvim';
-import { BladeCacheManagerType } from '../cacheManagers/managerTypes';
+////import { BladeCacheManagerType } from '../cacheManagers/managerTypes';
+import { type ProjectManagerType } from '../projects/types';
 
 import { SUPPORTED_LANGUAGE } from '../constant';
 
-export async function register(context: ExtensionContext, bladeCacheManager: BladeCacheManagerType) {
+export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
   if (!workspace.getConfiguration('laravel').get('completion.enable')) return;
 
   const { document } = await workspace.getCurrentState();
@@ -14,12 +15,12 @@ export async function register(context: ExtensionContext, bladeCacheManager: Bla
 
   watcher.onDidCreate((e) => {
     ////console.log(`====Create!!====`);
-    bladeCacheManager.set([e.fsPath]);
+    projectManager.bladeProjectManager.set([e.fsPath]);
   });
 
   watcher.onDidDelete((e) => {
     ////console.log(`====Delete!!====`);
-    bladeCacheManager.delete([e.fsPath]);
+    projectManager.bladeProjectManager.delete([e.fsPath]);
   });
 
   context.subscriptions.push(watcher);

@@ -1,19 +1,21 @@
 import { ExtensionContext, workspace } from 'coc.nvim';
 
-import * as cacheManagersFeature from './cacheManagers';
-import * as regenerateCommandFeature from './commands/cacheRegenerate';
-import * as statsCommandFeature from './commands/stats';
+import * as projectManagerFeature from './projects/manager';
+import * as projectRestartCommandFeature from './commands/projectRestart';
+import * as projectStatsCommandFeature from './commands/projectStats';
 import * as completionFeature from './completions/completion';
 import * as bladeWatcherFeature from './watchers/blade';
+//import * as tranlationWatcherFeature from './watchers/translation';
 
 export async function activate(context: ExtensionContext): Promise<void> {
   if (!workspace.getConfiguration('laravel').get<boolean>('enable')) return;
 
-  const cacheManagers = await cacheManagersFeature.register(context);
-  if (cacheManagers) {
-    statsCommandFeature.register(context, cacheManagers.managers.bladeCacheManager);
-    regenerateCommandFeature.register(context, cacheManagers.managers.bladeCacheManager);
-    bladeWatcherFeature.register(context, cacheManagers.managers.bladeCacheManager);
-    completionFeature.register(context, cacheManagers.managers.bladeCacheManager);
+  const projectManager = await projectManagerFeature.register(context);
+  if (projectManager) {
+    projectStatsCommandFeature.register(context, projectManager);
+    projectRestartCommandFeature.register(context, projectManager);
+    bladeWatcherFeature.register(context, projectManager);
+    //tranlationWatcherFeature.register(context, projectManager);
+    completionFeature.register(context, projectManager);
   }
 }

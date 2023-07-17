@@ -13,7 +13,8 @@ import {
 
 import { DOCUMENT_SELECTOR, SUPPORTED_LANGUAGE } from '../constant';
 
-import { type BladeCacheManagerType } from '../cacheManagers/managerTypes';
+////import { type BladeCacheManagerType } from '../cacheManagers/managerTypes';
+import { type ProjectManagerType } from '../projects/types';
 import * as bladeGuardCompletionHandler from './handlers/bladeGuardHandler';
 import * as bladeRouteCompletionHandler from './handlers/bladeRouteHandler';
 import * as bladeViewCompletionHanlder from './handlers/bladeViewHandler';
@@ -24,9 +25,10 @@ import * as middlewareCompletionHandler from './handlers/middlewareHandler';
 import * as routeCompletionHandler from './handlers/routeHandler';
 import * as validationCompletionHandler from './handlers/validationHandler';
 import * as viewCompletionHandler from './handlers/viewHandler';
+import * as bladeTranslationCompletionHandler from './handlers/bladeTranslationHandler';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function register(context: ExtensionContext, bladeCacheManager: BladeCacheManagerType) {
+export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
   if (!workspace.getConfiguration('laravel').get('completion.enable')) return;
 
   const { document } = await workspace.getCurrentState();
@@ -39,7 +41,7 @@ export async function register(context: ExtensionContext, bladeCacheManager: Bla
       'laravel',
       'LV',
       DOCUMENT_SELECTOR,
-      new LaravelCompletionProvider(context, bladeCacheManager),
+      new LaravelCompletionProvider(context, projectManager),
       [
         ':', // guard,
         '.', // route, view
@@ -53,11 +55,11 @@ export async function register(context: ExtensionContext, bladeCacheManager: Bla
 
 class LaravelCompletionProvider implements CompletionItemProvider {
   private _context: ExtensionContext;
-  public bladeCacheManager: BladeCacheManagerType;
+  public projectManager: ProjectManagerType;
 
-  constructor(context: ExtensionContext, bladeCacheManager: BladeCacheManagerType) {
+  constructor(context: ExtensionContext, projectManager: ProjectManagerType) {
     this._context = context;
-    this.bladeCacheManager = bladeCacheManager;
+    this.projectManager = projectManager;
   }
 
   async provideCompletionItems(
@@ -110,7 +112,11 @@ class LaravelCompletionProvider implements CompletionItemProvider {
 
     // view
     if (workspace.getConfiguration('laravel').get('completion.viewEnable')) {
-      const viewCompletionItems = await viewCompletionHandler.doCompletion(document, position, this.bladeCacheManager);
+      const viewCompletionItems = await viewCompletionHandler.doCompletion(
+        document,
+        position,
+        this.projectManager.bladeProjectManager
+      );
       if (viewCompletionItems) {
         items.push(...viewCompletionItems);
       }
@@ -119,7 +125,7 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       const bladeViewCompletionItems = await bladeViewCompletionHanlder.doCompletion(
         document,
         position,
-        this.bladeCacheManager
+        this.projectManager.bladeProjectManager
       );
       if (bladeViewCompletionItems) {
         items.push(...bladeViewCompletionItems);
@@ -144,6 +150,18 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       const bladeGuardCompletionItems = await bladeGuardCompletionHandler.doCompletion(document, position);
       if (bladeGuardCompletionItems) {
         items.push(...bladeGuardCompletionItems);
+      }
+    }
+
+    // translation
+    if (workspace.getConfiguration('laravel').get('completion.translationEnable')) {
+      const guardCompletionItems = await bladeTranslationCompletionHandler.doCompletion(
+        document,
+        position,
+        this.projectManager.translationProjectManager
+      );
+      if (guardCompletionItems) {
+        items.push(...guardCompletionItems);
       }
     }
 

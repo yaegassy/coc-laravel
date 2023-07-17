@@ -2,7 +2,7 @@ import path from 'path';
 
 import fg from 'fast-glob';
 
-export class BladeCacheManager {
+export class BladeProjectsManager {
   bladeMapStore: Map<string, string>;
   workspaceRoot: string;
   initialized: boolean;
@@ -13,7 +13,7 @@ export class BladeCacheManager {
     this.initialized = false;
   }
 
-  async initial() {
+  async initialize() {
     const files = await fg('**/resources/views/**/*.blade.php', {
       ignore: ['**/.git/**', '**/vendor/**', '**/node_modules/**'],
       absolute: true,
@@ -45,7 +45,12 @@ export class BladeCacheManager {
 
   async regenerate() {
     this.bladeMapStore.clear();
-    await this.initial();
+    await this.initialize();
+  }
+
+  async restart() {
+    this.bladeMapStore.clear();
+    await this.initialize();
   }
 
   list() {

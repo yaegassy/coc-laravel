@@ -1,12 +1,12 @@
 import { CompletionItem, CompletionItemKind, LinesTextDocument, Position, TextEdit, workspace } from 'coc.nvim';
 
 import * as viewService from '../services/viewService';
-import { type BladeCacheManagerType } from '../../cacheManagers/managerTypes';
+import { type BladeProjectsManagerType } from '../../projects/types';
 
 export async function doCompletion(
   document: LinesTextDocument,
   position: Position,
-  bladeCacheManager: BladeCacheManagerType
+  bladeProjectManager: BladeProjectsManagerType
 ) {
   if (document.languageId !== 'php') return [];
 
@@ -34,7 +34,7 @@ export async function doCompletion(
     const canCompletion = viewService.canCompletion(offset, serviceLocations);
     if (!canCompletion) return [];
 
-    const viewList = Array.from(bladeCacheManager.list());
+    const viewList = Array.from(bladeProjectManager.list());
     if (viewList.length === 0) return [];
 
     for (const view of viewList) {

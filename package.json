@@ -108,17 +108,22 @@
           "type": "boolean",
           "default": true,
           "description": "Enable guard completion."
+        },
+        "laravel.completion.translationEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable translation completion."
         }
       }
     },
     "commands": [
       {
-        "command": "laravel.stats",
-        "title": "Show stats"
+        "command": "laravel.project.stats",
+        "title": "Show project stats"
       },
       {
-        "command": "laravel.cache.regenerate",
-        "title": "Cache regenerate"
+        "command": "laravel.project.restart",
+        "title": "Run project restart"
       }
     ]
   },
