@@ -2,19 +2,13 @@ import { workspace } from 'coc.nvim';
 
 import { kebabCase } from 'case-anything';
 import fg from 'fast-glob';
+import fs from 'fs';
 import path from 'path';
 
 import { getArtisanPath, runTinker } from '../../common/shared';
+import * as bladeProjectService from '../services/blade';
 
-type Props = {
-  propsKey: string;
-  propsValue: string;
-};
-
-type ComponentMapValueType = {
-  path: string;
-  props: Props[];
-};
+import { ComponentMapValueType, PropsType } from '../types';
 
 export class BladeProjectsManager {
   bladeMapStore: Map<string, string>;
@@ -114,28 +108,68 @@ export class BladeProjectsManager {
       if (file.endsWith('.blade.php')) {
         const pathName = this.getBladePathName(file);
         const component: [string, string] = [pathName, file];
-        this.doSetComponentMap(component);
+        await this.doSetComponentMap(component);
       } else if (file.endsWith('.php')) {
         const fileWithoutExtName = path.basename(file).replace('.php', '');
         const kebabCaseName = kebabCase(fileWithoutExtName);
         const componentKey = 'x-' + kebabCaseName;
         const component: [string, string] = [componentKey, file];
-        this.doSetComponentMap(component);
+        await this.doSetComponentMap(component);
       }
     }
   }
 
-  doSetComponentMap(component: [string, string]) {
+  async doSetComponentMap(component: [string, string]) {
     if (component[0].startsWith('x-')) {
+      //
+      // From class based component
+      //
+
+      const code = await fs.promises.readFile(component[1], { encoding: 'utf8' });
+      const props = bladeProjectService.getPropsFromClassBasedComponent(code);
+
       this.componentMapStore.set(component[0], {
         path: component[1],
-        props: [],
+        props,
       });
     } else if (component[0].startsWith('components.')) {
+      //
+      // From blade file component
+      //
+
+      const props: PropsType[] = [];
+
+      const code = await fs.promises.readFile(component[1], { encoding: 'utf8' });
+      const parsedBladeDoc = bladeProjectService.getBladeDocument(code);
+
+      let phpCodeInProps: string | undefined = undefined;
+      if (parsedBladeDoc) {
+        phpCodeInProps = bladeProjectService.getPHPCodeInProps(parsedBladeDoc);
+      }
+
+      if (phpCodeInProps) {
+        const artisanPath = getArtisanPath();
+        if (artisanPath) {
+          const jsonEncodedPHPCode = `echo json_encode(${phpCodeInProps})`;
+          const resJsonStr = await runTinker(jsonEncodedPHPCode, artisanPath);
+          const resJson = JSON.parse(resJsonStr);
+
+          if (Array.isArray(resJson)) {
+            for (const i in resJson) {
+              props.push({ propsKey: i, propsValue: resJson[i] });
+            }
+          } else if (typeof resJson === 'object') {
+            Object.keys(resJson).map((key) => {
+              props.push({ propsKey: key, propsValue: resJson[key] });
+            });
+          }
+        }
+      }
+
       const componentKey = component[0].replace('components.', 'x-');
       this.componentMapStore.set(componentKey, {
         path: component[1],
-        props: [],
+        props,
       });
     }
   }
@@ -167,7 +201,7 @@ export class BladeProjectsManager {
 
   async restart() {
     this.bladeMapStore.clear();
-    ////this.componentMapStore.clear();
+    this.componentMapStore.clear();
 
     await this.initialize();
   }

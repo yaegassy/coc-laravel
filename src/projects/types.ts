@@ -8,3 +8,13 @@ export type ProjectManagerType = {
   bladeProjectManager: BladeProjectsManagerType;
   translationProjectManager: TranslationProjectManagerType;
 };
+
+export type PropsType = {
+  propsKey: string;
+  propsValue: string;
+};
+
+export type ComponentMapValueType = {
+  path: string;
+  props: PropsType[];
+};

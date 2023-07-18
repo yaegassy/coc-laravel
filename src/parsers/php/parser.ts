@@ -1,4 +1,17 @@
-import { Engine, Node, Location as ParserLocation } from 'php-parser';
+import {
+  Class as ClassNode,
+  Engine,
+  Identifier,
+  Method,
+  Node,
+  Location as ParserLocation,
+  String as StringNode,
+} from 'php-parser';
+
+export type ParameterType = {
+  name: string;
+  value?: string;
+};
 
 export function getAst(code: string) {
   const parserEngine = getParserEngine();
@@ -67,4 +80,73 @@ export function canCompletion(documentOffset: number, parserLocations: ParserLoc
   }
 
   return false;
+}
+
+export function existsExtendsClassFor(ast: Node, name: string) {
+  let exists = false;
+
+  walk((node) => {
+    if (node.kind === 'class') {
+      const classNode = node as ClassNode;
+      if (classNode.extends?.name === name) {
+        exists = true;
+      }
+    }
+  }, ast);
+
+  return exists;
+}
+
+export function getPublicParametersOfConstructor(ast: Node) {
+  const parameters: ParameterType[] = [];
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  walk((node, _parent) => {
+    if (node.kind === 'method') {
+      const methodNode = node as Method;
+      let existsConstruct = false;
+      if (typeof methodNode.name === 'object') {
+        const identifierNode = methodNode.name as Identifier;
+        if (identifierNode.name === '__construct') {
+          existsConstruct = true;
+        }
+      }
+
+      if (!existsConstruct) return;
+      if (methodNode.arguments.length === 0) return;
+
+      for (const parameter of methodNode.arguments) {
+        // flags:
+        //   - type MODIFIER_PUBLIC = 1;
+        //   - type MODIFIER_PROTECTED = 2;
+        //   - type MODIFIER_PRIVATE = 4;
+        if (parameter.flags !== 1) return;
+
+        let parameterValue: string | undefined = undefined;
+        if (parameter.value) {
+          if (parameter.value.kind === 'string') {
+            const stringNode = parameter.value as StringNode;
+            parameterValue = stringNode.value;
+          }
+        }
+
+        let parameterName: string | undefined = undefined;
+        if (typeof parameter.name === 'object') {
+          const identifierNode = parameter.name as Identifier;
+          parameterName = identifierNode.name;
+        }
+
+        if (parameterName) {
+          const parameter: ParameterType = {
+            name: parameterName,
+            value: parameterValue,
+          };
+
+          parameters.push(parameter);
+        }
+      }
+    }
+  }, ast);
+
+  return parameters;
 }

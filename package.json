@@ -113,6 +113,11 @@
           "type": "boolean",
           "default": true,
           "description": "Enable translation completion."
+        },
+        "laravel.completion.componentEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable component completion."
         }
       }
     },
