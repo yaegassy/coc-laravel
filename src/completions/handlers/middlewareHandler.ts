@@ -37,7 +37,7 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
     const artisanPath = getArtisanPath();
     if (!artisanPath) return [];
 
-    const runCode = `echo json_encode(array_merge(app('Illuminate\\Contracts\\Http\\Kernel')->getMiddlewareGroups(), app('Illuminate\\Contracts\\Http\\Kernel')->getRouteMiddleware()), JSON_PRETTY_PRINT)`;
+    const runCode = `echo json_encode(array_merge(app('Illuminate\\Contracts\\Http\\Kernel')->getMiddlewareGroups(), app('Illuminate\\Contracts\\Http\\Kernel')->getRouteMiddleware()))`;
     const middlewareJsonStr = await runTinker(runCode, artisanPath);
     const middlewareJson = JSON.parse(middlewareJsonStr);
 

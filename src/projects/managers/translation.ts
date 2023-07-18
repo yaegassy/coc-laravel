@@ -22,11 +22,11 @@ export class TranslationProjectManager {
     const artisanPath = getArtisanPath();
     if (!artisanPath) return;
 
-    const getLangPathPHPCode = `echo json_encode(app()->langPath(), JSON_PRETTY_PRINT)`;
+    const getLangPathPHPCode = `echo json_encode(app()->langPath())`;
     const resLangPath = await runTinker(getLangPathPHPCode, artisanPath);
     this.langPath = resLangPath.replace(/["']/g, '').replace(/\\/g, '').replace('\n', '');
 
-    const getLocalePHPCode = `echo json_encode(config('app.locale'), JSON_PRETTY_PRINT)`;
+    const getLocalePHPCode = `echo json_encode(config('app.locale'))`;
     const resLocale = await runTinker(getLocalePHPCode, artisanPath);
     this.locale = resLocale.replace(/["']/g, '').replace(/\\/g, '').replace('\n', '');
 

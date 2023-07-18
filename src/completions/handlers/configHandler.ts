@@ -17,7 +17,7 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
 
   const artisanPath = getArtisanPath();
 
-  const runCode = 'echo json_encode(config()->all(), JSON_PRETTY_PRINT);';
+  const runCode = 'echo json_encode(config()->all());';
   if (artisanPath) {
     const out = await runTinker(runCode, artisanPath);
 
