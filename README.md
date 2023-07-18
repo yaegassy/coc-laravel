@@ -27,10 +27,11 @@ This coc-extension will provide various completion features and more features fo
   - Middleware completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635271630)
   - Guard completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635272378)
   - Translation completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1637244306)
+  - ComponentTag completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1640305113)
 
 - [TODO]
   - Completions
-    - Component completion
+    - ComponentProps completion
   - Definitions
     - Some features are provided by [coc-blade](https://github.com/yaegassy/coc-blade) that I am developing, but considering porting to `coc-laravel` with enhancements.
   - Diagnostics
@@ -88,6 +89,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.completion.middlewareEnable`: Enable middleware completion, default: `true`
 - `laravel.completion.guardEnable`: Enable guard completion, default: `true`
 - `laravel.completion.translationEnable`: Enable translation completion, default: `true`
+- `laravel.completion.componentEnable`: Enable component completion, default: `true`
 
 ## Commands
 
