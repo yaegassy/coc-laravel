@@ -14,7 +14,7 @@ export async function register(context: ExtensionContext, projectManager: Projec
   if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
 
   await registerBladeWatcher(context, projectManager);
-  ////await registerClassBasedViewWatcher(context, projectManager);
+  await registerClassBasedViewWatcher(context, projectManager);
 }
 
 async function registerBladeWatcher(context: ExtensionContext, projectManager: ProjectManagerType) {
@@ -33,45 +33,45 @@ async function registerBladeWatcher(context: ExtensionContext, projectManager: P
   const watcher = workspace.createFileSystemWatcher(globPattern, false, false, false);
   watcher.onDidCreate(async (e) => {
     await projectManager.bladeProjectManager.setBlade([e.fsPath]);
-    ////await projectManager.bladeProjectManager.setComponent([e.fsPath]);
+    await projectManager.bladeProjectManager.setComponent([e.fsPath]);
   });
   watcher.onDidChange(async (e) => {
     await projectManager.bladeProjectManager.setBlade([e.fsPath]);
-    ////await projectManager.bladeProjectManager.setComponent([e.fsPath]);
+    await projectManager.bladeProjectManager.setComponent([e.fsPath]);
   });
   watcher.onDidDelete((e) => {
     projectManager.bladeProjectManager.deleteBlade([e.fsPath]);
-    ////projectManager.bladeProjectManager.deleteComponent([e.fsPath]);
+    projectManager.bladeProjectManager.deleteComponent([e.fsPath]);
   });
 
   context.subscriptions.push(watcher);
 }
 
-////async function registerClassBasedViewWatcher(context: ExtensionContext, projectManager: ProjectManagerType) {
-////  const artisanPath = getArtisanPath();
-////  if (!artisanPath) return;
-////
-////  const getAppPathPHPCode = `echo json_encode(app()->path())`;
-////  const resAppPath = await runTinker(getAppPathPHPCode, artisanPath);
-////  const appPath = resAppPath
-////    .replace(/["']/g, '')
-////    .replace(/\\/g, '') // remove json quate
-////    .replace(/\\\\/g, '/') // replace window path to posix path
-////    .replace('\n', '');
-////
-////  const globPattern = path.posix.join('**', appPath.replace(workspace.root, ''), 'View', 'Components', '**', '*.php');
-////
-////  const watcher = workspace.createFileSystemWatcher(globPattern, false, false, false);
-////
-////  watcher.onDidCreate(async (e) => {
-////    await projectManager.bladeProjectManager.setComponent([e.fsPath]);
-////  });
-////  watcher.onDidChange(async (e) => {
-////    await projectManager.bladeProjectManager.setComponent([e.fsPath]);
-////  });
-////  watcher.onDidDelete((e) => {
-////    projectManager.bladeProjectManager.deleteComponent([e.fsPath]);
-////  });
-////
-////  context.subscriptions.push(watcher);
-////}
+async function registerClassBasedViewWatcher(context: ExtensionContext, projectManager: ProjectManagerType) {
+  const artisanPath = getArtisanPath();
+  if (!artisanPath) return;
+
+  const getAppPathPHPCode = `echo json_encode(app()->path())`;
+  const resAppPath = await runTinker(getAppPathPHPCode, artisanPath);
+  const appPath = resAppPath
+    .replace(/["']/g, '')
+    .replace(/\\/g, '') // remove json quate
+    .replace(/\\\\/g, '/') // replace window path to posix path
+    .replace('\n', '');
+
+  const globPattern = path.posix.join('**', appPath.replace(workspace.root, ''), 'View', 'Components', '**', '*.php');
+
+  const watcher = workspace.createFileSystemWatcher(globPattern, false, false, false);
+
+  watcher.onDidCreate(async (e) => {
+    await projectManager.bladeProjectManager.setComponent([e.fsPath]);
+  });
+  watcher.onDidChange(async (e) => {
+    await projectManager.bladeProjectManager.setComponent([e.fsPath]);
+  });
+  watcher.onDidDelete((e) => {
+    projectManager.bladeProjectManager.deleteComponent([e.fsPath]);
+  });
+
+  context.subscriptions.push(watcher);
+}

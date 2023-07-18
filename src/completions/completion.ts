@@ -16,6 +16,7 @@ import { type ProjectManagerType } from '../projects/types';
 import * as bladeGuardCompletionHandler from './handlers/bladeGuardHandler';
 import * as bladeRouteCompletionHandler from './handlers/bladeRouteHandler';
 import * as bladeTranslationCompletionHandler from './handlers/bladeTranslationHandler';
+import * as bladeComponentCompletionHandler from './handlers/bladeComponentHandler';
 import * as bladeViewCompletionHanlder from './handlers/bladeViewHandler';
 import * as configCompletionHandler from './handlers/configHandler';
 import * as envCompletionHandler from './handlers/envHandler';
@@ -41,6 +42,7 @@ export async function register(context: ExtensionContext, projectManager: Projec
       DOCUMENT_SELECTOR,
       new LaravelCompletionProvider(context, projectManager),
       [
+        '<', // component,
         ':', // guard,
         '.', // route, view
         '"', // config, validation, env, route, view, middleware
@@ -160,6 +162,18 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       );
       if (translationCompletionItems) {
         items.push(...translationCompletionItems);
+      }
+    }
+
+    // component
+    if (workspace.getConfiguration('laravel').get('completion.componentEnable')) {
+      const componentCompletionItems = await bladeComponentCompletionHandler.doCompletion(
+        document,
+        position,
+        this.projectManager.bladeProjectManager
+      );
+      if (componentCompletionItems) {
+        items.push(...componentCompletionItems);
       }
     }
 

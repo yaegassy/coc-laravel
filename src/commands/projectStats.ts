@@ -15,16 +15,15 @@ export async function register(context: ExtensionContext, projectManagers: Proje
       const blaceProjectContent =
         '### Blade\n\n' + '```json\n' + JSON.stringify(bladeProjectList, null, 2) + '\n```\n\n';
 
-      ////const componentProjectList = Array.from(projectManagers.bladeProjectManager.componentList());
-      ////const componentProjectContent =
-      ////  '### Component\n\n' + '```json\n' + JSON.stringify(componentProjectList, null, 2) + '\n```\n\n';
+      const componentProjectList = Array.from(projectManagers.bladeProjectManager.componentList());
+      const componentProjectContent =
+        '### Component\n\n' + '```json\n' + JSON.stringify(componentProjectList, null, 2) + '\n```\n\n';
 
       const translationProjectList = Array.from(projectManagers.translationProjectManager.list());
       const translationProjectContent =
         '### Translation\n\n' + '```json\n' + JSON.stringify(translationProjectList, null, 2) + '\n```\n\n';
 
-      outputText += blaceProjectContent + translationProjectContent;
-      ////outputText += blaceProjectContent + componentProjectContent + translationProjectContent;
+      outputText += blaceProjectContent + componentProjectContent + translationProjectContent;
 
       await workspace.nvim
         .command('belowright vnew blade-stats | setlocal buftype=nofile bufhidden=hide noswapfile filetype=markdown')
