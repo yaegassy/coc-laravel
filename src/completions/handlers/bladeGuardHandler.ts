@@ -75,7 +75,7 @@ function canCompletion(word: string) {
   const slicedWord = word.slice(unnecessaryWordCount);
   const evalWord = slicedWord.replace('"', "'");
 
-  if (!evalWord.startsWith("Auth::guard('")) {
+  if (!evalWord.startsWith("Auth::guard('") && !evalWord.startsWith("@auth('") && !evalWord.startsWith("@guest('")) {
     return false;
   }
 
