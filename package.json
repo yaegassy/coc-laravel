@@ -131,7 +131,7 @@
     "case-anything": "^2.1.13",
     "fast-glob": "^3.3.0",
     "php-parser": "3.1.5",
-    "stillat-blade-parser": "^1.1.11",
-    "web-tree-sitter": "^0.20.8"
+    "stillat-blade-parser": "1.1.11",
+    "web-tree-sitter": "0.20.8"
   }
 }

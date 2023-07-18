@@ -1475,7 +1475,7 @@ std-env@^3.3.3:
   resolved "https://registry.yarnpkg.com/std-env/-/std-env-3.3.3.tgz#a54f06eb245fdcfef53d56f3c0251f1d5c3d01fe"
   integrity sha512-Rz6yejtVyWnVjC1RFvNmYL10kgjC49EOghxWn0RFqlCHGFpQx+Xe7yW3I4ceK1SGrWIGMjD5Kbue8W/udkbMJg==
 
-stillat-blade-parser@^1.1.11:
+stillat-blade-parser@1.1.11:
   version "1.1.11"
   resolved "https://registry.yarnpkg.com/stillat-blade-parser/-/stillat-blade-parser-1.1.11.tgz#c11fa887b8df57807e96b65d763485d04fa61ed9"
   integrity sha512-od+E0r1F3gWFCwtDuMD/yOZTQpoBlJ0YKRzkWYoRRbDFjX+Zfn5vYO+FDGikDXd73yTKHj8fwwOhngcefj8qMQ==
@@ -1640,7 +1640,7 @@ vitest@^0.32.4:
     vite-node "0.32.4"
     why-is-node-running "^2.2.2"
 
-web-tree-sitter@^0.20.8:
+web-tree-sitter@0.20.8:
   version "0.20.8"
   resolved "https://registry.yarnpkg.com/web-tree-sitter/-/web-tree-sitter-0.20.8.tgz#1e371cb577584789cadd75cb49c7ddfbc99d04c8"
   integrity sha512-weOVgZ3aAARgdnb220GqYuh7+rZU0Ka9k9yfKtGAzEYMa6GgiCzW9JjQRJyCJakvibQW+dfjJdihjInKuuCAUQ==
