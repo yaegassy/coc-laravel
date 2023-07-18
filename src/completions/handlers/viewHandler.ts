@@ -34,7 +34,7 @@ export async function doCompletion(
     const canCompletion = viewService.canCompletion(offset, serviceLocations);
     if (!canCompletion) return [];
 
-    const viewList = Array.from(bladeProjectManager.list());
+    const viewList = Array.from(bladeProjectManager.bladeFilelist());
     if (viewList.length === 0) return [];
 
     for (const view of viewList) {

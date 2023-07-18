@@ -33,7 +33,7 @@ export async function doCompletion(
   }
 
   try {
-    const viewList = Array.from(bladeProjectManager.list());
+    const viewList = Array.from(bladeProjectManager.bladeFilelist());
 
     for (const view of viewList) {
       const adjustStartCharacter = wordWithExtraChars
