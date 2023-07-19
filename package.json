@@ -58,6 +58,12 @@
         "patterns": [
           "artisan"
         ]
+      },
+      {
+        "filetype": "blade",
+        "patterns": [
+          "artisan"
+        ]
       }
     ],
     "configuration": {
