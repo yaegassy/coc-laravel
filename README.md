@@ -28,11 +28,15 @@ This coc-extension will provide various completion features and more features fo
   - Guard completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635272378)
   - Translation completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1637244306)
   - ComponentTag completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1640305113)
+  - ComponentProps completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1641364877)
 
 - [TODO]
   - Completions
-    - ComponentProps completion
+    - PHP completion in Blade file (BladeEcho `{{ | }}` and more php region)
+    - Other enhancements to each completion
   - Definitions
+    - Some features are provided by [coc-blade](https://github.com/yaegassy/coc-blade) that I am developing, but considering porting to `coc-laravel` with enhancements.
+  - Hovers
     - Some features are provided by [coc-blade](https://github.com/yaegassy/coc-blade) that I am developing, but considering porting to `coc-laravel` with enhancements.
   - Diagnostics
     - Some features are provided by [coc-blade](https://github.com/yaegassy/coc-blade) that I am developing, but considering porting to `coc-laravel` with enhancements.
