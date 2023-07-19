@@ -42,7 +42,7 @@ export async function doCompletion(
   let wordWithExtraChars: string | undefined = undefined;
   const wordWithExtraCharsRange = doc.getWordRangeAtPosition(
     Position.create(position.line, position.character - 1),
-    '-'
+    ':-'
   );
   if (wordWithExtraCharsRange) {
     wordWithExtraChars = document.getText(wordWithExtraCharsRange);
