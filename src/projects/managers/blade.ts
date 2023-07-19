@@ -41,6 +41,7 @@ export class BladeProjectsManager {
     const bladeFiles = await fg(bladeGlobPattern, {
       ignore: ['**/.git/**', '**/vendor/**', '**/node_modules/**'],
       absolute: true,
+      cwd: workspace.root,
     });
 
     // ====
@@ -68,6 +69,7 @@ export class BladeProjectsManager {
     const classBasedViewFiles = await fg(classBasedViewGlobPattern, {
       ignore: ['**/.git/**', '**/vendor/**', '**/node_modules/**'],
       absolute: true,
+      cwd: workspace.root,
     });
 
     const componentFiles: string[] = [];
