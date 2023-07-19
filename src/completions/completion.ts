@@ -38,8 +38,8 @@ export async function register(context: ExtensionContext, projectManager: Projec
   // Register provider
   context.subscriptions.push(
     languages.registerCompletionItemProvider(
-      'laravel',
-      'LV',
+      'Laravel',
+      'Laravel',
       DOCUMENT_SELECTOR,
       new LaravelCompletionProvider(context, projectManager),
       [
