@@ -199,11 +199,6 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       if (phpFunctionCompletionItems) {
         items.push(...phpFunctionCompletionItems);
       }
-
-      const bladeGuardCompletionItems = await bladeGuardCompletionHandler.doCompletion(document, position);
-      if (bladeGuardCompletionItems) {
-        items.push(...bladeGuardCompletionItems);
-      }
     }
 
     return items;
