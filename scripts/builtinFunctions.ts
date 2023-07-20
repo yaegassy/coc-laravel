@@ -9,11 +9,10 @@ import { PHPFunctionType } from '../src/projects/types';
 
 const STUBS_PATH = path.resolve(path.join(__dirname, '../stubs'));
 const BUILTIN_FUNCTION_JSON_PATH = path.resolve(path.join(__dirname, '../resources/jsonData/builtinFunctions.json'));
+const ALLOW_STUBS = ['Core', 'date', 'standard'];
 
 function isAllowStubFile(file: string) {
-  const allowStubs = ['Core', 'date', 'standard'];
-
-  for (const stub of allowStubs) {
+  for (const stub of ALLOW_STUBS) {
     if (file.startsWith(path.join(STUBS_PATH, stub))) {
       return true;
     }
@@ -58,32 +57,6 @@ function getStubMapFunctionFilesFromCode(code: string) {
 // Entry point
 //
 
-// (async () => {
-//   const phpFunctions: PHPFunctionType[] = [];
-
-//   const stubsMapPHPCode = await fs.promises.readFile(path.join(STUBS_PATH, 'PhpStormStubsMap.php'), {
-//     encoding: 'utf8',
-//   });
-//   const relativeFiles = getStubMapFunctionFilesFromCode(stubsMapPHPCode);
-//   const abusoluteFiles = relativeFiles.map((f) => path.join(STUBS_PATH, f));
-
-//   for (const file of abusoluteFiles) {
-//     if (!isAllowStubFile(file)) continue;
-
-//     const phpCode = await fs.promises.readFile(file, { encoding: 'utf8' });
-//     const functions = phpFunctionProjectService.getPHPFunctions(phpCode, file);
-
-//     const convedPathFunctions = functions.map((f) => {
-//       f.path = f.path.replace(STUBS_PATH, '').replace(/\//, '');
-//       return f;
-//     });
-
-//     phpFunctions.push(...convedPathFunctions);
-//   }
-
-//   fs.promises.writeFile(BUILTIN_FUNCTION_JSON_PATH, JSON.stringify(phpFunctions, null, 2));
-// })();
-
 (async () => {
   const phpFunctions: PHPFunctionType[] = [];
 
@@ -108,5 +81,4 @@ function getStubMapFunctionFilesFromCode(code: string) {
   }
 
   fs.promises.writeFile(BUILTIN_FUNCTION_JSON_PATH, JSON.stringify(phpFunctions, null, 2));
-  //fs.promises.writeFile(BUILTIN_FUNCTION_JSON_PATH, phpFunctions.toString());
 })();
