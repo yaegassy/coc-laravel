@@ -48,6 +48,8 @@ This coc-extension will provide various completion features and more features fo
   - Diagnostics
     - Some features are provided by [coc-blade](https://github.com/yaegassy/coc-blade) that I am developing, but considering porting to `coc-laravel` with enhancements.
       - Warn of blade view files that do not exist in the project, etc.
+  - References
+    - findAllFileReferences commands feature, and etc.
   - CodeActions
     - Action to be generated if the target blade file does not exist in the project
   - Artisan and Sail commands integration
