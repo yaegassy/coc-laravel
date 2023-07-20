@@ -3,10 +3,9 @@ import { workspace } from 'coc.nvim';
 import fs from 'fs';
 import path from 'path';
 
-import { PHPFunctionType } from '../types';
 import { BUILTIN_FUNCTIONS_JSON_PATH } from '../../constant';
-
 import * as phpFunctionProjectService from '../services/phpFunction';
+import { PHPFunctionType } from '../types';
 
 export class PHPFunctionProjectManager {
   phpFunctionMapStore: Map<string, PHPFunctionType>;

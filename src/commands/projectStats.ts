@@ -25,7 +25,7 @@ export async function register(context: ExtensionContext, projectManagers: Proje
 
       const phpFunctionProjectList = Array.from(projectManagers.phpFunctionProjectManager.list());
       const phpFunctionProjectContent =
-        '### Translation\n\n' + '```json\n' + JSON.stringify(phpFunctionProjectList, null, 2) + '\n```\n\n';
+        '### PHP Function\n\n' + '```json\n' + JSON.stringify(phpFunctionProjectList, null, 2) + '\n```\n\n';
 
       outputText +=
         blaceProjectContent + componentProjectContent + translationProjectContent + phpFunctionProjectContent;

@@ -14,8 +14,8 @@ import {
   StaticLookup,
   String as StringNode,
   TypeReference,
-  UnionType,
   Unary,
+  UnionType,
 } from 'php-parser';
 
 import * as phpParser from '../../parsers/php/parser';

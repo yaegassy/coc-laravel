@@ -3,9 +3,8 @@ import { ExtensionContext, workspace } from 'coc.nvim';
 import path from 'path';
 
 import { getArtisanPath, runTinker } from '../../common/shared';
-import { type ProjectManagerType } from '../../projects/types';
-
 import { SUPPORTED_LANGUAGE } from '../../constant';
+import { type ProjectManagerType } from '../../projects/types';
 
 export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
   if (!workspace.getConfiguration('laravel').get('completion.enable')) return;

@@ -7,7 +7,6 @@ import path from 'path';
 
 import { getArtisanPath, runTinker } from '../../common/shared';
 import * as bladeProjectService from '../services/blade';
-
 import { ComponentMapValueType, PropsType } from '../types';
 
 export class BladeProjectsManager {

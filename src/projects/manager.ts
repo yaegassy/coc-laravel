@@ -2,8 +2,8 @@ import { ExtensionContext, workspace } from 'coc.nvim';
 
 import { SUPPORTED_LANGUAGE } from '../constant';
 import { BladeProjectsManager } from './managers/blade';
-import { TranslationProjectManager } from './managers/translation';
 import { PHPFunctionProjectManager } from './managers/phpFunction';
+import { TranslationProjectManager } from './managers/translation';
 import { type ProjectManagerType } from './types';
 
 export async function register(context: ExtensionContext) {
