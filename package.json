@@ -21,6 +21,9 @@
     "type": "git",
     "url": "https://github.com/yaegassy/coc-laravel"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "stubs": "rimraf stubs && git clone git@github.com:JetBrains/phpstorm-stubs.git --depth 1 stubs && ts-node scripts/builtinFunctions.ts",
     "lint": "eslint src --ext ts",
