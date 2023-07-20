@@ -4,8 +4,7 @@ import * as projectRestartCommandFeature from './commands/projectRestart';
 import * as projectStatsCommandFeature from './commands/projectStats';
 import * as completionFeature from './completions/completion';
 import * as projectManagerFeature from './projects/manager';
-import * as bladeWatcherFeature from './watchers/blade';
-import * as tranlationWatcherFeature from './watchers/translation';
+import * as watcherFeature from './watchers/watcher';
 
 export async function activate(context: ExtensionContext): Promise<void> {
   if (!workspace.getConfiguration('laravel').get<boolean>('enable')) return;
@@ -14,8 +13,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   if (projectManager) {
     projectStatsCommandFeature.register(context, projectManager);
     projectRestartCommandFeature.register(context, projectManager);
-    bladeWatcherFeature.register(context, projectManager);
-    tranlationWatcherFeature.register(context, projectManager);
+    watcherFeature.register(context, projectManager);
     completionFeature.register(context, projectManager);
   }
 }

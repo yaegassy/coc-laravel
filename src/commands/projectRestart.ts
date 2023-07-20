@@ -7,6 +7,8 @@ export async function register(context: ExtensionContext, projectManager: Projec
     commands.registerCommand('laravel.project.restart', async () => {
       await projectManager.bladeProjectManager.restart();
       await projectManager.translationProjectManager.restart();
+      await projectManager.phpFunctionProjectManager.restart();
+
       window.showInformationMessage('SUCCESS');
     })
   );

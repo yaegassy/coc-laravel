@@ -19,6 +19,16 @@ Plug 'yaegassy/coc-laravel', {'do': 'yarn install --frozen-lockfile'}
 This coc-extension will provide various completion features and more features for Laravel projects.
 
 - Completions
+  - ComponentTag completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1640305113)
+  - ComponentProps completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1641364877)
+  - PHP Function completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1643359916)
+    - Provides function completion within the PHP-related regions of the Blade file.
+      - Contents of completion items
+        - Standard functions obtained by parsed the `phpstorm-stubs`
+          - Since all the standard functions are very numerous, many of which I do
+            not think will be used in the blade files, at this point only `standard`,
+            `date`, and `core` have been used to generate the completion items.
+        - Function parsed and retrieved from composer `autoload` file
   - Config completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635266998)
   - Env completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635267885)
   - Validation completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635268664)
@@ -27,12 +37,9 @@ This coc-extension will provide various completion features and more features fo
   - Middleware completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635271630)
   - Guard completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635272378)
   - Translation completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1637244306)
-  - ComponentTag completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1640305113)
-  - ComponentProps completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1641364877)
 
 - [TODO]
   - Completions
-    - PHP completion in Blade file (BladeEcho `{{ | }}` and more php region)
     - Other enhancements to each completion
   - Definitions
     - Some features are provided by [coc-blade](https://github.com/yaegassy/coc-blade) that I am developing, but considering porting to `coc-laravel` with enhancements.
@@ -94,6 +101,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.completion.guardEnable`: Enable guard completion, default: `true`
 - `laravel.completion.translationEnable`: Enable translation completion, default: `true`
 - `laravel.completion.componentEnable`: Enable component completion, default: `true`
+- `laravel.completion.phpFunctionEnable`: Enable php function completion, default: `true`
 
 ## Commands
 
@@ -119,6 +127,7 @@ For more information, check this coc.nvim's wiki.
 - [glayzzle/php-parser](https://github.com/glayzzle/php-parser)
 - [Stillat/blade-parser-typescript](https://github.com/Stillat/blade-parser-typescript)
 - [web-tree-sitter](https://www.npmjs.com/package/web-tree-sitter)
+- [JetBrains/phpstorm-stubs](https://github.com/JetBrains/phpstorm-stubs)
 
 ## License
 

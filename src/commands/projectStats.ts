@@ -23,7 +23,12 @@ export async function register(context: ExtensionContext, projectManagers: Proje
       const translationProjectContent =
         '### Translation\n\n' + '```json\n' + JSON.stringify(translationProjectList, null, 2) + '\n```\n\n';
 
-      outputText += blaceProjectContent + componentProjectContent + translationProjectContent;
+      const phpFunctionProjectList = Array.from(projectManagers.phpFunctionProjectManager.list());
+      const phpFunctionProjectContent =
+        '### Translation\n\n' + '```json\n' + JSON.stringify(phpFunctionProjectList, null, 2) + '\n```\n\n';
+
+      outputText +=
+        blaceProjectContent + componentProjectContent + translationProjectContent + phpFunctionProjectContent;
 
       await workspace.nvim
         .command('belowright vnew blade-stats | setlocal buftype=nofile bufhidden=hide noswapfile filetype=markdown')

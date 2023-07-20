@@ -23,6 +23,7 @@ import * as configCompletionHandler from './handlers/configHandler';
 import * as envCompletionHandler from './handlers/envHandler';
 import * as guardCompletionHandler from './handlers/guardHandler';
 import * as middlewareCompletionHandler from './handlers/middlewareHandler';
+import * as phpFunctionCompletionHandler from './handlers/phpFunctionHandler';
 import * as routeCompletionHandler from './handlers/routeHandler';
 import * as validationCompletionHandler from './handlers/validationHandler';
 import * as viewCompletionHandler from './handlers/viewHandler';
@@ -32,7 +33,6 @@ export async function register(context: ExtensionContext, projectManager: Projec
   if (!workspace.getConfiguration('laravel').get('completion.enable')) return;
 
   const { document } = await workspace.getCurrentState();
-
   if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
 
   // Register provider
@@ -186,6 +186,23 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       );
       if (componentPropsCompletionItems) {
         items.push(...componentPropsCompletionItems);
+      }
+    }
+
+    // php function
+    if (workspace.getConfiguration('laravel').get('completion.phpFunctionEnable')) {
+      const phpFunctionCompletionItems = await phpFunctionCompletionHandler.doCompletion(
+        document,
+        position,
+        this.projectManager.phpFunctionProjectManager
+      );
+      if (phpFunctionCompletionItems) {
+        items.push(...phpFunctionCompletionItems);
+      }
+
+      const bladeGuardCompletionItems = await bladeGuardCompletionHandler.doCompletion(document, position);
+      if (bladeGuardCompletionItems) {
+        items.push(...bladeGuardCompletionItems);
       }
     }
 
