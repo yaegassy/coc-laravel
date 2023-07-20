@@ -25,7 +25,7 @@
     "access": "public"
   },
   "scripts": {
-    "stubs": "rimraf stubs && git clone git@github.com:JetBrains/phpstorm-stubs.git --depth 1 stubs && ts-node scripts/builtinFunctions.ts",
+    "stubs": "rimraf stubs && git clone git@github.com:JetBrains/phpstorm-stubs.git --depth 1 stubs && vite-node scripts/builtinFunctions.ts",
     "lint": "eslint src --ext ts",
     "clean": "rimraf lib",
     "watch": "node esbuild.js --watch",
@@ -48,7 +48,6 @@
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.8",
     "rimraf": "^3.0.2",
-    "ts-node": "^10.9.1",
     "typescript": "~5.0.4",
     "vitest": "^0.32.4"
   },
