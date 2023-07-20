@@ -136,12 +136,12 @@
     },
     "commands": [
       {
-        "command": "laravel.project.stats",
-        "title": "Show project stats"
-      },
-      {
         "command": "laravel.project.restart",
         "title": "Run project restart"
+      },
+      {
+        "command": "laravel.project.stats",
+        "title": "(Develop) Show project stats"
       }
     ]
   },

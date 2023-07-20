@@ -107,8 +107,8 @@ For more information, check this coc.nvim's wiki.
 
 ## Commands
 
-- `laravel.project.stats`: Show project stats
 - `laravel.project.restart`: Run project restart
+- `laravel.project.stats`: (Develop) Show project stats
 
 ## Recommended coc-extensions for php
 
