@@ -15,6 +15,10 @@ export async function register(context: ExtensionContext, projectManagers: Proje
       const blaceProjectContent =
         '### Blade\n\n' + '```json\n' + JSON.stringify(bladeProjectList, null, 2) + '\n```\n\n';
 
+      const viewReferenceProjectList = Array.from(projectManagers.viewReferenceProjectManager.list());
+      const viewReferenceContent =
+        '### View Reference\n\n' + '```json\n' + JSON.stringify(viewReferenceProjectList, null, 2) + '\n```\n\n';
+
       const componentProjectList = Array.from(projectManagers.bladeProjectManager.componentList());
       const componentProjectContent =
         '### Component\n\n' + '```json\n' + JSON.stringify(componentProjectList, null, 2) + '\n```\n\n';
@@ -28,7 +32,11 @@ export async function register(context: ExtensionContext, projectManagers: Proje
         '### PHP Function\n\n' + '```json\n' + JSON.stringify(phpFunctionProjectList, null, 2) + '\n```\n\n';
 
       outputText +=
-        blaceProjectContent + componentProjectContent + translationProjectContent + phpFunctionProjectContent;
+        blaceProjectContent +
+        viewReferenceContent +
+        componentProjectContent +
+        translationProjectContent +
+        phpFunctionProjectContent;
 
       await workspace.nvim
         .command('belowright vnew blade-stats | setlocal buftype=nofile bufhidden=hide noswapfile filetype=markdown')

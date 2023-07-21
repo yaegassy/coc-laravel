@@ -42,6 +42,9 @@ This coc-extension will provide various completion features and more features fo
     - [Blade -> Blade] Jump to the Blade template specified by the `@extends` and `@include` directives.
   - Component definition | [DEMO](https://github.com/yaegassy/coc-laravel/issues/2#issuecomment-1644974475)
     - [Blade -> PHP or Blade] Jump to the component file. Both class components and anonymous components are supported.
+- References
+  - `laravel.view.findAllReferences` command
+  - View reference
 
 - [TODO]
   - Completions
@@ -53,8 +56,6 @@ This coc-extension will provide various completion features and more features fo
       - Warn of blade view files that do not exist in the project, etc.
   - Artisan and Sail commands integration
     - I am providing the feature in [@yaegassy/coc-intelephense](https://github.com/yaegassy/coc-intelephense), which I am developing, but I am considering porting the feature to `coc-laravel`
-  - References
-    - findAllFileReferences commands feature, and etc.
   - CodeActions
     - Action to be generated if the target blade file does not exist in the project
   - And more...
@@ -108,11 +109,13 @@ For more information, check this coc.nvim's wiki.
 - `laravel.completion.componentEnable`: Enable component completion, default: `true`
 - `laravel.completion.phpFunctionEnable`: Enable php function completion, default: `true`
 - `laravel.definition.enable`: Enable definition, default `true`
+- `laravel.reference.enable`: Enable reference, default `true`
 
 ## Commands
 
 - `laravel.project.restart`: Run project restart
 - `laravel.project.stats`: (Develop) Show project stats
+- `laravel.view.findAllReferences`: Find view file references
 
 ## Recommended coc-extensions for php
 

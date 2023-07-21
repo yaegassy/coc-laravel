@@ -138,6 +138,11 @@
           "type": "boolean",
           "default": true,
           "description": "Enable definition."
+        },
+        "laravel.reference.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable reference."
         }
       }
     },
@@ -149,6 +154,10 @@
       {
         "command": "laravel.project.stats",
         "title": "(Develop) Show project stats"
+      },
+      {
+        "command": "laravel.view.findAllReferences",
+        "title": "Find view file references"
       }
     ]
   },
