@@ -16,41 +16,40 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
   if (!text.startsWith('config("') && !text.startsWith("config('")) return [];
 
   const artisanPath = getArtisanPath();
+  if (!artisanPath) return [];
 
   const runCode = 'echo json_encode(config()->all());';
-  if (artisanPath) {
-    const out = await runTinker(runCode, artisanPath);
 
-    try {
-      const configData = JSON.parse(out);
-      const configItems = getConfig(configData);
+  const out = await runTinker(runCode, artisanPath);
+  if (!out) return;
 
-      let edit: TextEdit | undefined;
-      Object.keys(configItems).map((key) => {
-        if (text.includes('.')) {
-          const enteredTextItem = text.replace(/config\(/, '').replace(/["']/g, '') || '';
-          edit = {
-            range: {
-              start: {
-                line: position.line,
-                character: position.character - enteredTextItem.length,
-              },
-              end: position,
-            },
-            newText: configItems[key].name,
-          };
-        }
+  const configData = JSON.parse(out);
+  const configItems = getConfig(configData);
 
-        items.push({
-          label: configItems[key].name,
-          kind: CompletionItemKind.Value,
-          insertText: configItems[key].name,
-          detail: String(configItems[key].value),
-          textEdit: edit ? edit : undefined,
-        });
-      });
-    } catch {}
-  }
+  let edit: TextEdit | undefined;
+  Object.keys(configItems).map((key) => {
+    if (text.includes('.')) {
+      const enteredTextItem = text.replace(/config\(/, '').replace(/["']/g, '') || '';
+      edit = {
+        range: {
+          start: {
+            line: position.line,
+            character: position.character - enteredTextItem.length,
+          },
+          end: position,
+        },
+        newText: configItems[key].name,
+      };
+    }
+
+    items.push({
+      label: configItems[key].name,
+      kind: CompletionItemKind.Value,
+      insertText: configItems[key].name,
+      detail: String(configItems[key].value),
+      textEdit: edit ? edit : undefined,
+    });
+  });
 
   return items;
 }

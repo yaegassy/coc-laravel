@@ -38,6 +38,7 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
     if (!artisanPath) return [];
     const runCode = `echo json_encode(config('auth'))`;
     const authJsonStr = await runTinker(runCode, artisanPath);
+    if (!authJsonStr) return [];
     // In fact, there are elements other than guards, but in this context only
     // guards are needed, so they are recognized as JSON-type for guards.
     const authGuardsJson: AuthGuardsJsonType = JSON.parse(authJsonStr);

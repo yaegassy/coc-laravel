@@ -16,8 +16,12 @@ export type ParameterType = {
 };
 
 export function getAst(code: string) {
-  const parserEngine = getParserEngine();
-  return parserEngine.parseEval(stripPHPTag(code));
+  try {
+    const parserEngine = getParserEngine();
+    return parserEngine.parseEval(stripPHPTag(code));
+  } catch (e) {
+    return undefined;
+  }
 }
 
 export function stripPHPTag(code: string) {

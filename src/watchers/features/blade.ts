@@ -23,6 +23,7 @@ async function registerBladeWatcher(context: ExtensionContext, projectManager: P
 
   const getViewPathPHPCode = `echo json_encode(app()->viewPath())`;
   const resViewPath = await runTinker(getViewPathPHPCode, artisanPath);
+  if (!resViewPath) return;
   const viewPath = resViewPath
     .replace(/["']/g, '')
     .replace(/\\/g, '') // remove json quate
@@ -53,6 +54,7 @@ async function registerClassBasedViewWatcher(context: ExtensionContext, projectM
 
   const getAppPathPHPCode = `echo json_encode(app()->path())`;
   const resAppPath = await runTinker(getAppPathPHPCode, artisanPath);
+  if (!resAppPath) return;
   const appPath = resAppPath
     .replace(/["']/g, '')
     .replace(/\\/g, '') // remove json quate

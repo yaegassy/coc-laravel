@@ -53,7 +53,9 @@ export class PHPFunctionProjectManager {
       const relativeFilePath = autoloadedFunctionFile.replace(workspace.root, '').replace(/^\//, '');
       const targetPHPCode = await fs.promises.readFile(autoloadedFunctionFile, { encoding: 'utf8' });
       const autoloadedFunctions = phpFunctionProjectService.getPHPFunctions(targetPHPCode, relativeFilePath);
-      phpFunctions.push(...autoloadedFunctions);
+      if (autoloadedFunctions) {
+        phpFunctions.push(...autoloadedFunctions);
+      }
     }
 
     //

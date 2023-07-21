@@ -26,6 +26,7 @@ export async function doCompletion(
 
   try {
     const ast = viewService.getAst(code);
+    if (!ast) return [];
 
     const serviceLocations = viewService.getServiceLocations(ast);
     if (serviceLocations.length === 0) return [];

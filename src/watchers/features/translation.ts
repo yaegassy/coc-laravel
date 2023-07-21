@@ -19,10 +19,12 @@ export async function register(context: ExtensionContext, projectManager: Projec
 
   const getLangPathPHPCode = `echo json_encode(app()->langPath())`;
   const resLangPath = await runTinker(getLangPathPHPCode, artisanPath);
+  if (!resLangPath) return;
   const langPath = resLangPath.replace(/["']/g, '').replace(/\\/g, '').replace('\n', '');
 
   const getLocalePHPCode = `echo json_encode(config('app.locale'))`;
   const resLocale = await runTinker(getLocalePHPCode, artisanPath);
+  if (!resLocale) return;
   const locale = resLocale.replace(/["']/g, '').replace(/\\/g, '').replace('\n', '');
 
   const globPattern = path.join('**', langPath.replace(workspace.root, ''), locale, '**/*.{php,json}');

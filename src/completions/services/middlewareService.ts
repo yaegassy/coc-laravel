@@ -267,7 +267,6 @@ function serviceWalkCase5(ast: Node) {
 
     if (node.kind === 'call') {
       const callNode = node as Call;
-      ///console.log(JSON.stringify(callNode, null, 2));
       if (callNode.what.kind === 'propertylookup') {
         const propertyLookupNode = callNode.what as unknown as PropertyLookup;
         if (propertyLookupNode.what.kind === 'call') {

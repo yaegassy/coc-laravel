@@ -24,10 +24,12 @@ export class TranslationProjectManager {
 
     const getLangPathPHPCode = `echo json_encode(app()->langPath())`;
     const resLangPath = await runTinker(getLangPathPHPCode, artisanPath);
+    if (!resLangPath) return;
     this.langPath = resLangPath.replace(/["']/g, '').replace(/\\/g, '').replace('\n', '');
 
     const getLocalePHPCode = `echo json_encode(config('app.locale'))`;
     const resLocale = await runTinker(getLocalePHPCode, artisanPath);
+    if (!resLocale) return;
     this.locale = resLocale.replace(/["']/g, '').replace(/\\/g, '').replace('\n', '');
 
     const globPattern = path.join(this.langPath, this.locale, '**/*.{php,json}');
@@ -58,6 +60,7 @@ export class TranslationProjectManager {
 
   handlePHP(code: string, filenameWitoutExt: string) {
     const ast = parser.getAst(code);
+    if (!ast) return;
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     parser.walk((node, _parent) => {

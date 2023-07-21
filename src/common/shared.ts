@@ -20,27 +20,35 @@ export function getArtisanPath() {
  * @param artisanPath - Path to artisan command
  */
 export async function runTinker(code: string, artisanPath: string) {
-  const r = new Promise<string>((resolve, reject) => {
-    cp.exec(`php "${artisanPath}" tinker --execute="${code}"`, (_err, stdout, stderr) => {
+  const r = new Promise<string | undefined>((resolve, reject) => {
+    cp.exec(`php "${artisanPath}" tinker --execute="${code}"`, (err, stdout, stderr) => {
+      if (err) reject(undefined);
+
       if (stdout.length > 0) {
         resolve(stdout);
       } else {
         reject(stderr);
       }
     });
+  }).catch(() => {
+    return undefined;
   });
   return r;
 }
 
 export async function runRouteListJson(artisanPath: string) {
-  const r = new Promise<string>((resolve, reject) => {
-    cp.exec(`php "${artisanPath}" route:list --json`, (_err, stdout, stderr) => {
+  const r = new Promise<string | undefined>((resolve, reject) => {
+    cp.exec(`php "${artisanPath}" route:list --json`, (err, stdout, stderr) => {
+      if (err) reject(undefined);
+
       if (stdout.length > 0) {
         resolve(stdout);
       } else {
         reject(stderr);
       }
     });
+  }).catch(() => {
+    return undefined;
   });
   return r;
 }

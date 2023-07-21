@@ -17,7 +17,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
     projectStatsCommandFeature.register(context, projectManager);
     projectRestartCommandFeature.register(context, projectManager);
     viewFindAllReferencesCommandFeature.register(context, projectManager);
-
     completionFeature.register(context, projectManager);
     definitionFeature.register(context, projectManager);
     referenceFeature.register(context, projectManager);

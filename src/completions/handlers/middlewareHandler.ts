@@ -24,41 +24,41 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
   const stripedPHPTagCode = middlewareService.stripPHPTag(code);
   const diffOffset = code.length - stripedPHPTagCode.length;
 
-  try {
-    const ast = middlewareService.getAst(code);
+  const ast = middlewareService.getAst(code);
+  if (!ast) return [];
 
-    const serviceLocations = middlewareService.getServiceLocations(ast);
-    if (serviceLocations.length === 0) return [];
+  const serviceLocations = middlewareService.getServiceLocations(ast);
+  if (serviceLocations.length === 0) return [];
 
-    const offset = document.offsetAt(position) - diffOffset;
-    const canCompletion = middlewareService.canCompletion(offset, serviceLocations);
-    if (!canCompletion) return [];
+  const offset = document.offsetAt(position) - diffOffset;
+  const canCompletion = middlewareService.canCompletion(offset, serviceLocations);
+  if (!canCompletion) return [];
 
-    const artisanPath = getArtisanPath();
-    if (!artisanPath) return [];
+  const artisanPath = getArtisanPath();
+  if (!artisanPath) return [];
 
-    const runCode = `echo json_encode(array_merge(app('Illuminate\\Contracts\\Http\\Kernel')->getMiddlewareGroups(), app('Illuminate\\Contracts\\Http\\Kernel')->getRouteMiddleware()))`;
-    const middlewareJsonStr = await runTinker(runCode, artisanPath);
-    const middlewareJson = JSON.parse(middlewareJsonStr);
+  const runCode = `echo json_encode(array_merge(app('Illuminate\\Contracts\\Http\\Kernel')->getMiddlewareGroups(), app('Illuminate\\Contracts\\Http\\Kernel')->getRouteMiddleware()))`;
+  const middlewareJsonStr = await runTinker(runCode, artisanPath);
+  if (!middlewareJsonStr) return [];
+  const middlewareJson = JSON.parse(middlewareJsonStr);
 
-    Object.keys(middlewareJson).map((key) => {
-      const adjustStartCharacter = adjustText ? position.character - adjustText.length : position.character;
+  Object.keys(middlewareJson).map((key) => {
+    const adjustStartCharacter = adjustText ? position.character - adjustText.length : position.character;
 
-      const edit: TextEdit = {
-        range: {
-          start: { line: position.line, character: adjustStartCharacter },
-          end: position,
-        },
-        newText: key,
-      };
+    const edit: TextEdit = {
+      range: {
+        start: { line: position.line, character: adjustStartCharacter },
+        end: position,
+      },
+      newText: key,
+    };
 
-      items.push({
-        label: key,
-        kind: CompletionItemKind.Text,
-        textEdit: edit,
-      });
+    items.push({
+      label: key,
+      kind: CompletionItemKind.Text,
+      textEdit: edit,
     });
-  } catch {}
+  });
 
   return items;
 }

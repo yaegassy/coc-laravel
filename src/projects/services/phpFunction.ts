@@ -26,6 +26,8 @@ export function getAbusoluteAutoloadFunctionFilesFromCode(code: string, rootDir:
   const files: string[] = [];
 
   const ast = phpParser.getAst(code);
+  if (!ast) return [];
+
   phpParser.walk((node) => {
     if (node.kind !== 'return') return;
     const returnNode = node as Return;
@@ -54,6 +56,8 @@ export function getPHPFunctions(code: string, filePath: string) {
   const phpFunctions: PHPFunctionType[] = [];
 
   const ast = phpParser.getAst(code);
+  if (!ast) return;
+
   phpParser.walk((node) => {
     if (node.kind !== 'function') return;
     const functionNode = node as FunctionNode;

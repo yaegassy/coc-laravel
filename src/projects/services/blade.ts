@@ -26,6 +26,7 @@ export function getPropsFromClassBasedComponent(code: string) {
   const props: PropsType[] = [];
 
   const ast = phpParser.getAst(code);
+  if (!ast) return;
 
   const existsExtendsComponent = phpParser.existsExtendsClassFor(ast, 'Component');
   if (!existsExtendsComponent) return [];

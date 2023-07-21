@@ -90,6 +90,7 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
 
   try {
     const ast = validationService.getAst(code);
+    if (!ast) return [];
     if (!validationService.existsExtendsFormRequest(ast)) return items;
 
     const serviceLocations = validationService.getServiceLocations(ast);

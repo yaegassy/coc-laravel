@@ -23,8 +23,6 @@ export class ViewReferenceProjectManager {
       cwd: this.rootDir,
     });
 
-    console.log(`=K=: ${JSON.stringify(files, null, 2)}`);
-
     await this.set(files);
 
     this.initialized = true;

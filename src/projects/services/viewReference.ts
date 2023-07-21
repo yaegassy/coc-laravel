@@ -7,6 +7,7 @@ import { CallViewFunctionType, ViewReferenceMapValueType } from '../types';
 export async function getViewReferenceMapValue(file: string) {
   const code = await fs.promises.readFile(file, { encoding: 'utf8' });
   const ast = phpParser.getAst(code);
+  if (!ast) return;
 
   const callViewFuncs: CallViewFunctionType[] = [];
 

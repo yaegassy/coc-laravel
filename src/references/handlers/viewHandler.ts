@@ -23,16 +23,15 @@ export async function doReference(
   const stripedPHPTagCode = viewService.stripPHPTag(code);
   const diffOffset = code.length - stripedPHPTagCode.length;
 
-  try {
-    const ast = viewService.getAst(code);
+  const ast = viewService.getAst(code);
+  if (!ast) return [];
 
-    const serviceLocations = viewService.getServiceLocations(ast);
-    if (serviceLocations.length === 0) return [];
+  const serviceLocations = viewService.getServiceLocations(ast);
+  if (serviceLocations.length === 0) return [];
 
-    const offset = document.offsetAt(position) - diffOffset;
-    const canProvideService = viewService.canProvideService(offset, serviceLocations);
-    if (!canProvideService) return [];
-  } catch (e) {}
+  const offset = document.offsetAt(position) - diffOffset;
+  const canProvideService = viewService.canProvideService(offset, serviceLocations);
+  if (!canProvideService) return [];
 
   const viewReferences = Array.from(projectManager.viewReferenceProjectManager.list());
   for (const [, v] of viewReferences) {

@@ -29,44 +29,44 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
   const stripedPHPTagCode = guardService.stripPHPTag(code);
   const diffOffset = code.length - stripedPHPTagCode.length;
 
-  try {
-    const ast = guardService.getAst(code);
+  const ast = guardService.getAst(code);
+  if (!ast) return [];
 
-    const serviceLocations = guardService.getServiceLocations(ast);
-    if (serviceLocations.length === 0) return [];
+  const serviceLocations = guardService.getServiceLocations(ast);
+  if (serviceLocations.length === 0) return [];
 
-    const offset = document.offsetAt(position) - diffOffset;
-    const canCompletion = guardService.canCompletion(offset, serviceLocations);
-    if (!canCompletion) return [];
+  const offset = document.offsetAt(position) - diffOffset;
+  const canCompletion = guardService.canCompletion(offset, serviceLocations);
+  if (!canCompletion) return [];
 
-    const artisanPath = getArtisanPath();
-    if (!artisanPath) return [];
+  const artisanPath = getArtisanPath();
+  if (!artisanPath) return [];
 
-    const runCode = `echo json_encode(config('auth'))`;
-    const authJsonStr = await runTinker(runCode, artisanPath);
-    // In fact, there are elements other than guards, but in this context only
-    // guards are needed, so they are recognized as JSON-type for guards.
-    const authGuardsJson: AuthGuardsJsonType = JSON.parse(authJsonStr);
-    if (!authGuardsJson.guards) return [];
+  const runCode = `echo json_encode(config('auth'))`;
+  const authJsonStr = await runTinker(runCode, artisanPath);
+  if (!authJsonStr) return [];
+  // In fact, there are elements other than guards, but in this context only
+  // guards are needed, so they are recognized as JSON-type for guards.
+  const authGuardsJson: AuthGuardsJsonType = JSON.parse(authJsonStr);
+  if (!authGuardsJson.guards) return [];
 
-    Object.keys(authGuardsJson.guards).map((key) => {
-      const adjustStartCharacter = adjustText ? position.character + adjustText.length : position.character;
+  Object.keys(authGuardsJson.guards).map((key) => {
+    const adjustStartCharacter = adjustText ? position.character + adjustText.length : position.character;
 
-      const edit: TextEdit = {
-        range: {
-          start: { line: position.line, character: adjustStartCharacter },
-          end: position,
-        },
-        newText: key,
-      };
+    const edit: TextEdit = {
+      range: {
+        start: { line: position.line, character: adjustStartCharacter },
+        end: position,
+      },
+      newText: key,
+    };
 
-      items.push({
-        label: key,
-        kind: CompletionItemKind.Text,
-        textEdit: edit,
-      });
+    items.push({
+      label: key,
+      kind: CompletionItemKind.Text,
+      textEdit: edit,
     });
-  } catch {}
+  });
 
   return items;
 }

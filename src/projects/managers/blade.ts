@@ -29,6 +29,7 @@ export class BladeProjectsManager {
 
     const getViewPathPHPCode = `echo json_encode(app()->viewPath())`;
     const resViewPath = await runTinker(getViewPathPHPCode, artisanPath);
+    if (!resViewPath) return;
     const viewPath = resViewPath
       .replace(/["']/g, '')
       .replace(/\\/g, '') // remove json quate
@@ -50,6 +51,7 @@ export class BladeProjectsManager {
 
     const getAppPathPHPCode = `echo json_encode(app()->path())`;
     const resAppPath = await runTinker(getAppPathPHPCode, artisanPath);
+    if (!resAppPath) return;
     const appPath = resAppPath
       .replace(/["']/g, '')
       .replace(/\\/g, '') // remove json quate
@@ -129,10 +131,12 @@ export class BladeProjectsManager {
       const code = await fs.promises.readFile(component[1], { encoding: 'utf8' });
       const props = bladeProjectService.getPropsFromClassBasedComponent(code);
 
-      this.componentMapStore.set(component[0], {
-        path: component[1],
-        props,
-      });
+      if (props) {
+        this.componentMapStore.set(component[0], {
+          path: component[1],
+          props,
+        });
+      }
     } else if (component[0].startsWith('components.')) {
       //
       // From blade file component
@@ -153,6 +157,7 @@ export class BladeProjectsManager {
         if (artisanPath) {
           const jsonEncodedPHPCode = `echo json_encode(${phpCodeInProps})`;
           const resJsonStr = await runTinker(jsonEncodedPHPCode, artisanPath);
+          if (!resJsonStr) return;
           const resJson = JSON.parse(resJsonStr);
 
           if (Array.isArray(resJson)) {
