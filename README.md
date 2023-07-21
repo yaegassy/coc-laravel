@@ -20,6 +20,12 @@ Plug 'yaegassy/coc-laravel', {'do': 'yarn install --frozen-lockfile'}
 
 ## Features
 
+**Note**:
+
+This coc-extension executes `artisan` commands in the background for some features. Therefore, you must be able to run `PHP` in your environment.
+
+---
+
 This coc-extension will provide various completion features and more features for Laravel projects.
 
 - Completions
