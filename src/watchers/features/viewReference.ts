@@ -9,7 +9,7 @@ export async function register(context: ExtensionContext, projectManager: Projec
   const { document } = await workspace.getCurrentState();
   if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
 
-  const globPattern = '**/{routes,app/Http/{Controllers,Livewire}}/**/*.php';
+  const globPattern = '**/{routes,app/Http/{Controllers,Livewire},app/View/Components}/**/*.php';
   const watcher = workspace.createFileSystemWatcher(globPattern, false, false, false);
 
   watcher.onDidCreate(async (e) => {

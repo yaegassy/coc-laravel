@@ -15,13 +15,15 @@ export class ViewReferenceProjectManager {
   }
 
   async initialize() {
-    const globPattern = '**/{routes,app/Http/{Controllers,Livewire}}/**/*.php';
+    const globPattern = '**/{routes,app/Http/{Controllers,Livewire},app/View/Components}/**/*.php';
 
     const files = await fg(globPattern, {
       ignore: ['**/.git/**', '**/vendor/**', '**/node_modules/**'],
       absolute: true,
       cwd: this.rootDir,
     });
+
+    console.log(`=K=: ${JSON.stringify(files, null, 2)}`);
 
     await this.set(files);
 
