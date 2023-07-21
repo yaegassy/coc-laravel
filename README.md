@@ -43,8 +43,12 @@ This coc-extension will provide various completion features and more features fo
   - Component definition | [DEMO](https://github.com/yaegassy/coc-laravel/issues/2#issuecomment-1644974475)
     - [Blade -> PHP or Blade] Jump to the component file. Both class components and anonymous components are supported.
 - References
-  - `laravel.view.findAllReferences` command
-  - View reference
+  - `laravel.view.findAllReferences` command | [DEMO](https://github.com/yaegassy/coc-laravel/issues/3#issuecomment-1645929779)
+    - [Blade -> PHP] Show references to PHP files that use the current blade
+      file. Referenced directories are `routes`, `app/Http/Controllers`,
+      `app/View/Components` and `app/Http/Livewire`.
+  - View reference | [DEMO](https://github.com/yaegassy/coc-laravel/issues/3#issuecomment-1645932674)
+    - [PHP -> Blade] Reference to a PHP file that uses the same template in the view function.
 
 - [TODO]
   - Completions
