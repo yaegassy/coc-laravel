@@ -36,12 +36,12 @@ This coc-extension will provide various completion features and more features fo
   - Guard completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635272378)
   - Translation completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1637244306)
 - Definitions
-  - View definition
+  - View definition | [DEMO](https://github.com/yaegassy/coc-laravel/issues/2#issuecomment-1644973067)
     - [PHP -> Blade] Definition jump to the Blade template specified by the view() function.
-  - Blade View definition
+  - Blade View definition | [DEMO](https://github.com/yaegassy/coc-laravel/issues/2#issuecomment-1644973626)
     - [Blade -> Blade] Jump to the Blade template specified by the `@extends` and `@include` directives.
-  - Component definition
-    - [Blade -> Blade or PHP] Jump to the component file. Both class components and anonymous components are supported.
+  - Component definition | [DEMO](https://github.com/yaegassy/coc-laravel/issues/2#issuecomment-1644974475)
+    - [Blade -> PHP or Blade] Jump to the component file. Both class components and anonymous components are supported.
 
 - [TODO]
   - Completions
