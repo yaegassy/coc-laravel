@@ -35,23 +35,28 @@ This coc-extension will provide various completion features and more features fo
   - Middleware completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635271630)
   - Guard completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635272378)
   - Translation completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1637244306)
+- Definitions
+  - View definition
+    - [PHP -> Blade] Definition jump to the Blade template specified by the view() function.
+  - Blade View definition
+    - [Blade -> Blade] Jump to the Blade template specified by the `@extends` and `@include` directives.
+  - Component definition
+    - [Blade -> Blade or PHP] Jump to the component file. Both class components and anonymous components are supported.
 
 - [TODO]
   - Completions
     - Other enhancements to each completion
-  - Definitions
-    - Some features are provided by [coc-blade](https://github.com/yaegassy/coc-blade) that I am developing, but considering porting to `coc-laravel` with enhancements.
   - Hovers
     - Some features are provided by [coc-blade](https://github.com/yaegassy/coc-blade) that I am developing, but considering porting to `coc-laravel` with enhancements.
   - Diagnostics
     - Some features are provided by [coc-blade](https://github.com/yaegassy/coc-blade) that I am developing, but considering porting to `coc-laravel` with enhancements.
       - Warn of blade view files that do not exist in the project, etc.
+  - Artisan and Sail commands integration
+    - I am providing the feature in [@yaegassy/coc-intelephense](https://github.com/yaegassy/coc-intelephense), which I am developing, but I am considering porting the feature to `coc-laravel`
   - References
     - findAllFileReferences commands feature, and etc.
   - CodeActions
     - Action to be generated if the target blade file does not exist in the project
-  - Artisan and Sail commands integration
-    - I am providing the feature in [@yaegassy/coc-intelephense](https://github.com/yaegassy/coc-intelephense), which I am developing, but I am considering porting the feature to `coc-laravel`
   - And more...
 
 ## [RECOMMENDED] Additional installation of "watchman"
@@ -102,6 +107,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.completion.translationEnable`: Enable translation completion, default: `true`
 - `laravel.completion.componentEnable`: Enable component completion, default: `true`
 - `laravel.completion.phpFunctionEnable`: Enable php function completion, default: `true`
+- `laravel.definition.enable`: Enable definition, default `true`
 
 ## Commands
 

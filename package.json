@@ -133,6 +133,11 @@
           "type": "boolean",
           "default": true,
           "description": "Enable php function completion."
+        },
+        "laravel.definition.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable definition."
         }
       }
     },

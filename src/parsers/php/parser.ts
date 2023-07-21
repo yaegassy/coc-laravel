@@ -6,6 +6,8 @@ import {
   Node,
   Location as ParserLocation,
   String as StringNode,
+  Call,
+  Name,
 } from 'php-parser';
 
 export type ParameterType = {
@@ -149,4 +151,26 @@ export function getPublicParametersOfConstructor(ast: Node) {
   }, ast);
 
   return parameters;
+}
+
+export function getLocationOfCallFunctionArgumentsFor(ast: Node, name: string) {
+  const locations: ParserLocation[] = [];
+
+  walk((node) => {
+    if (node.kind === 'call') {
+      const callNode = node as Call;
+      if (callNode.what.kind === 'name') {
+        const nameNode = callNode.what as Name;
+        if (nameNode.name === name) {
+          if (callNode.arguments.length >= 1) {
+            if (callNode.arguments[0].loc) {
+              locations.push(callNode.arguments[0].loc);
+            }
+          }
+        }
+      }
+    }
+  }, ast);
+
+  return locations;
 }
