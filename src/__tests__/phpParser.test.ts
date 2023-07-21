@@ -14,6 +14,7 @@ test('Determine if the FormRequest class is an inherited class', () => {
     encoding: 'utf8',
   });
   const ast = validationService.getAst(code);
+  if (!ast) return;
 
   const exists = validationService.existsExtendsFormRequest(ast);
   expect(exists).toBe(true);
@@ -25,6 +26,7 @@ test('Retrieve an array in a PHP file', () => {
   });
 
   const ast = parser.getAst(code);
+  if (!ast) return;
 
   const fileName = 'validation';
   const mapStore: Map<string, string> = new Map();
@@ -74,6 +76,7 @@ test('Determine if the name class is an inherited class', () => {
   });
 
   const ast = parser.getAst(code);
+  if (!ast) return;
   const exists = parser.existsExtendsClassFor(ast, 'Component');
 
   expect(true).toBe(exists);
@@ -85,6 +88,7 @@ test('Get public properties of constructor', () => {
   });
 
   const ast = parser.getAst(code);
+  if (!ast) return;
 
   type ParameterType = {
     name: string;

@@ -40,6 +40,7 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
   if (!artisanPath) return [];
 
   const routeListJsonStr = await runRouteListJson(artisanPath);
+  if (!routeListJsonStr) return [];
   const routeListJson = JSON.parse(routeListJsonStr) as RouteListJsonType[];
   if (routeListJson.length === 0) return;
 
