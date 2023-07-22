@@ -143,6 +143,11 @@
           "type": "boolean",
           "default": true,
           "description": "Enable reference."
+        },
+        "laravel.hover.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable hover."
         }
       }
     },

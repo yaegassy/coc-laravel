@@ -55,20 +55,15 @@ This coc-extension will provide various completion features and more features fo
       `app/View/Components` and `app/Http/Livewire`.
   - View reference | [DEMO](https://github.com/yaegassy/coc-laravel/issues/3#issuecomment-1645932674)
     - [PHP -> Blade] Reference to a PHP file that uses the same template in the view function.
+- Hovers
+    - ComponentTag Hover
+    - Blade Directive Hover
+      - Please install [coc-blade](https://github.com/yaegassy/coc-blade), it is implemented in [coc-blade](https://github.com/yaegassy/coc-blade)
+- Artisan and Sail commands integration
+    - Please install [coc-intelephense](https://github.com/yaegassy/coc-intelephense), it is implemented in [coc-intelephense](https://github.com/yaegassy/coc-intelephense)
 
 - [TODO]
-  - Completions
-    - Other enhancements to each completion
-  - Hovers
-    - Some features are provided by [coc-blade](https://github.com/yaegassy/coc-blade) that I am developing, but considering porting to `coc-laravel` with enhancements.
-  - Diagnostics
-    - Some features are provided by [coc-blade](https://github.com/yaegassy/coc-blade) that I am developing, but considering porting to `coc-laravel` with enhancements.
-      - Warn of blade view files that do not exist in the project, etc.
-  - Artisan and Sail commands integration
-    - I am providing the feature in [@yaegassy/coc-intelephense](https://github.com/yaegassy/coc-intelephense), which I am developing, but I am considering porting the feature to `coc-laravel`
-  - CodeActions
-    - Action to be generated if the target blade file does not exist in the project
-  - And more...
+  - Diagnostics, CodeActions and more...
 
 ## [RECOMMENDED] Additional installation of "watchman"
 
@@ -120,6 +115,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.completion.phpFunctionEnable`: Enable php function completion, default: `true`
 - `laravel.definition.enable`: Enable definition, default `true`
 - `laravel.reference.enable`: Enable reference, default `true`
+- `laravel.hover.enable`: Enable hover, default `true`
 
 ## Commands
 
