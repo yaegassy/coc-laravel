@@ -56,11 +56,11 @@ This coc-extension will provide various completion features and more features fo
   - View reference | [DEMO](https://github.com/yaegassy/coc-laravel/issues/3#issuecomment-1645932674)
     - [PHP -> Blade] Reference to a PHP file that uses the same template in the view function.
 - Hovers
-    - ComponentTag Hover
-    - Blade Directive Hover
-      - Please install [coc-blade](https://github.com/yaegassy/coc-blade), it is implemented in [coc-blade](https://github.com/yaegassy/coc-blade)
+  - ComponentTag Hover | [DEMO](https://github.com/yaegassy/coc-laravel/issues/4#issue-1816594130)
+  - Blade Directive Hover
+    - Please install [coc-blade](https://github.com/yaegassy/coc-blade), it is implemented in [coc-blade](https://github.com/yaegassy/coc-blade)
 - Artisan and Sail commands integration
-    - Please install [coc-intelephense](https://github.com/yaegassy/coc-intelephense), it is implemented in [coc-intelephense](https://github.com/yaegassy/coc-intelephense)
+  - Please install [coc-intelephense](https://github.com/yaegassy/coc-intelephense), it is implemented in [coc-intelephense](https://github.com/yaegassy/coc-intelephense)
 
 - [TODO]
   - Diagnostics, CodeActions and more...
