@@ -32,7 +32,8 @@ export async function doCompletion(
   if (!phpFunctionCompletionService.canCompletionFromContextWord(contextWord)) return [];
 
   const code = document.getText();
-  if (!phpFunctionCompletionService.canCompletionFromPHPRegionInBlade(code, position)) return [];
+  const offset = document.offsetAt(position);
+  if (!phpFunctionCompletionService.canCompletionFromPHPRegionInBlade(code, offset)) return [];
 
   let wordWithExtraChars: string | undefined = undefined;
   const wordWithExtraCharsRange = doc.getWordRangeAtPosition(

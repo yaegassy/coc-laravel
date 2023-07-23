@@ -1,103 +1,105 @@
-import { Position } from 'coc.nvim';
-
 import { BladeComponentNode, BladeEchoNode, DirectiveNode } from 'stillat-blade-parser/out/nodes/nodes';
-import * as bladeParer from '../../parsers/blade/parser';
+import * as bladeParser from '../../parsers/blade/parser';
+import { RangeOffset } from '../types';
 
-export function canCompletionFromPHPRegionInBlade(code: string, editorPostion: Position) {
-  const bladeDoc = bladeParer.getBladeDocument(code);
+export function canCompletionFromPHPRegionInBlade(code: string, editorOffset: number) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return undefined;
 
   const flags: boolean[] = [];
 
-  bladeDoc.getAllNodes().forEach((node) => {
-    // TODO: Further increase judgment depending on the context within.
-    //
-    // Case:
-    //   - {{ | }}
+  flags.push(isBladeEchoRegion(code, editorOffset));
+  flags.push(isPHPDirectiveRegion(code, editorOffset));
+  flags.push(isDirectiveWithParametersRegion(code, editorOffset));
+  flags.push(isComponentPropsRegion(code, editorOffset));
+
+  if (flags.includes(true)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function isBladeEchoRegion(code: string, editorOffset: number) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return false;
+
+  const rangeOffsetsAll: RangeOffset[] = [];
+
+  for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof BladeEchoNode) {
-      if (node.startPosition && node.endPosition) {
-        if (node.startPosition.line - 1 <= editorPostion.line && node.endPosition.line - 1 >= editorPostion.line) {
-          if (node.startPosition.line - 1 === editorPostion.line) {
-            if (node.endPosition.line - 1 === editorPostion.line) {
-              if (
-                node.startPosition.char - 1 <= editorPostion.character &&
-                node.endPosition.char - 1 >= editorPostion.character
-              ) {
-                flags.push(true);
-              }
-            } else {
-              if (node.startPosition.char - 1 <= editorPostion.character) {
-                flags.push(true);
-              }
-            }
-          } else {
-            if (node.endPosition.line - 1 === editorPostion.line) {
-              if (node.endPosition.char - 1 >= editorPostion.character) {
-                flags.push(true);
-              }
-            } else {
-              flags.push(true);
-            }
-          }
-        }
-      }
-    }
+      if (!node.offset) continue;
+      const rangeOffsets: RangeOffset[] = [
+        {
+          start: node.offset.start,
+          end: node.offset.end,
+        },
+      ];
 
-    // Case:
-    //   - @php ... @endphp
+      rangeOffsetsAll.push(...rangeOffsets);
+    }
+  }
+
+  for (const rangeOffset of rangeOffsetsAll) {
+    if (rangeOffset.start <= editorOffset && rangeOffset.end >= editorOffset) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function isPHPDirectiveRegion(code: string, editorOffset: number) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return false;
+
+  const rangeOffsetsAll: RangeOffset[] = [];
+
+  for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof DirectiveNode) {
-      if (node.directiveName === 'php') {
-        const endPhpDirectiveNode = node.getFinalClosingDirective();
-        if (endPhpDirectiveNode.directiveName === 'endphp') {
-          if (node.startPosition && endPhpDirectiveNode.endPosition) {
-            if (node.startPosition.line - 1 === editorPostion.line) {
-              if (endPhpDirectiveNode.endPosition.line - 1 === editorPostion.line) {
-                if (
-                  node.startPosition.char - 1 <= editorPostion.character &&
-                  endPhpDirectiveNode.endPosition.char - 1 >= editorPostion.character
-                ) {
-                  flags.push(true);
-                }
-              } else {
-                if (node.startPosition.char - 1 <= editorPostion.character) {
-                  flags.push(true);
-                }
-              }
-            } else {
-              if (endPhpDirectiveNode.endPosition.line - 1 === editorPostion.line) {
-                if (endPhpDirectiveNode.endPosition.char - 1 >= editorPostion.character) {
-                  flags.push(true);
-                }
-              } else {
-                flags.push(true);
-              }
-            }
-          }
-        }
+      if (node.directiveName !== 'php') continue;
+      if (!node.offset) continue;
+      const endPhpDirectiveNode = node.getFinalClosingDirective();
+      if (endPhpDirectiveNode.directiveName === 'endphp') {
+        if (!endPhpDirectiveNode.offset?.end) continue;
+
+        const rangeOffsets: RangeOffset[] = [
+          {
+            start: node.offset.start,
+            end: endPhpDirectiveNode.offset.end,
+          },
+        ];
+
+        rangeOffsetsAll.push(...rangeOffsets);
+      } else if (endPhpDirectiveNode.directiveName === 'php') {
+        const rangeOffsets: RangeOffset[] = [
+          {
+            start: node.offset.start,
+            end: node.offset.end,
+          },
+        ];
+
+        rangeOffsetsAll.push(...rangeOffsets);
       }
     }
+  }
 
-    // Case:
-    //   - @if (|)
-    //   - @elseif (|)
-    //   - @unless (|)
-    //   - @isset (|)
-    //   - @empty (|)
-    //   - @unless (|)
-    //   - @isset(|)
-    //   - @empty(|)
-    //   - @switch(|)
-    //   - @for (|)
-    //   - @foreach (|)
-    //   - @forelse (|)
-    //   - @while (|)
-    //   - @continue(|)
-    //   - @break(|)
-    //   - @checked(|)
-    //   - @selected(|)
-    //   - @disabled(|)
-    //   - @readonly(|)
-    //   - @required(|)
+  for (const rangeOffset of rangeOffsetsAll) {
+    if (rangeOffset.start <= editorOffset && rangeOffset.end >= editorOffset) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function isDirectiveWithParametersRegion(code: string, editorOffset: number) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return false;
+
+  const rangeOffsetsAll: RangeOffset[] = [];
+
+  for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof DirectiveNode) {
       if (
         node.directiveName === 'if' ||
@@ -118,77 +120,65 @@ export function canCompletionFromPHPRegionInBlade(code: string, editorPostion: P
         node.directiveName === 'readonly' ||
         node.directiveName === 'required'
       ) {
-        if (node.directiveParametersPosition) {
-          if (node.directiveParametersPosition.start && node.directiveParametersPosition.end) {
-            if (node.directiveParametersPosition.start.line - 1 === editorPostion.line) {
-              if (node.directiveParametersPosition.end.line - 1 === editorPostion.line) {
-                if (
-                  node.directiveParametersPosition.start.char - 1 <= editorPostion.character &&
-                  node.directiveParametersPosition.end.char - 1 >= editorPostion.character
-                ) {
-                  flags.push(true);
-                }
-              } else {
-                if (node.directiveParametersPosition.start.char - 1 <= editorPostion.character) {
-                  flags.push(true);
-                }
-              }
-            } else {
-              if (node.directiveParametersPosition.end.line - 1 === editorPostion.line) {
-                if (node.directiveParametersPosition.end.char - 1 >= editorPostion.character) {
-                  flags.push(true);
-                }
-              } else {
-                flags.push(true);
-              }
-            }
-          }
-        }
+        if (!node.directiveParametersPosition) continue;
+        if (!node.directiveParametersPosition.start?.offset) continue;
+        if (!node.directiveParametersPosition.end?.offset) continue;
+
+        const rangeOffsets: RangeOffset[] = [
+          {
+            start: node.directiveParametersPosition.start.offset,
+            end: node.directiveParametersPosition.end.offset,
+          },
+        ];
+
+        rangeOffsetsAll.push(...rangeOffsets);
       }
     }
-
-    // Case:
-    if (node instanceof BladeComponentNode) {
-      if (node.hasParameters) {
-        for (const parameter of node.parameters) {
-          if (parameter.isExpression) {
-            if (parameter.valuePosition) {
-              if (parameter.valuePosition.start && parameter.valuePosition.end) {
-                if (parameter.valuePosition.start.line - 1 === editorPostion.line) {
-                  if (parameter.valuePosition.end.line - 1 === editorPostion.line) {
-                    if (
-                      parameter.valuePosition.start.char - 1 <= editorPostion.character &&
-                      parameter.valuePosition.end.char - 1 >= editorPostion.character
-                    ) {
-                      flags.push(true);
-                    }
-                  } else {
-                    if (parameter.valuePosition.start.char - 1 <= editorPostion.character) {
-                      flags.push(true);
-                    }
-                  }
-                } else {
-                  if (parameter.valuePosition.end.line - 1 === editorPostion.line) {
-                    if (parameter.valuePosition.end.char - 1 >= editorPostion.character) {
-                      flags.push(true);
-                    }
-                  } else {
-                    flags.push(true);
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  });
-
-  if (flags.includes(true)) {
-    return true;
-  } else {
-    return false;
   }
+
+  for (const rangeOffset of rangeOffsetsAll) {
+    if (rangeOffset.start <= editorOffset && rangeOffset.end >= editorOffset) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function isComponentPropsRegion(code: string, editorOffset: number) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return false;
+
+  const rangeOffsetsAll: RangeOffset[] = [];
+
+  for (const node of bladeDoc.getAllNodes()) {
+    if (node instanceof BladeComponentNode) {
+      if (!node.hasParameters) continue;
+      for (const parameter of node.parameters) {
+        if (!parameter.isExpression) continue;
+        if (!parameter.valuePosition) continue;
+        if (!parameter.valuePosition.start?.offset) continue;
+        if (!parameter.valuePosition.end?.offset) continue;
+
+        const rangeOffsets: RangeOffset[] = [
+          {
+            start: parameter.valuePosition.start.offset,
+            end: parameter.valuePosition.end.offset,
+          },
+        ];
+
+        rangeOffsetsAll.push(...rangeOffsets);
+      }
+    }
+  }
+
+  for (const rangeOffset of rangeOffsetsAll) {
+    if (rangeOffset.start <= editorOffset && rangeOffset.end >= editorOffset) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export function canCompletionFromContextWord(word: string) {
