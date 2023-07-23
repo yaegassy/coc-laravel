@@ -16,13 +16,29 @@ export function canCompletionFromPHPRegionInBlade(code: string, editorPostion: P
     //   - {{ | }}
     if (node instanceof BladeEchoNode) {
       if (node.startPosition && node.endPosition) {
-        if (
-          node.startPosition.line - 1 <= editorPostion.line &&
-          node.startPosition.char - 1 <= editorPostion.character &&
-          node.endPosition.line - 1 >= editorPostion.line &&
-          node.endPosition.char - 1 >= editorPostion.character
-        ) {
-          flags.push(true);
+        if (node.startPosition.line - 1 <= editorPostion.line && node.endPosition.line - 1 >= editorPostion.line) {
+          if (node.startPosition.line - 1 === editorPostion.line) {
+            if (node.endPosition.line - 1 === editorPostion.line) {
+              if (
+                node.startPosition.char - 1 <= editorPostion.character &&
+                node.endPosition.char - 1 >= editorPostion.character
+              ) {
+                flags.push(true);
+              }
+            } else {
+              if (node.startPosition.char - 1 <= editorPostion.character) {
+                flags.push(true);
+              }
+            }
+          } else {
+            if (node.endPosition.line - 1 === editorPostion.line) {
+              if (node.endPosition.char - 1 >= editorPostion.character) {
+                flags.push(true);
+              }
+            } else {
+              flags.push(true);
+            }
+          }
         }
       }
     }
@@ -34,13 +50,27 @@ export function canCompletionFromPHPRegionInBlade(code: string, editorPostion: P
         const endPhpDirectiveNode = node.getFinalClosingDirective();
         if (endPhpDirectiveNode.directiveName === 'endphp') {
           if (node.startPosition && endPhpDirectiveNode.endPosition) {
-            if (
-              node.startPosition.line - 1 <= editorPostion.line &&
-              node.startPosition.char - 1 <= editorPostion.character &&
-              endPhpDirectiveNode.endPosition.line - 1 >= editorPostion.line &&
-              endPhpDirectiveNode.endPosition.char - 1 >= editorPostion.character
-            ) {
-              flags.push(true);
+            if (node.startPosition.line - 1 === editorPostion.line) {
+              if (endPhpDirectiveNode.endPosition.line - 1 === editorPostion.line) {
+                if (
+                  node.startPosition.char - 1 <= editorPostion.character &&
+                  endPhpDirectiveNode.endPosition.char - 1 >= editorPostion.character
+                ) {
+                  flags.push(true);
+                }
+              } else {
+                if (node.startPosition.char - 1 <= editorPostion.character) {
+                  flags.push(true);
+                }
+              }
+            } else {
+              if (endPhpDirectiveNode.endPosition.line - 1 === editorPostion.line) {
+                if (endPhpDirectiveNode.endPosition.char - 1 >= editorPostion.character) {
+                  flags.push(true);
+                }
+              } else {
+                flags.push(true);
+              }
             }
           }
         }
@@ -90,13 +120,27 @@ export function canCompletionFromPHPRegionInBlade(code: string, editorPostion: P
       ) {
         if (node.directiveParametersPosition) {
           if (node.directiveParametersPosition.start && node.directiveParametersPosition.end) {
-            if (
-              node.directiveParametersPosition.start.line - 1 <= editorPostion.line &&
-              node.directiveParametersPosition.start.char - 1 <= editorPostion.character &&
-              node.directiveParametersPosition.end.line - 1 >= editorPostion.line &&
-              node.directiveParametersPosition.end.char - 1 >= editorPostion.character
-            ) {
-              flags.push(true);
+            if (node.directiveParametersPosition.start.line - 1 === editorPostion.line) {
+              if (node.directiveParametersPosition.end.line - 1 === editorPostion.line) {
+                if (
+                  node.directiveParametersPosition.start.char - 1 <= editorPostion.character &&
+                  node.directiveParametersPosition.end.char - 1 >= editorPostion.character
+                ) {
+                  flags.push(true);
+                }
+              } else {
+                if (node.directiveParametersPosition.start.char - 1 <= editorPostion.character) {
+                  flags.push(true);
+                }
+              }
+            } else {
+              if (node.directiveParametersPosition.end.line - 1 === editorPostion.line) {
+                if (node.directiveParametersPosition.end.char - 1 >= editorPostion.character) {
+                  flags.push(true);
+                }
+              } else {
+                flags.push(true);
+              }
             }
           }
         }
@@ -110,13 +154,27 @@ export function canCompletionFromPHPRegionInBlade(code: string, editorPostion: P
           if (parameter.isExpression) {
             if (parameter.valuePosition) {
               if (parameter.valuePosition.start && parameter.valuePosition.end) {
-                if (
-                  parameter.valuePosition.start.line - 1 <= editorPostion.line &&
-                  parameter.valuePosition.start.char - 1 <= editorPostion.character &&
-                  parameter.valuePosition.end.line - 1 >= editorPostion.line &&
-                  parameter.valuePosition.end.char - 1 >= editorPostion.character
-                ) {
-                  flags.push(true);
+                if (parameter.valuePosition.start.line - 1 === editorPostion.line) {
+                  if (parameter.valuePosition.end.line - 1 === editorPostion.line) {
+                    if (
+                      parameter.valuePosition.start.char - 1 <= editorPostion.character &&
+                      parameter.valuePosition.end.char - 1 >= editorPostion.character
+                    ) {
+                      flags.push(true);
+                    }
+                  } else {
+                    if (parameter.valuePosition.start.char - 1 <= editorPostion.character) {
+                      flags.push(true);
+                    }
+                  }
+                } else {
+                  if (parameter.valuePosition.end.line - 1 === editorPostion.line) {
+                    if (parameter.valuePosition.end.char - 1 >= editorPostion.character) {
+                      flags.push(true);
+                    }
+                  } else {
+                    flags.push(true);
+                  }
                 }
               }
             }
