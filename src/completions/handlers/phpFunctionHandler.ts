@@ -25,7 +25,7 @@ export async function doCompletion(
   const doc = workspace.getDocument(document.uri);
   if (!doc) return [];
 
-  const contextWordRange = doc.getWordRangeAtPosition(Position.create(position.line, position.character - 1), ':"=>');
+  const contextWordRange = doc.getWordRangeAtPosition(Position.create(position.line, position.character - 1), ':"=>\'');
   if (!contextWordRange) return [];
 
   const contextWord = document.getText(contextWordRange) || '';
