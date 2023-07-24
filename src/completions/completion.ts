@@ -16,6 +16,7 @@ import { type ProjectManagerType } from '../projects/types';
 import * as bladeComponentPropsCompletionHandler from './handlers/bladeComponentPropsHandler';
 import * as bladeComponentTagCompletionHandler from './handlers/bladeComponentTagHandler';
 import * as bladeConfigCompletionHandler from './handlers/bladeConfigHandler';
+import * as bladeEnvCompletionHandler from './handlers/bladeEnvHandler';
 import * as bladeGuardCompletionHandler from './handlers/bladeGuardHandler';
 import * as bladeRouteCompletionHandler from './handlers/bladeRouteHandler';
 import * as bladeTranslationCompletionHandler from './handlers/bladeTranslationHandler';
@@ -92,6 +93,11 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       const envCompletionItems = await envCompletionHandler.doCompletion(document, position);
       if (envCompletionItems) {
         items.push(...envCompletionItems);
+      }
+
+      const bladeEnvCompletionItems = await bladeEnvCompletionHandler.doCompletion(document, position);
+      if (bladeEnvCompletionItems) {
+        items.push(...bladeEnvCompletionItems);
       }
     }
 

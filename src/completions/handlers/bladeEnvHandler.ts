@@ -3,36 +3,30 @@ import { CompletionItem, CompletionItemKind, LinesTextDocument, Position, TextEd
 import fs from 'fs';
 import path from 'path';
 
-import * as envService from '../services/envService';
+import * as bladeEnvService from '../services/bladeEnvService';
 
 export async function doCompletion(document: LinesTextDocument, position: Position) {
-  if (document.languageId !== 'php') return [];
+  if (document.languageId !== 'blade') return [];
 
   const items: CompletionItem[] = [];
 
   const doc = workspace.getDocument(document.uri);
   if (!doc) return [];
-  let adjustText: string | undefined = undefined;
-  const wordRange = doc.getWordRangeAtPosition(Position.create(position.line, position.character - 1), '.');
-  if (wordRange) {
-    adjustText = document.getText(wordRange);
+
+  let wordWithExtraChars: string | undefined = undefined;
+  const wordWithExtraCharsRange = doc.getWordRangeAtPosition(
+    Position.create(position.line, position.character - 1),
+    '.'
+  );
+  if (wordWithExtraCharsRange) {
+    wordWithExtraChars = document.getText(wordWithExtraCharsRange);
   }
 
   const code = document.getText();
-  const stripedPHPTagCode = envService.stripPHPTag(code);
-  const diffOffset = code.length - stripedPHPTagCode.length;
+  const offset = document.offsetAt(position);
+  if (!bladeEnvService.canCompletionFromContext(code, offset)) return [];
 
   try {
-    const ast = envService.getAst(code);
-    if (!ast) return [];
-
-    const serviceLocations = envService.getServiceLocations(ast);
-    if (serviceLocations.length === 0) return [];
-
-    const offset = document.offsetAt(position) - diffOffset;
-    const canCompletion = envService.canCompletion(offset, serviceLocations);
-    if (!canCompletion) return [];
-
     const enviroments: { [key: string]: string } = {};
 
     const envPath = path.join(workspace.root, '.env');
@@ -46,7 +40,9 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
       }
 
       Object.keys(enviroments).map((key) => {
-        const adjustStartCharacter = adjustText ? position.character - adjustText.length : position.character;
+        const adjustStartCharacter = wordWithExtraChars
+          ? position.character - wordWithExtraChars.length
+          : position.character;
 
         const edit: TextEdit = {
           range: {
@@ -59,6 +55,7 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
         items.push({
           label: key,
           kind: CompletionItemKind.Text,
+          insertText: key,
           detail: enviroments[key],
           textEdit: edit,
         });

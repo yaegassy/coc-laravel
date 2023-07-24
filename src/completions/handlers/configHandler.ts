@@ -50,15 +50,14 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
           start: { line: position.line, character: adjustStartCharacter },
           end: position,
         },
-        newText: configItems[key].name,
+        newText: key,
       };
 
       items.push({
         label: configItems[key].name,
         kind: CompletionItemKind.Value,
-        insertText: configItems[key].name,
         detail: String(configItems[key].value),
-        textEdit: edit ? edit : undefined,
+        textEdit: edit,
       });
     });
   } catch {}

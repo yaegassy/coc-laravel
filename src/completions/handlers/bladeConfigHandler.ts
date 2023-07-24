@@ -53,7 +53,7 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
       kind: CompletionItemKind.Value,
       insertText: configItems[key].name,
       detail: String(configItems[key].value),
-      textEdit: edit ? edit : undefined,
+      textEdit: edit,
     });
   });
 
