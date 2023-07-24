@@ -134,6 +134,11 @@
           "default": true,
           "description": "Enable php function completion."
         },
+        "laravel.completion.methodParameterEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable method parameter completion."
+        },
         "laravel.definition.enable": {
           "type": "boolean",
           "default": true,
@@ -148,6 +153,11 @@
           "type": "boolean",
           "default": true,
           "description": "Enable hover."
+        },
+        "laravel.diagnostic.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable diagnostic."
         }
       }
     },

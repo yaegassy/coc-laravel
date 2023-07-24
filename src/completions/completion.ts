@@ -18,6 +18,7 @@ import * as bladeComponentTagCompletionHandler from './handlers/bladeComponentTa
 import * as bladeConfigCompletionHandler from './handlers/bladeConfigHandler';
 import * as bladeEnvCompletionHandler from './handlers/bladeEnvHandler';
 import * as bladeGuardCompletionHandler from './handlers/bladeGuardHandler';
+import * as bladeMethodParameterHandler from './handlers/bladeMethodParameterHandler';
 import * as bladeRouteCompletionHandler from './handlers/bladeRouteHandler';
 import * as bladeTranslationCompletionHandler from './handlers/bladeTranslationHandler';
 import * as bladeViewCompletionHanlder from './handlers/bladeViewHandler';
@@ -217,6 +218,14 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       );
       if (phpFunctionCompletionItems) {
         items.push(...phpFunctionCompletionItems);
+      }
+    }
+
+    // method parameter
+    if (workspace.getConfiguration('laravel').get('completion.methodParameterEnable')) {
+      const methodParameterCompletionItems = await bladeMethodParameterHandler.doCompletion(document, position);
+      if (methodParameterCompletionItems) {
+        items.push(...methodParameterCompletionItems);
       }
     }
 

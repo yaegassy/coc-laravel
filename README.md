@@ -41,6 +41,7 @@ This coc-extension will provide various completion features and more features fo
   - Middleware completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635271630)
   - Guard completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635272378)
   - Translation completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1637244306)
+  - Method directive parameter completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1647629965)
 - Definitions
   - View definition | [DEMO](https://github.com/yaegassy/coc-laravel/issues/2#issuecomment-1644973067)
     - [PHP -> Blade] Definition jump to the Blade template specified by the view() function.
@@ -61,9 +62,13 @@ This coc-extension will provide various completion features and more features fo
     - Please install [coc-blade](https://github.com/yaegassy/coc-blade), it is implemented in [coc-blade](https://github.com/yaegassy/coc-blade)
 - Artisan and Sail commands integration
   - Please install [coc-intelephense](https://github.com/yaegassy/coc-intelephense), it is implemented in [coc-intelephense](https://github.com/yaegassy/coc-intelephense)
-
-- [TODO]
-  - Diagnostics, CodeActions and more...
+- Diagnostics
+  - Method directive parameter validation | [DEMO](https://github.com/yaegassy/coc-laravel/issues/5#issuecomment-1647636587)
+  - [TODO]
+    - Diagnostic features will be added as we come up with useful ones, based on projects already analyzed.
+- CodeActions
+  - [TODO]
+    - CodeAction features will be added as we come up with useful ones, based on projects already analyzed.
 
 ## [RECOMMENDED] Additional installation of "watchman"
 
@@ -113,6 +118,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.completion.translationEnable`: Enable translation completion, default: `true`
 - `laravel.completion.componentEnable`: Enable component completion, default: `true`
 - `laravel.completion.phpFunctionEnable`: Enable php function completion, default: `true`
+- `laravel.completion.methodParameterEnable`: Enable method parameter completion, default: `true`
 - `laravel.definition.enable`: Enable definition, default `true`
 - `laravel.reference.enable`: Enable reference, default `true`
 - `laravel.hover.enable`: Enable hover, default `true`
