@@ -182,7 +182,12 @@ function isComponentPropsRegion(code: string, editorOffset: number) {
 }
 
 export function canCompletionFromContextWord(word: string) {
-  if (word.startsWith('"') || (word.startsWith("'") && word.startsWith('>')) || word.startsWith('-')) {
+  if (
+    word.startsWith('"') ||
+    (word.startsWith("'") && word.startsWith('>')) ||
+    word.startsWith('-') ||
+    word.startsWith(':')
+  ) {
     return false;
   }
 
