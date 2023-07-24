@@ -122,6 +122,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.definition.enable`: Enable definition, default `true`
 - `laravel.reference.enable`: Enable reference, default `true`
 - `laravel.hover.enable`: Enable hover, default `true`
+- `laravel.diagnostic.enable`: Enable diagnostic, default: `true`
 
 ## Commands
 
