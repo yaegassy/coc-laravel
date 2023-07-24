@@ -27,6 +27,7 @@ import * as guardCompletionHandler from './handlers/guardHandler';
 import * as middlewareCompletionHandler from './handlers/middlewareHandler';
 import * as phpFunctionCompletionHandler from './handlers/phpFunctionHandler';
 import * as routeCompletionHandler from './handlers/routeHandler';
+import * as translationCompletionHandler from './handlers/translationHandler';
 import * as validationCompletionHandler from './handlers/validationHandler';
 import * as viewCompletionHandler from './handlers/viewHandler';
 
@@ -132,7 +133,6 @@ class LaravelCompletionProvider implements CompletionItemProvider {
         items.push(...viewCompletionItems);
       }
 
-      // TODO: Use blade parser to determine if the cursor position is completable.
       const bladeViewCompletionItems = await bladeViewCompletionHanlder.doCompletion(
         document,
         position,
@@ -166,13 +166,22 @@ class LaravelCompletionProvider implements CompletionItemProvider {
 
     // translation
     if (workspace.getConfiguration('laravel').get('completion.translationEnable')) {
-      const translationCompletionItems = await bladeTranslationCompletionHandler.doCompletion(
+      const translationCompletionItems = await translationCompletionHandler.doCompletion(
         document,
         position,
         this.projectManager.translationProjectManager
       );
       if (translationCompletionItems) {
         items.push(...translationCompletionItems);
+      }
+
+      const bladeTranslationCompletionItems = await bladeTranslationCompletionHandler.doCompletion(
+        document,
+        position,
+        this.projectManager.translationProjectManager
+      );
+      if (bladeTranslationCompletionItems) {
+        items.push(...bladeTranslationCompletionItems);
       }
     }
 
