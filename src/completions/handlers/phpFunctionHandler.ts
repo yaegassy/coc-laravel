@@ -25,20 +25,26 @@ export async function doCompletion(
   const doc = workspace.getDocument(document.uri);
   if (!doc) return [];
 
-  const contextWordRange = doc.getWordRangeAtPosition(Position.create(position.line, position.character - 1), ':"=>\'');
-  if (!contextWordRange) return [];
-
-  const contextWord = document.getText(contextWordRange) || '';
-  if (!phpFunctionCompletionService.canCompletionFromContextWord(contextWord)) return [];
-
   const code = document.getText();
   const offset = document.offsetAt(position);
-  if (!phpFunctionCompletionService.canCompletionFromPHPRegionInBlade(code, offset)) return [];
+  if (!phpFunctionCompletionService.canCompletionFromPHPRegionInBladeByOffset(code, offset)) return [];
+
+  // **MEMO**:
+  //
+  // If the cursor is on one of the following php ast nodes, completion stops!
+  //
+  // - string node
+  //   - "|", '|'
+  // - staticlookup node
+  //   - XXXX::|
+  // - propertylookup node
+  //   - XXXX()->|
+  if (phpFunctionCompletionService.hasDenyKindNameFromPHPRegionInBladeByOffset(code, offset)) return [];
 
   let wordWithExtraChars: string | undefined = undefined;
   const wordWithExtraCharsRange = doc.getWordRangeAtPosition(
     Position.create(position.line, position.character - 1),
-    '.-_$'
+    '_$'
   );
   if (wordWithExtraCharsRange) {
     wordWithExtraChars = document.getText(wordWithExtraCharsRange);
