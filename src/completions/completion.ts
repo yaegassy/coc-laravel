@@ -15,6 +15,7 @@ import { DOCUMENT_SELECTOR, SUPPORTED_LANGUAGE } from '../constant';
 import { type ProjectManagerType } from '../projects/types';
 import * as bladeComponentPropsCompletionHandler from './handlers/bladeComponentPropsHandler';
 import * as bladeComponentTagCompletionHandler from './handlers/bladeComponentTagHandler';
+import * as bladeConfigCompletionHandler from './handlers/bladeConfigHandler';
 import * as bladeGuardCompletionHandler from './handlers/bladeGuardHandler';
 import * as bladeRouteCompletionHandler from './handlers/bladeRouteHandler';
 import * as bladeTranslationCompletionHandler from './handlers/bladeTranslationHandler';
@@ -78,6 +79,11 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       const configCompletionItems = await configCompletionHandler.doCompletion(document, position);
       if (configCompletionItems) {
         items.push(...configCompletionItems);
+      }
+
+      const bladeConfigCompletionItems = await bladeConfigCompletionHandler.doCompletion(document, position);
+      if (bladeConfigCompletionItems) {
+        items.push(...bladeConfigCompletionItems);
       }
     }
 

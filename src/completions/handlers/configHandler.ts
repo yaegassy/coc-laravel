@@ -1,55 +1,67 @@
 import { CompletionItem, CompletionItemKind, LinesTextDocument, Position, TextEdit, workspace } from 'coc.nvim';
 
 import { getArtisanPath, runTinker } from '../../common/shared';
+import * as configService from '../services/configService';
 
 export async function doCompletion(document: LinesTextDocument, position: Position) {
+  if (document.languageId !== 'php') return [];
+
   const items: CompletionItem[] = [];
 
   const doc = workspace.getDocument(document.uri);
   if (!doc) return [];
+  let adjustText: string | undefined = undefined;
+  const wordRange = doc.getWordRangeAtPosition(Position.create(position.line, position.character - 1), '.-');
+  if (wordRange) {
+    adjustText = document.getText(wordRange);
+  }
 
-  const wordRange = doc.getWordRangeAtPosition(Position.create(position.line, position.character - 1), '(\'".');
-  if (!wordRange) return [];
+  const code = document.getText();
+  const stripedPHPTagCode = configService.stripPHPTag(code);
+  const diffOffset = code.length - stripedPHPTagCode.length;
 
-  const text = document.getText(wordRange) || '';
-  if (!text) return [];
-  if (!text.startsWith('config("') && !text.startsWith("config('")) return [];
+  try {
+    const ast = configService.getAst(code);
+    if (!ast) return [];
 
-  const artisanPath = getArtisanPath();
-  if (!artisanPath) return [];
+    const serviceLocations = configService.getServiceLocations(ast);
+    if (serviceLocations.length === 0) return [];
 
-  const runCode = 'echo json_encode(config()->all());';
+    const offset = document.offsetAt(position) - diffOffset;
+    const canCompletion = configService.canCompletion(offset, serviceLocations);
+    if (!canCompletion) return [];
 
-  const out = await runTinker(runCode, artisanPath);
-  if (!out) return;
+    const artisanPath = getArtisanPath();
+    if (!artisanPath) return [];
 
-  const configData = JSON.parse(out);
-  const configItems = getConfig(configData);
+    const runCode = 'echo json_encode(config()->all());';
 
-  let edit: TextEdit | undefined;
-  Object.keys(configItems).map((key) => {
-    if (text.includes('.')) {
-      const enteredTextItem = text.replace(/config\(/, '').replace(/["']/g, '') || '';
-      edit = {
+    const out = await runTinker(runCode, artisanPath);
+    if (!out) return;
+
+    const configData = JSON.parse(out);
+    const configItems = getConfig(configData);
+
+    Object.keys(configItems).map((key) => {
+      const adjustStartCharacter = adjustText ? position.character - adjustText.length : position.character;
+
+      const edit: TextEdit = {
         range: {
-          start: {
-            line: position.line,
-            character: position.character - enteredTextItem.length,
-          },
+          start: { line: position.line, character: adjustStartCharacter },
           end: position,
         },
         newText: configItems[key].name,
       };
-    }
 
-    items.push({
-      label: configItems[key].name,
-      kind: CompletionItemKind.Value,
-      insertText: configItems[key].name,
-      detail: String(configItems[key].value),
-      textEdit: edit ? edit : undefined,
+      items.push({
+        label: configItems[key].name,
+        kind: CompletionItemKind.Value,
+        insertText: configItems[key].name,
+        detail: String(configItems[key].value),
+        textEdit: edit ? edit : undefined,
+      });
     });
-  });
+  } catch {}
 
   return items;
 }
