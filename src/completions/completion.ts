@@ -110,7 +110,7 @@ class LaravelCompletionProvider implements CompletionItemProvider {
         items.push(...routeCompletionItems);
       }
 
-      // TODO: Use blade parser to determine if the cursol position is completable.
+      // TODO: Use blade parser to determine if the cursor position is completable.
       const bladeRouteCompletionItems = await bladeRouteCompletionHandler.doCompletion(document, position);
       if (bladeRouteCompletionItems) {
         items.push(...bladeRouteCompletionItems);
@@ -128,7 +128,7 @@ class LaravelCompletionProvider implements CompletionItemProvider {
         items.push(...viewCompletionItems);
       }
 
-      // TODO: Use blade parser to determine if the cursol position is completable.
+      // TODO: Use blade parser to determine if the cursor position is completable.
       const bladeViewCompletionItems = await bladeViewCompletionHanlder.doCompletion(
         document,
         position,

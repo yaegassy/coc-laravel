@@ -33,10 +33,10 @@ export async function doCompletion(
 
   const code = document.getText();
 
-  const cursolPositionComponent = bladeComponentPropsCompletionService.getCursolPostionComponent(code, position);
-  if (!cursolPositionComponent) return [];
+  const cursorPositionComponent = bladeComponentPropsCompletionService.getCursorPostionComponent(code, position);
+  if (!cursorPositionComponent) return [];
 
-  const component = bladeProjectManager.componentMapStore.get(cursolPositionComponent);
+  const component = bladeProjectManager.componentMapStore.get(cursorPositionComponent);
   if (!component) return [];
 
   let wordWithExtraChars: string | undefined = undefined;

@@ -3,7 +3,7 @@ import { Position } from 'coc.nvim';
 import { BladeComponentNode } from 'stillat-blade-parser/out/nodes/nodes';
 import * as bladeParer from '../../parsers/blade/parser';
 
-export function getCursolPostionComponent(code: string, editorPostion: Position) {
+export function getCursorPostionComponent(code: string, editorPostion: Position) {
   const componentNames: string[] = [];
 
   const bladeDoc = bladeParer.getBladeDocument(code);
