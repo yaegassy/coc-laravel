@@ -172,6 +172,40 @@ export function isCallNameFuncInComponentPropsFromOffset(code: string, editorOff
   return false;
 }
 
+export function isTargetDirectiveWithParametersFromOffset(code: string, editorOffset: number, directiveName: string) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return false;
+
+  const rangeOffsetsAll: RangeOffset[] = [];
+
+  for (const node of bladeDoc.getAllNodes()) {
+    if (node instanceof DirectiveNode) {
+      if (node.directiveName === directiveName) {
+        if (!node.directiveParametersPosition) continue;
+        if (!node.directiveParametersPosition.start?.offset) continue;
+        if (!node.directiveParametersPosition.end?.offset) continue;
+
+        const rangeOffsets: RangeOffset[] = [
+          {
+            start: node.directiveParametersPosition.start.offset,
+            end: node.directiveParametersPosition.end.offset,
+          },
+        ];
+
+        rangeOffsetsAll.push(...rangeOffsets);
+      }
+    }
+  }
+
+  for (const rangeOffset of rangeOffsetsAll) {
+    if (rangeOffset.start <= editorOffset && rangeOffset.end >= editorOffset) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 function getRangeOfsetsFromPHPParserByCallName(ast: Node, adjustOffset: number, callName: string) {
   const rangeOffsets: RangeOffset[] = [];
 

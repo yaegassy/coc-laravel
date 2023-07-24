@@ -1,6 +1,7 @@
 import { CompletionItem, CompletionItemKind, LinesTextDocument, Position, TextEdit, workspace } from 'coc.nvim';
 
 import { type BladeProjectsManagerType } from '../../projects/types';
+import * as bladeViewService from '../services/bladeViewService';
 
 export async function doCompletion(
   document: LinesTextDocument,
@@ -14,15 +15,6 @@ export async function doCompletion(
   const doc = workspace.getDocument(document.uri);
   if (!doc) return [];
 
-  const canCompletionWordRange = doc.getWordRangeAtPosition(
-    Position.create(position.line, position.character - 1),
-    '(\'".-@:'
-  );
-  if (!canCompletionWordRange) return [];
-
-  const canCompletionWord = document.getText(canCompletionWordRange) || '';
-  if (!canCompletion(canCompletionWord)) return [];
-
   let wordWithExtraChars: string | undefined = undefined;
   const wordWithExtraCharsRange = doc.getWordRangeAtPosition(
     Position.create(position.line, position.character - 1),
@@ -31,6 +23,10 @@ export async function doCompletion(
   if (wordWithExtraCharsRange) {
     wordWithExtraChars = document.getText(wordWithExtraCharsRange);
   }
+
+  const code = document.getText();
+  const offset = document.offsetAt(position);
+  if (!bladeViewService.canCompletionFromContext(code, offset)) return [];
 
   try {
     const viewList = Array.from(bladeProjectManager.bladeFilelist());
@@ -57,30 +53,4 @@ export async function doCompletion(
   } catch {}
 
   return items;
-}
-
-function canCompletion(word: string) {
-  let unnecessaryWordCount = 0;
-  for (const w of word) {
-    if (w !== '(') break;
-    unnecessaryWordCount++;
-  }
-
-  const slicedWord = word.slice(unnecessaryWordCount);
-  const evalWord = slicedWord.replace('"', "'");
-
-  // TODO: More support
-  // @includeWhen
-  // @includeUnless
-  // @includeFirst
-  if (
-    !evalWord.startsWith("@include('") &&
-    !evalWord.startsWith("@includeIf('") &&
-    !evalWord.startsWith("@extends('") &&
-    !evalWord.startsWith("@each('")
-  ) {
-    return false;
-  }
-
-  return true;
 }
