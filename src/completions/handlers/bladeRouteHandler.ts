@@ -1,6 +1,7 @@
 import { CompletionItem, CompletionItemKind, LinesTextDocument, Position, TextEdit, workspace } from 'coc.nvim';
 
 import { getArtisanPath, runRouteListJson } from '../../common/shared';
+import * as bladeRouteService from '../services/bladeRouteService';
 
 type RouteListJsonType = {
   domain: string | null;
@@ -19,14 +20,6 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
   const doc = workspace.getDocument(document.uri);
   if (!doc) return [];
 
-  const canCompletionWordRange = doc.getWordRangeAtPosition(
-    Position.create(position.line, position.character - 1),
-    '(\'".-@:'
-  );
-  if (!canCompletionWordRange) return [];
-  const canCompletionWord = document.getText(canCompletionWordRange) || '';
-  if (!canCompletion(canCompletionWord)) return [];
-
   let wordWithExtraChars: string | undefined = undefined;
   const wordWithExtraCharsRange = doc.getWordRangeAtPosition(
     Position.create(position.line, position.character - 1),
@@ -35,6 +28,10 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
   if (wordWithExtraCharsRange) {
     wordWithExtraChars = document.getText(wordWithExtraCharsRange);
   }
+
+  const code = document.getText();
+  const offset = document.offsetAt(position);
+  if (!bladeRouteService.canCompletionFromContext(code, offset)) return [];
 
   const artisanPath = getArtisanPath();
   if (!artisanPath) return [];
@@ -79,21 +76,4 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
   }
 
   return items;
-}
-
-function canCompletion(word: string) {
-  let unnecessaryWordCount = 0;
-  for (const w of word) {
-    if (w !== '(') break;
-    unnecessaryWordCount++;
-  }
-
-  const slicedWord = word.slice(unnecessaryWordCount);
-  const evalWord = slicedWord.replace('"', "'");
-
-  if (!evalWord.startsWith("route('") && !evalWord.startsWith("Route::has('")) {
-    return false;
-  }
-
-  return true;
 }

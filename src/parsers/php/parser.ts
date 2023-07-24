@@ -157,7 +157,7 @@ export function getPublicParametersOfConstructor(ast: Node) {
   return parameters;
 }
 
-export function getLocationOfCallFunctionArgumentsFor(ast: Node, name: string) {
+export function getLocationOfCallFunctionArgumentsFor(ast: Node, callName: string) {
   const locations: ParserLocation[] = [];
 
   walk((node) => {
@@ -165,7 +165,7 @@ export function getLocationOfCallFunctionArgumentsFor(ast: Node, name: string) {
       const callNode = node as Call;
       if (callNode.what.kind === 'name') {
         const nameNode = callNode.what as Name;
-        if (nameNode.name === name) {
+        if (nameNode.name === callName) {
           if (callNode.arguments.length >= 1) {
             if (callNode.arguments[0].loc) {
               locations.push(callNode.arguments[0].loc);

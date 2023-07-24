@@ -1,16 +1,16 @@
 import { Call, Identifier, Name, Node, Location as ParserLocation, PropertyLookup } from 'php-parser';
 
-import * as parser from '../../parsers/php/parser';
+import * as phpParser from '../../parsers/php/parser';
 
-export const getAst = parser.getAst;
-export const walk = parser.walk;
-export const stripPHPTag = parser.stripPHPTag;
-export const canCompletion = parser.canCompletion;
+export const getAst = phpParser.getAst;
+export const walk = phpParser.walk;
+export const stripPHPTag = phpParser.stripPHPTag;
+export const canCompletion = phpParser.canCompletion;
 
 export function getServiceLocations(ast: Node) {
   const locations: ParserLocation[] = [];
 
-  const routeFunctionArguments = getLocationsOfRouteFunctionArguments(ast);
+  const routeFunctionArguments = phpParser.getLocationOfCallFunctionArgumentsFor(ast, 'route');
   if (routeFunctionArguments.length !== 0) locations.push(...routeFunctionArguments);
 
   const chainRouteFunctionArgumentsOfRedirectFunction =
@@ -21,34 +21,11 @@ export function getServiceLocations(ast: Node) {
   return locations;
 }
 
-export function getLocationsOfRouteFunctionArguments(ast: Node) {
-  const locations: ParserLocation[] = [];
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  parser.walk((node, _parent) => {
-    if (node.kind === 'call') {
-      const callNode = node as Call;
-      if (callNode.what.kind === 'name') {
-        const nameNode = callNode.what as Name;
-        if (nameNode.name === 'route') {
-          if (callNode.arguments.length >= 1) {
-            if (callNode.arguments[0].loc) {
-              locations.push(callNode.arguments[0].loc);
-            }
-          }
-        }
-      }
-    }
-  }, ast);
-
-  return locations;
-}
-
 export function getLocationsByChainRouteFunctionArgumentsOfRedirectFunction(ast: Node) {
   const locations: ParserLocation[] = [];
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  parser.walk((node, _parent) => {
+  phpParser.walk((node, _parent) => {
     let existsRedirect = false;
     let existsRoute = false;
 
