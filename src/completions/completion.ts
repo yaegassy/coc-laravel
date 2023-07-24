@@ -43,7 +43,7 @@ export async function register(context: ExtensionContext, projectManager: Projec
       'Laravel',
       'Laravel',
       DOCUMENT_SELECTOR,
-      new LaravelCompletionProvider(context, projectManager),
+      new LaravelCompletionProvider(projectManager),
       [
         '<', // component,
         ':', // guard,
@@ -57,11 +57,9 @@ export async function register(context: ExtensionContext, projectManager: Projec
 }
 
 class LaravelCompletionProvider implements CompletionItemProvider {
-  private _context: ExtensionContext;
   public projectManager: ProjectManagerType;
 
-  constructor(context: ExtensionContext, projectManager: ProjectManagerType) {
-    this._context = context;
+  constructor(projectManager: ProjectManagerType) {
     this.projectManager = projectManager;
   }
 
