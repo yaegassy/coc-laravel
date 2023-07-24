@@ -1,6 +1,7 @@
 import { CompletionItem, CompletionItemKind, LinesTextDocument, Position, TextEdit, workspace } from 'coc.nvim';
 
 import { getArtisanPath, runTinker } from '../../common/shared';
+import * as bladeGuardService from '../services/bladeGuardService';
 
 type AuthGuardsJsonType = {
   guards?: {
@@ -16,22 +17,18 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
   const doc = workspace.getDocument(document.uri);
   if (!doc) return [];
 
-  const canCompletionWordRange = doc.getWordRangeAtPosition(
-    Position.create(position.line, position.character - 1),
-    '(\'".-@:'
-  );
-  if (!canCompletionWordRange) return [];
-  const canCompletionWord = document.getText(canCompletionWordRange) || '';
-  if (!canCompletion(canCompletionWord)) return [];
-
   let wordWithExtraChars: string | undefined = undefined;
   const wordWithExtraCharsRange = doc.getWordRangeAtPosition(
     Position.create(position.line, position.character - 1),
-    '.-'
+    '.-:'
   );
   if (wordWithExtraCharsRange) {
     wordWithExtraChars = document.getText(wordWithExtraCharsRange);
   }
+
+  const code = document.getText();
+  const offset = document.offsetAt(position);
+  if (!bladeGuardService.canCompletionFromContext(code, offset)) return [];
 
   try {
     const artisanPath = getArtisanPath();
@@ -64,21 +61,4 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
   } catch {}
 
   return items;
-}
-
-function canCompletion(word: string) {
-  let unnecessaryWordCount = 0;
-  for (const w of word) {
-    if (w !== '(') break;
-    unnecessaryWordCount++;
-  }
-
-  const slicedWord = word.slice(unnecessaryWordCount);
-  const evalWord = slicedWord.replace('"', "'");
-
-  if (!evalWord.startsWith("Auth::guard('") && !evalWord.startsWith("@auth('") && !evalWord.startsWith("@guest('")) {
-    return false;
-  }
-
-  return true;
 }
