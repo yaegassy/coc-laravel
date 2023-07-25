@@ -15,10 +15,6 @@ export async function doCompletion(
   const doc = workspace.getDocument(document.uri);
   if (!doc) return [];
 
-  const offset = document.offsetAt(position);
-  const code = document.getText();
-  if (!bladeComponentTagService.canCompletionFromContext(code, offset)) return [];
-
   let wordWithExtraChars: string | undefined = undefined;
   const wordWithExtraCharsRange = doc.getWordRangeAtPosition(
     Position.create(position.line, position.character - 1),
@@ -27,6 +23,10 @@ export async function doCompletion(
   if (wordWithExtraCharsRange) {
     wordWithExtraChars = document.getText(wordWithExtraCharsRange);
   }
+
+  const offset = document.offsetAt(position);
+  const code = document.getText();
+  if (!bladeComponentTagService.canCompletionFromContext(code, offset, wordWithExtraChars)) return [];
 
   const components = Array.from(bladeProjectManager.componentList());
 

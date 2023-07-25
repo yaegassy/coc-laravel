@@ -7,7 +7,7 @@ import {
 
 import * as htmlLsParser from '../../parsers/html/parser';
 
-export function canCompletionFromContext(code: string, editorOffset: number) {
+export function canCompletionFromContext(code: string, editorOffset: number, wordWithExtraChars?: string) {
   if (isBladeEchoRegionByOffset(code, editorOffset)) return false;
   if (isDirectiveWithParametersRegionByOffset(code, editorOffset)) return false;
   if (isPHPDirectiveRegionByOffset(code, editorOffset)) return false;
@@ -20,6 +20,8 @@ export function canCompletionFromContext(code: string, editorOffset: number) {
   }
   // false | If the tag name does not start with x
   if (!currentHtmlNode.tag.startsWith('x')) return false;
+
+  if (wordWithExtraChars?.startsWith('x-')) return true;
 
   if (isComponentRegionAfterComponentNameByOffset(code, editorOffset)) return false;
 
