@@ -3,9 +3,11 @@ import { DirectiveNode } from 'stillat-blade-parser/out/nodes/nodes';
 
 import * as bladeParser from '../../parsers/blade/parser';
 
-const METHODS = ['PUT', 'PATCH', 'DELETE'];
+import { METHOD_DIRECTIVE_PARAMETERS } from '../../constant';
 
 export async function doValidate(textDocument: TextDocument) {
+  if (textDocument.languageId !== 'blade') return;
+
   const diagnostics: Diagnostic[] = [];
 
   const code = textDocument.getText();
@@ -20,11 +22,12 @@ export async function doValidate(textDocument: TextDocument) {
       if (!node.directiveParametersPosition.end?.offset) continue;
 
       const methodParameter = node.directiveParameters.replace(/^\(["']/, '').replace(/["']\)$/, '');
-      if (METHODS.includes(methodParameter)) continue;
+      if (METHOD_DIRECTIVE_PARAMETERS.includes(methodParameter)) continue;
 
       const diagnostic: Diagnostic = {
         source: 'laravel',
         severity: 2,
+        code: 'MDP001',
         message: 'There is an error in the parameter of the method directive',
         range: {
           start: textDocument.positionAt(node.directiveParametersPosition.start.offset),

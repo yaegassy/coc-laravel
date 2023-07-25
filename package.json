@@ -158,6 +158,11 @@
           "type": "boolean",
           "default": true,
           "description": "Enable diagnostic."
+        },
+        "laravel.codeAction.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable code action."
         }
       }
     },

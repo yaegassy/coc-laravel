@@ -42,6 +42,8 @@ This coc-extension will provide various completion features and more features fo
   - Guard completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635272378)
   - Translation completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1637244306)
   - Method directive parameter completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1647629965)
+  - Misc
+    - Please install [coc-blade](https://github.com/yaegassy/coc-blade), it is implemented in [coc-blade](https://github.com/yaegassy/coc-blade)
 - Definitions
   - View definition | [DEMO](https://github.com/yaegassy/coc-laravel/issues/2#issuecomment-1644973067)
     - [PHP -> Blade] Definition jump to the Blade template specified by the view() function.
@@ -60,15 +62,16 @@ This coc-extension will provide various completion features and more features fo
   - ComponentTag Hover | [DEMO](https://github.com/yaegassy/coc-laravel/issues/4#issue-1816594130)
   - Blade Directive Hover
     - Please install [coc-blade](https://github.com/yaegassy/coc-blade), it is implemented in [coc-blade](https://github.com/yaegassy/coc-blade)
-- Artisan and Sail commands integration
-  - Please install [coc-intelephense](https://github.com/yaegassy/coc-intelephense), it is implemented in [coc-intelephense](https://github.com/yaegassy/coc-intelephense)
 - Diagnostics
   - Method directive parameter validation | [DEMO](https://github.com/yaegassy/coc-laravel/issues/5#issuecomment-1647636587)
   - [TODO]
     - Diagnostic features will be added as we come up with useful ones, based on projects already analyzed.
 - CodeActions
+  - Fix MethodDirectiveParameter | [DEMO](https://github.com/yaegassy/coc-laravel/issues/6#issuecomment-1648914444)
   - [TODO]
     - CodeAction features will be added as we come up with useful ones, based on projects already analyzed.
+- Artisan and Sail commands integration
+  - Please install [coc-intelephense](https://github.com/yaegassy/coc-intelephense), it is implemented in [coc-intelephense](https://github.com/yaegassy/coc-intelephense)
 
 ## [RECOMMENDED] Additional installation of "watchman"
 
@@ -123,12 +126,26 @@ For more information, check this coc.nvim's wiki.
 - `laravel.reference.enable`: Enable reference, default `true`
 - `laravel.hover.enable`: Enable hover, default `true`
 - `laravel.diagnostic.enable`: Enable diagnostic, default: `true`
+- `laravel.codeAction.enable`: Enable code action, default: `true`
 
 ## Commands
 
 - `laravel.project.restart`: Run project restart
 - `laravel.project.stats`: (Develop) Show project stats
 - `laravel.view.findAllReferences`: Find view file references
+
+## CodeActions
+
+**Example key mapping (Code Action related)**:
+
+```vim
+nmap <silent> ga <Plug>(coc-codeaction-line)
+nmap <silent> <leader>ac <Plug>(coc-codeaction-cursor)
+```
+
+**Actions**:
+
+- `Fix MethodDirectiveParameter`
 
 ## Recommended coc-extensions for php
 

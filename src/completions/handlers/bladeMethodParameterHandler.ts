@@ -2,6 +2,8 @@ import { CompletionItem, CompletionItemKind, LinesTextDocument, Position, TextEd
 
 import * as bladeMethodParameterService from '../services/bladeMethodParameterService';
 
+import { METHOD_DIRECTIVE_PARAMETERS } from '../../constant';
+
 export async function doCompletion(document: LinesTextDocument, position: Position) {
   if (document.languageId !== 'blade') return [];
 
@@ -24,9 +26,7 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
   if (!bladeMethodParameterService.canCompletionFromContext(code, offset)) return [];
 
   try {
-    const methods = ['PUT', 'PATCH', 'DELETE'];
-
-    for (const method of methods) {
+    for (const method of METHOD_DIRECTIVE_PARAMETERS) {
       const adjustStartCharacter = wordWithExtraChars
         ? position.character - wordWithExtraChars.length
         : position.character;
