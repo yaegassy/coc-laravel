@@ -32,7 +32,7 @@ function getParserEngine() {
   const parserEngine = new Engine({
     parser: {
       debug: false,
-      extractDoc: false,
+      extractDoc: true,
       php7: true,
       locations: true,
       suppressErrors: true,
