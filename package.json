@@ -186,6 +186,7 @@
     "fast-glob": "^3.3.0",
     "php-parser": "3.1.5",
     "stillat-blade-parser": "1.1.11",
+    "vscode-html-languageservice": "^5.0.6",
     "web-tree-sitter": "0.20.8"
   }
 }
