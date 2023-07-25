@@ -1,6 +1,7 @@
 import { CompletionItem, CompletionItemKind, LinesTextDocument, Position, TextEdit, workspace } from 'coc.nvim';
 
 import { type BladeProjectsManagerType } from '../../projects/types';
+import * as bladeComponentTagService from '../services/bladeComponentTagService';
 
 export async function doCompletion(
   document: LinesTextDocument,
@@ -14,14 +15,9 @@ export async function doCompletion(
   const doc = workspace.getDocument(document.uri);
   if (!doc) return [];
 
-  const canCompletionWordRange = doc.getWordRangeAtPosition(
-    Position.create(position.line, position.character - 1),
-    '<.-'
-  );
-  if (!canCompletionWordRange) return [];
-
-  const canCompletionWord = document.getText(canCompletionWordRange) || '';
-  if (!canCompletion(canCompletionWord)) return;
+  const offset = document.offsetAt(position);
+  const code = document.getText();
+  if (!bladeComponentTagService.canCompletionFromContext(code, offset)) return [];
 
   let wordWithExtraChars: string | undefined = undefined;
   const wordWithExtraCharsRange = doc.getWordRangeAtPosition(
@@ -64,13 +60,4 @@ export async function doCompletion(
   }
 
   return items;
-}
-
-// TODO: add html parsers, etc. to properly determine possible complementary positions.
-function canCompletion(word: string) {
-  if (!word.startsWith('<')) {
-    return false;
-  }
-
-  return true;
 }

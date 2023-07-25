@@ -208,6 +208,46 @@ export function isComponentParameterValueRegionByOffset(code: string, editorOffs
   return false;
 }
 
+export function isComponentRegionAfterComponentNameByOffset(code: string, editorOffset: number) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return false;
+
+  const rangeOffsetsAll: RangeOffset[] = [];
+
+  for (const node of bladeDoc.getAllNodes()) {
+    if (node instanceof BladeComponentNode) {
+      const componentNameNode = node.name;
+      if (!componentNameNode?.endPosition) continue;
+
+      let contextEndOffset: number = editorOffset;
+      if (node.endPosition) {
+        if (node.isClosingTag || node.isSelfClosing) {
+          contextEndOffset = node.endPosition.offset;
+        } else {
+          contextEndOffset = node.endPosition.offset + 1;
+        }
+      }
+
+      const rangeOffsets: RangeOffset[] = [
+        {
+          start: componentNameNode.endPosition.offset,
+          end: contextEndOffset,
+        },
+      ];
+
+      rangeOffsetsAll.push(...rangeOffsets);
+    }
+  }
+
+  for (const rangeOffset of rangeOffsetsAll) {
+    if (rangeOffset.start <= editorOffset && rangeOffset.end >= editorOffset) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 //
 // isCallNameFunc...
 //
