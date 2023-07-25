@@ -36,6 +36,9 @@ export async function doCompletion(
   const cursorPositionComponent = bladeComponentPropsCompletionService.getCursorPostionComponent(code, position);
   if (!cursorPositionComponent) return [];
 
+  const offset = document.offsetAt(position);
+  if (!bladeComponentPropsCompletionService.hasDenyCompletionFromRegionByOffset(code, offset)) return [];
+
   const component = bladeProjectManager.componentMapStore.get(cursorPositionComponent);
   if (!component) return [];
 

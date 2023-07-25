@@ -2,7 +2,7 @@ import * as bladeParser from '../../parsers/blade/parser';
 
 import {
   isBladeEchoRegionByOffset,
-  isComponentPropsRegionByOffset,
+  isComponentPropsValueRegionByOffset,
   isDenyKindNameInBladeEchoFromOffset,
   isDenyKindNameInComponentPropsFromOffset,
   isDenyKindNameInDirectiveWithParametersFromOffset,
@@ -20,7 +20,7 @@ export function canCompletionFromPHPRegionInBladeByOffset(code: string, editorOf
   flags.push(isBladeEchoRegionByOffset(code, editorOffset));
   flags.push(isPHPDirectiveRegionByOffset(code, editorOffset));
   flags.push(isDirectiveWithParametersRegionByOffset(code, editorOffset));
-  flags.push(isComponentPropsRegionByOffset(code, editorOffset));
+  flags.push(isComponentPropsValueRegionByOffset(code, editorOffset));
 
   if (flags.includes(true)) {
     return true;

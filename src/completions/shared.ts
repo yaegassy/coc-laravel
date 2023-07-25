@@ -134,7 +134,7 @@ export function isDirectiveWithParametersRegionByOffset(code: string, editorOffs
   return false;
 }
 
-export function isComponentPropsRegionByOffset(code: string, editorOffset: number) {
+export function isComponentPropsValueRegionByOffset(code: string, editorOffset: number) {
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
@@ -144,7 +144,45 @@ export function isComponentPropsRegionByOffset(code: string, editorOffset: numbe
     if (node instanceof BladeComponentNode) {
       if (!node.hasParameters) continue;
       for (const parameter of node.parameters) {
+        // case :xxxx is true
         if (!parameter.isExpression) continue;
+        if (!parameter.valuePosition) continue;
+        if (!parameter.valuePosition.start?.offset) continue;
+        if (!parameter.valuePosition.end?.offset) continue;
+
+        const rangeOffsets: RangeOffset[] = [
+          {
+            start: parameter.valuePosition.start.offset,
+            end: parameter.valuePosition.end.offset,
+          },
+        ];
+
+        rangeOffsetsAll.push(...rangeOffsets);
+      }
+    }
+  }
+
+  for (const rangeOffset of rangeOffsetsAll) {
+    if (rangeOffset.start <= editorOffset && rangeOffset.end >= editorOffset) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export function isComponentParameterValueRegionByOffset(code: string, editorOffset: number) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return false;
+
+  const rangeOffsetsAll: RangeOffset[] = [];
+
+  for (const node of bladeDoc.getAllNodes()) {
+    if (node instanceof BladeComponentNode) {
+      if (!node.hasParameters) continue;
+      for (const parameter of node.parameters) {
+        // case :xxxx is true
+        //if (!parameter.isExpression) continue;
         if (!parameter.valuePosition) continue;
         if (!parameter.valuePosition.start?.offset) continue;
         if (!parameter.valuePosition.end?.offset) continue;
@@ -806,7 +844,7 @@ export function isDenyKindNameInComponentPropsFromOffset(code: string, editorOff
 
         const denyRangeOffsets = getDenyRangeOffsetsFromPHPParserByKindName(
           phpAst,
-          parameter.valuePosition.start.offset,
+          parameter.valuePosition.start.offset + 1,
           denyKindName
         );
 

@@ -1,7 +1,24 @@
 import { Position } from 'coc.nvim';
 
+import { isComponentParameterValueRegionByOffset } from '../shared';
+
 import { BladeComponentNode } from 'stillat-blade-parser/out/nodes/nodes';
 import * as bladeParser from '../../parsers/blade/parser';
+
+export function hasDenyCompletionFromRegionByOffset(code: string, editorOffset: number) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return false;
+
+  const flags: boolean[] = [];
+
+  flags.push(isComponentParameterValueRegionByOffset(code, editorOffset));
+
+  if (flags.includes(true)) {
+    return false;
+  } else {
+    return true;
+  }
+}
 
 export function getCursorPostionComponent(code: string, editorPostion: Position) {
   const componentNames: string[] = [];
