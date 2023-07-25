@@ -224,7 +224,13 @@ export function isComponentRegionAfterComponentNameByOffset(code: string, editor
         if (node.isClosingTag || node.isSelfClosing) {
           contextEndOffset = node.endPosition.offset;
         } else {
-          contextEndOffset = node.endPosition.offset + 1;
+          // **MEMO**:
+          //
+          // There seems to be a difference in the position returned by the
+          // parser depending on the context. Therefore, the offset was
+          // corrected.
+          const adjustOffset = 2;
+          contextEndOffset = node.endPosition.offset + adjustOffset;
         }
       }
 
