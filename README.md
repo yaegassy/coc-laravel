@@ -167,6 +167,7 @@ nmap <silent> <leader>ac <Plug>(coc-codeaction-cursor)
 - [Stillat/blade-parser-typescript](https://github.com/Stillat/blade-parser-typescript)
 - [web-tree-sitter](https://www.npmjs.com/package/web-tree-sitter)
 - [JetBrains/phpstorm-stubs](https://github.com/JetBrains/phpstorm-stubs)
+- [microsoft/vscode-html-languageservice](https://github.com/microsoft/vscode-html-languageservice)
 
 ## License
 
