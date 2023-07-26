@@ -6,6 +6,7 @@ import path from 'path';
 import { BUILTIN_FUNCTIONS_JSON_PATH } from '../../constant';
 import * as phpFunctionProjectService from '../services/phpFunction';
 import { PHPFunctionType } from '../types';
+import { getArtisanPath } from '../../common/shared';
 
 export class PHPFunctionProjectManager {
   phpFunctionMapStore: Map<string, PHPFunctionType>;
@@ -18,6 +19,10 @@ export class PHPFunctionProjectManager {
   }
 
   async initialize() {
+    // Checking artisan to determine if it is a laravel project
+    const artisanPath = getArtisanPath();
+    if (!artisanPath) return;
+
     const phpFunctions: PHPFunctionType[] = [];
 
     //
@@ -49,14 +54,17 @@ export class PHPFunctionProjectManager {
       workspace.root
     );
 
-    for (const autoloadedFunctionFile of abusoluteAutoloadedFunctionsFiles) {
-      const relativeFilePath = autoloadedFunctionFile.replace(workspace.root, '').replace(/^\//, '');
-      const targetPHPCode = await fs.promises.readFile(autoloadedFunctionFile, { encoding: 'utf8' });
-      const autoloadedFunctions = phpFunctionProjectService.getPHPFunctions(targetPHPCode, relativeFilePath);
-      if (autoloadedFunctions) {
-        phpFunctions.push(...autoloadedFunctions);
+    // Some of the PATHs read do not exist or cause errors
+    try {
+      for (const autoloadedFunctionFile of abusoluteAutoloadedFunctionsFiles) {
+        const relativeFilePath = autoloadedFunctionFile.replace(workspace.root, '').replace(/^\//, '');
+        const targetPHPCode = await fs.promises.readFile(autoloadedFunctionFile, { encoding: 'utf8' });
+        const autoloadedFunctions = phpFunctionProjectService.getPHPFunctions(targetPHPCode, relativeFilePath);
+        if (autoloadedFunctions) {
+          phpFunctions.push(...autoloadedFunctions);
+        }
       }
-    }
+    } catch (e) {}
 
     //
     // Set MapStore
