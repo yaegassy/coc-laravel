@@ -29,8 +29,7 @@ This coc-extension executes `artisan` commands in the background for some featur
 This coc-extension will provide various completion features and more features for Laravel projects.
 
 - Completions
-  - ComponentTag completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1640305113)
-  - ComponentProps completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1641364877)
+  - Component completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1650935001)
   - PHP Function completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1643359916)
     - Provides function completion within the PHP-related regions of the Blade file.
   - Config completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635266998)
@@ -165,9 +164,9 @@ nmap <silent> <leader>ac <Plug>(coc-codeaction-cursor)
 
 - [glayzzle/php-parser](https://github.com/glayzzle/php-parser)
 - [Stillat/blade-parser-typescript](https://github.com/Stillat/blade-parser-typescript)
-- [web-tree-sitter](https://www.npmjs.com/package/web-tree-sitter)
 - [JetBrains/phpstorm-stubs](https://github.com/JetBrains/phpstorm-stubs)
 - [microsoft/vscode-html-languageservice](https://github.com/microsoft/vscode-html-languageservice)
+- [web-tree-sitter](https://www.npmjs.com/package/web-tree-sitter)
 
 ## License
 
