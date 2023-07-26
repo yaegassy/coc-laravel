@@ -1,9 +1,7 @@
 import { ExtensionContext, workspace } from 'coc.nvim';
 
 import * as codeActionFeature from './codeActions/codeAction';
-import * as projectRestartCommandFeature from './commands/projectRestart';
-import * as projectStatsCommandFeature from './commands/projectStats';
-import * as viewFindAllReferencesCommandFeature from './commands/viewFindAllReferences';
+import * as commandFeature from './commands/command';
 import * as completionFeature from './completions/completion';
 import * as definitionFeature from './definitions/definition';
 import * as diagnosticFeature from './diagnostics/diagnostic';
@@ -17,16 +15,14 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   const projectManager = await projectManagerFeature.register(context);
   if (projectManager) {
-    projectStatsCommandFeature.register(context, projectManager);
-    projectRestartCommandFeature.register(context, projectManager);
-    viewFindAllReferencesCommandFeature.register(context, projectManager);
-
+    commandFeature.register(context, projectManager);
     completionFeature.register(context, projectManager);
     definitionFeature.register(context, projectManager);
     referenceFeature.register(context, projectManager);
     hoverFeature.register(context, projectManager);
     diagnosticFeature.register(context);
     codeActionFeature.register(context);
+
     watcherFeature.register(context, projectManager);
   }
 }

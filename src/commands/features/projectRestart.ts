@@ -1,6 +1,6 @@
 import { ExtensionContext, commands, window } from 'coc.nvim';
 
-import { type ProjectManagerType } from '../projects/types';
+import { type ProjectManagerType } from '../../projects/types';
 
 export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
   context.subscriptions.push(

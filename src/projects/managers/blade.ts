@@ -1,11 +1,11 @@
-import { workspace } from 'coc.nvim';
+import { Uri, workspace } from 'coc.nvim';
 
 import { kebabCase } from 'case-anything';
 import fg from 'fast-glob';
 import fs from 'fs';
 import path from 'path';
 
-import { getArtisanPath, runTinker } from '../../common/shared';
+import { getAppPath, getArtisanPath, getViewPath, runTinker } from '../../common/shared';
 import * as bladeProjectService from '../services/blade';
 import { ComponentMapValueType, PropsType } from '../types';
 
@@ -15,78 +15,57 @@ export class BladeProjectsManager {
 
   workspaceRoot: string;
   initialized: boolean;
+  bladeFiles: string[];
 
   constructor(workspaceRoot: string) {
     this.workspaceRoot = workspaceRoot;
     this.bladeMapStore = new Map();
     this.componentMapStore = new Map();
     this.initialized = false;
+    this.bladeFiles = [];
   }
 
   async initialize() {
     const artisanPath = getArtisanPath();
     if (!artisanPath) return;
 
-    const getViewPathPHPCode = `echo json_encode(app()->viewPath())`;
-    const resViewPath = await runTinker(getViewPathPHPCode, artisanPath);
-    if (!resViewPath) return;
-    const viewPath = resViewPath
-      .replace(/["']/g, '')
-      .replace(/\\/g, '') // remove json quate
-      .replace(/\\\\/g, '/') // replace window path to posix path
-      .replace('\n', '');
+    const viewPath = await getViewPath(artisanPath);
+    if (viewPath) {
+      const relativeViewPath = this.getRelativePosixFilePath(viewPath, this.workspaceRoot);
+      const bladeFileGlobPattern = `**/${relativeViewPath}/**/*.blade.php`;
 
-    const bladeGlobPattern = path.join('**', viewPath.replace(workspace.root, ''), '**', '*.blade.php');
+      this.bladeFiles = await fg(bladeFileGlobPattern, {
+        ignore: ['**/.git/**', '**/vendor/**', '**/node_modules/**'],
+        absolute: true,
+        cwd: workspace.root,
+      });
 
-    const bladeFiles = await fg(bladeGlobPattern, {
-      ignore: ['**/.git/**', '**/vendor/**', '**/node_modules/**'],
-      absolute: true,
-      cwd: workspace.root,
-    });
-
-    // ====
-    await this.setBlade(bladeFiles);
-
-    ////
-
-    const getAppPathPHPCode = `echo json_encode(app()->path())`;
-    const resAppPath = await runTinker(getAppPathPHPCode, artisanPath);
-    if (!resAppPath) return;
-    const appPath = resAppPath
-      .replace(/["']/g, '')
-      .replace(/\\/g, '') // remove json quate
-      .replace(/\\\\/g, '/') // replace window path to posix path
-      .replace('\n', '');
-
-    const classBasedViewGlobPattern = path.posix.join(
-      '**',
-      appPath.replace(workspace.root, ''),
-      'View',
-      'Components',
-      '**',
-      '*.php'
-    );
-
-    const classBasedViewFiles = await fg(classBasedViewGlobPattern, {
-      ignore: ['**/.git/**', '**/vendor/**', '**/node_modules/**'],
-      absolute: true,
-      cwd: workspace.root,
-    });
-
-    const componentFiles: string[] = [];
-    if (bladeFiles) {
-      componentFiles.push(...bladeFiles);
-    }
-    if (classBasedViewFiles) {
-      componentFiles.push(...classBasedViewFiles);
+      await this.setBlade(this.bladeFiles);
     }
 
-    // ====
-    await this.setComponent(componentFiles);
+    const appPath = await getAppPath(artisanPath);
+    if (appPath) {
+      const relativeAppPath = this.getRelativePosixFilePath(appPath, this.workspaceRoot);
 
-    ////
+      const classBasedViewGlobPattern = `**/${relativeAppPath}/View/Components/**/*.php`;
 
-    // ====
+      const classBasedViewFiles = await fg(classBasedViewGlobPattern, {
+        ignore: ['**/.git/**', '**/vendor/**', '**/node_modules/**'],
+        absolute: true,
+        cwd: workspace.root,
+      });
+
+      const componentFiles: string[] = [];
+      if (this.bladeFiles) {
+        componentFiles.push(...this.bladeFiles);
+      }
+      if (classBasedViewFiles) {
+        componentFiles.push(...classBasedViewFiles);
+      }
+
+      await this.setComponent(componentFiles);
+    }
+
     this.initialized = true;
   }
 
@@ -234,5 +213,11 @@ export class BladeProjectsManager {
       return componentKey;
     }
     return undefined;
+  }
+
+  getRelativePosixFilePath(absoluteFilePath: string, rootPath: string) {
+    const rootUri = Uri.parse(rootPath).toString();
+    const abusoluteFileUri = Uri.parse(absoluteFilePath).toString();
+    return abusoluteFileUri.replace(rootUri + '/', '');
   }
 }

@@ -2,7 +2,7 @@ import { ExtensionContext, Location, Position, Uri, commands, workspace } from '
 
 import path from 'path';
 
-import { type ProjectManagerType } from '../projects/types';
+import { type ProjectManagerType } from '../../projects/types';
 
 export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
   if (!workspace.getConfiguration('laravel').get('reference.enable')) return;

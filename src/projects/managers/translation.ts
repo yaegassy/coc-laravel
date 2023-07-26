@@ -1,7 +1,8 @@
 import path from 'path';
 
 import fg from 'fast-glob';
-import fs from 'node:fs/promises';
+////import fs from 'node:fs/promises';
+import fs from 'fs';
 import { Array as ArrayNode, Entry, Return, String as StringNode } from 'php-parser';
 
 import { getArtisanPath, runTinker } from '../../common/shared';
@@ -49,7 +50,7 @@ export class TranslationProjectManager {
 
   async set(files: string[]) {
     for (const file of files) {
-      const code = await fs.readFile(file, { encoding: 'utf8' });
+      const code = await fs.promises.readFile(file, { encoding: 'utf8' });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const filenameWitoutExt = this.getPathName(file);
       if (path.extname(file) === '.php' && filenameWitoutExt) {

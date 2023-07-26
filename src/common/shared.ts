@@ -1,4 +1,4 @@
-import { workspace } from 'coc.nvim';
+import { workspace, Uri } from 'coc.nvim';
 
 import cp from 'child_process';
 import fs from 'fs';
@@ -51,4 +51,54 @@ export async function runRouteListJson(artisanPath: string) {
     return undefined;
   });
   return r;
+}
+
+export async function getAppPath(artisanPath: string) {
+  const getAppPathPHPCode = `echo json_encode(app()->path())`;
+  const resAppPath = await runTinker(getAppPathPHPCode, artisanPath);
+  if (!resAppPath) return;
+  const appPath = resAppPath
+    .replace(/["']/g, '')
+    .replace(/\\/g, '') // remove json quate
+    .replace(/\\\\/g, '/') // replace window path to posix path
+    .replace('\n', '');
+
+  return appPath;
+}
+
+export async function getViewPath(artisanPath: string) {
+  const getViewPathPHPCode = `echo json_encode(app()->viewPath())`;
+  const resViewPath = await runTinker(getViewPathPHPCode, artisanPath);
+  if (!resViewPath) return;
+  const viewPath = resViewPath
+    .replace(/["']/g, '')
+    .replace(/\\/g, '') // remove json quate
+    .replace(/\\\\/g, '/') // replace window path to posix path
+    .replace('\n', '');
+
+  return viewPath;
+}
+
+export async function getLangPath(artisanPath: string) {
+  const getLangPathPHPCode = `echo json_encode(app()->langPath())`;
+  const resLangPath = await runTinker(getLangPathPHPCode, artisanPath);
+  if (!resLangPath) return;
+  const langPath = resLangPath.replace(/["']/g, '').replace(/\\/g, '').replace('\n', '');
+
+  return langPath;
+}
+
+export async function getLocale(artisanPath: string) {
+  const getLocalePHPCode = `echo json_encode(config('app.locale'))`;
+  const resLocale = await runTinker(getLocalePHPCode, artisanPath);
+  if (!resLocale) return;
+  const locale = resLocale.replace(/["']/g, '').replace(/\\/g, '').replace('\n', '');
+
+  return locale;
+}
+
+export function getRelativePosixFilePath(absoluteFilePath: string, rootPath: string) {
+  const rootUri = Uri.parse(rootPath).toString();
+  const abusoluteFileUri = Uri.parse(absoluteFilePath).toString();
+  return abusoluteFileUri.replace(rootUri + '/', '');
 }
