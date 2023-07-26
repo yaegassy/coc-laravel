@@ -99,7 +99,7 @@ To make coc.nvim recognize `workspaceFolders` correctly, you can set `b:coc_root
 **Example**:
 
 ```vim
-  au FileType php let b:coc_root_patterns = ['.git', '.env', 'composer.json', 'artisan']
+  au FileType php,blade let b:coc_root_patterns = ['.git', '.env', 'composer.json', 'artisan']
 ```
 
 For more information, check this coc.nvim's wiki.
