@@ -184,6 +184,7 @@
   "dependencies": {
     "case-anything": "^2.1.13",
     "fast-glob": "^3.3.0",
+    "minimatch": "^9.0.3",
     "php-parser": "3.1.5",
     "stillat-blade-parser": "1.1.11",
     "vscode-html-languageservice": "^5.0.6",
