@@ -13,8 +13,7 @@ import {
 
 import { DOCUMENT_SELECTOR, SUPPORTED_LANGUAGE } from '../constant';
 import { type ProjectManagerType } from '../projects/types';
-import * as bladeComponentPropsCompletionHandler from './handlers/bladeComponentPropsHandler';
-import * as bladeComponentTagCompletionHandler from './handlers/bladeComponentTagHandler';
+import * as bladeComponentCompletionHandler from './handlers/bladeComponentHandler';
 import * as bladeConfigCompletionHandler from './handlers/bladeConfigHandler';
 import * as bladeEnvCompletionHandler from './handlers/bladeEnvHandler';
 import * as bladeGuardCompletionHandler from './handlers/bladeGuardHandler';
@@ -188,24 +187,13 @@ class LaravelCompletionProvider implements CompletionItemProvider {
 
     // component
     if (workspace.getConfiguration('laravel').get('completion.componentEnable')) {
-      // component tag
-      const componentTagCompletionItems = await bladeComponentTagCompletionHandler.doCompletion(
+      const componentCompletionItems = await bladeComponentCompletionHandler.doCompletion(
         document,
         position,
         this.projectManager.bladeProjectManager
       );
-      if (componentTagCompletionItems) {
-        items.push(...componentTagCompletionItems);
-      }
-
-      // component props
-      const componentPropsCompletionItems = await bladeComponentPropsCompletionHandler.doCompletion(
-        document,
-        position,
-        this.projectManager.bladeProjectManager
-      );
-      if (componentPropsCompletionItems) {
-        items.push(...componentPropsCompletionItems);
+      if (componentCompletionItems) {
+        items.push(...componentCompletionItems);
       }
     }
 
