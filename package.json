@@ -89,6 +89,11 @@
           "default": true,
           "description": "Enable completion."
         },
+        "laravel.completion.directiveEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable directive completion."
+        },
         "laravel.completion.configEnable": {
           "type": "boolean",
           "default": true,

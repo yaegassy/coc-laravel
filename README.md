@@ -32,6 +32,7 @@ This coc-extension will provide various completion features and more features fo
   - Component completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1650935001)
   - PHP Function completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1643359916)
     - Provides function completion within the PHP-related regions of the Blade file.
+  - Directive completion
   - Config completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635266998)
   - Env completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635267885)
   - Validation completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635268664)
@@ -111,6 +112,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.enable`: Enable coc-laravel extension, default: `true`
 - `laravel.environment.phpPath`: Path to PHP, you can use a custom version of PHP. If there is no setting, `php` of the execution environment will be used. default: `""`
 - `laravel.completion.enable`: Enable all completion feature, default: `true`
+- `laravel.completion.directiveEnable`: Enable directive completion, default: `true`
 - `laravel.completion.configEnable`: Enable config completion, default: `true`
 - `laravel.completion.envEnable`: Enable env completion, default: true
 - `laravel.completion.validationEnable`: Enable validation completion.

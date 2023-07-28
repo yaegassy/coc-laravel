@@ -5,9 +5,10 @@ import {
   CompletionItemProvider,
   CompletionList,
   ExtensionContext,
-  languages,
   LinesTextDocument,
   Position,
+  extensions,
+  languages,
   workspace,
 } from 'coc.nvim';
 
@@ -15,6 +16,7 @@ import { DOCUMENT_SELECTOR, SUPPORTED_LANGUAGE } from '../constant';
 import { type ProjectManagerType } from '../projects/types';
 import * as bladeComponentCompletionHandler from './handlers/bladeComponentHandler';
 import * as bladeConfigCompletionHandler from './handlers/bladeConfigHandler';
+import * as bladeDirectiveCompletionHandler from './handlers/bladeDirectiveHandler';
 import * as bladeEnvCompletionHandler from './handlers/bladeEnvHandler';
 import * as bladeGuardCompletionHandler from './handlers/bladeGuardHandler';
 import * as bladeMethodParameterHandler from './handlers/bladeMethodParameterHandler';
@@ -31,6 +33,9 @@ import * as translationCompletionHandler from './handlers/translationHandler';
 import * as validationCompletionHandler from './handlers/validationHandler';
 import * as viewCompletionHandler from './handlers/viewHandler';
 
+import path from 'path';
+import { CompletionItemDataType } from './types';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
   if (!workspace.getConfiguration('laravel').get('completion.enable')) return;
@@ -44,8 +49,9 @@ export async function register(context: ExtensionContext, projectManager: Projec
       'Laravel',
       'Laravel',
       DOCUMENT_SELECTOR,
-      new LaravelCompletionProvider(projectManager),
+      new LaravelCompletionProvider(context, projectManager),
       [
+        '@', // directive,
         '<', // component,
         ':', // guard,
         '.', // route, view
@@ -58,10 +64,19 @@ export async function register(context: ExtensionContext, projectManager: Projec
 }
 
 class LaravelCompletionProvider implements CompletionItemProvider {
+  private extensionContext: ExtensionContext;
   public projectManager: ProjectManagerType;
 
-  constructor(projectManager: ProjectManagerType) {
+  private existsCocBlade: boolean;
+
+  constructor(context: ExtensionContext, projectManager: ProjectManagerType) {
+    this.extensionContext = context;
     this.projectManager = projectManager;
+
+    this.existsCocBlade = false;
+    if (extensions.all.find((e) => e.id === 'coc-blade')) {
+      this.existsCocBlade = true;
+    }
   }
 
   async provideCompletionItems(
@@ -217,6 +232,37 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       }
     }
 
+    // directive
+    if (workspace.getConfiguration('laravel').get('completion.directiveEnable') && !this.existsCocBlade) {
+      const directiveJsonFilePaths = [
+        path.join(this.extensionContext.extensionPath, 'resources', 'jsonData', 'blade-directive.json'),
+        path.join(this.extensionContext.extensionPath, 'resources', 'jsonData', 'livewire-directive.json'),
+      ];
+
+      const bladeDirectiveCompletionItems = await bladeDirectiveCompletionHandler.doCompletion(
+        document,
+        position,
+        directiveJsonFilePaths
+      );
+      if (bladeDirectiveCompletionItems) {
+        items.push(...bladeDirectiveCompletionItems);
+      }
+    }
+
     return items;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async resolveCompletionItem(item: CompletionItem, _token: CancellationToken) {
+    if (!item.data) return item;
+    const itemData = item.data as CompletionItemDataType;
+
+    if (itemData.source === 'laravel-blade-directive') {
+      const docDataDir = path.join(this.extensionContext.extensionPath, 'resources', 'markdownData', 'blade');
+      const resolveItem = await bladeDirectiveCompletionHandler.doResolveCompletionItem(item, _token, docDataDir);
+      return resolveItem;
+    }
+
+    return item;
   }
 }
