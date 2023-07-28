@@ -67,15 +67,17 @@ class LaravelCompletionProvider implements CompletionItemProvider {
   private extensionContext: ExtensionContext;
   public projectManager: ProjectManagerType;
 
-  private existsCocBlade: boolean;
+  private isCocBladeCompletionEnableDirective: boolean;
 
   constructor(context: ExtensionContext, projectManager: ProjectManagerType) {
     this.extensionContext = context;
     this.projectManager = projectManager;
 
-    this.existsCocBlade = false;
+    this.isCocBladeCompletionEnableDirective = false;
     if (extensions.all.find((e) => e.id === 'coc-blade')) {
-      this.existsCocBlade = true;
+      this.isCocBladeCompletionEnableDirective = workspace
+        .getConfiguration('blade')
+        .get<boolean>('completion.enableDirective', true);
     }
   }
 
@@ -233,7 +235,10 @@ class LaravelCompletionProvider implements CompletionItemProvider {
     }
 
     // directive
-    if (workspace.getConfiguration('laravel').get('completion.directiveEnable') && !this.existsCocBlade) {
+    if (
+      workspace.getConfiguration('laravel').get('completion.directiveEnable') &&
+      !this.isCocBladeCompletionEnableDirective
+    ) {
       const directiveJsonFilePaths = [
         path.join(this.extensionContext.extensionPath, 'resources', 'jsonData', 'blade-directive.json'),
         path.join(this.extensionContext.extensionPath, 'resources', 'jsonData', 'livewire-directive.json'),
