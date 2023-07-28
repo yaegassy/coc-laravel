@@ -71,7 +71,8 @@ This coc-extension will provide various completion features and more features fo
   - [TODO]
     - CodeAction features will be added as we come up with useful ones, based on projects already analyzed.
 - Artisan and Sail commands integration
-  - Please install [coc-intelephense](https://github.com/yaegassy/coc-intelephense), it is implemented in [coc-intelephense](https://github.com/yaegassy/coc-intelephense)
+  - `laravel.artisan.run` command feature.
+  - `laravel.sailArtisan.run` command feature.
 
 ## [RECOMMENDED] Additional installation of "watchman"
 
@@ -129,11 +130,15 @@ For more information, check this coc.nvim's wiki.
 - `laravel.hover.enable`: Enable hover, default `true`
 - `laravel.diagnostic.enable`: Enable diagnostic, default: `true`
 - `laravel.codeAction.enable`: Enable code action, default: `true`
+- `laravel.artisan.withoutArgumentsCommandList`: List of commands to quickly execute `laravel.artisan.run` or `laravel.sailArtisan.run` without prompting for arguments or options, e.g. `[\"route:list\", \"clear-compiled\"]`, default: `[]`
+- `laravel.artisan.enableSplitRight`: Use vertical belowright for artisan terminal window, default: `false`
 
 ## Commands
 
 - `laravel.project.restart`: Run project restart
 - `laravel.project.stats`: (Develop) Show project stats
+- `laravel.artisan.run`: Run artisan command
+- `laravel.sailArtisan.run`: Run sail artisan command
 - `laravel.view.findAllReferences`: Find view file references
 
 ## CodeActions

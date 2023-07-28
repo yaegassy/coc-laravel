@@ -173,6 +173,16 @@
           "type": "boolean",
           "default": true,
           "description": "Enable code action."
+        },
+        "laravel.artisan.withoutArgumentsCommandList": {
+          "type": "array",
+          "default": [],
+          "description": "List of commands to quickly execute `laravel.artisan.run` or `laravel.sailArtisan.run` without prompting for arguments or options, e.g. `[\"route:list\", \"clear-compiled\"]`."
+        },
+        "laravel.artisan.enableSplitRight": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use vertical belowright for artisan terminal window."
         }
       }
     },
@@ -184,6 +194,14 @@
       {
         "command": "laravel.project.stats",
         "title": "(Develop) Show project stats"
+      },
+      {
+        "command": "laravel.artisan.run",
+        "title": "Run artisan command"
+      },
+      {
+        "command": "laravel.sailArtisan.run",
+        "title": "Run sail artisan command"
       },
       {
         "command": "laravel.view.findAllReferences",
