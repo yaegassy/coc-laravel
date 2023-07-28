@@ -61,7 +61,6 @@ This coc-extension will provide various completion features and more features fo
 - Hovers
   - ComponentTag Hover | [DEMO](https://github.com/yaegassy/coc-laravel/issues/4#issue-1816594130)
   - Blade Directive Hover
-    - Please install [coc-blade](https://github.com/yaegassy/coc-blade), it is implemented in [coc-blade](https://github.com/yaegassy/coc-blade)
 - Diagnostics
   - Method directive parameter validation | [DEMO](https://github.com/yaegassy/coc-laravel/issues/5#issuecomment-1647636587)
   - [TODO]

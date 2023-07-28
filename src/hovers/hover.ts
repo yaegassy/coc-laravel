@@ -13,6 +13,9 @@ import {
 import { DOCUMENT_SELECTOR } from '../constant';
 import { type ProjectManagerType } from '../projects/types';
 import * as bladeComponentTagHandler from './handlers/bladeComponentTagHandler';
+import * as bladeDirectiveHandler from './handlers/bladeDirectiveHandler';
+
+import path from 'path';
 
 export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
   context.subscriptions.push(
@@ -21,11 +24,11 @@ export async function register(context: ExtensionContext, projectManager: Projec
 }
 
 class LaravelHoverProvider implements HoverProvider {
-  _context: ExtensionContext;
+  extensionContext: ExtensionContext;
   projectManager: ProjectManagerType;
 
   constructor(context: ExtensionContext, projectManager: ProjectManagerType) {
-    this._context = context;
+    this.extensionContext = context;
     this.projectManager = projectManager;
   }
 
@@ -43,6 +46,12 @@ class LaravelHoverProvider implements HoverProvider {
     const bladeComponentTagValue = await bladeComponentTagHandler.doHover(document, position, this.projectManager);
     if (bladeComponentTagValue) {
       contents.value += `${bladeComponentTagValue}\n\n`;
+    }
+
+    const docDataDir = path.join(this.extensionContext.extensionPath, 'resources', 'markdownData');
+    const bladeDirectiveValue = await bladeDirectiveHandler.doHover(document, position, docDataDir);
+    if (bladeDirectiveValue) {
+      contents.value += `${bladeDirectiveValue}\n\n`;
     }
 
     if (contents.value.length === 0) return null;
