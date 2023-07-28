@@ -1,13 +1,13 @@
 import {
+  Call,
   Class as ClassNode,
   Engine,
   Identifier,
   Method,
+  Name,
   Node,
   Location as ParserLocation,
   String as StringNode,
-  Call,
-  Name,
 } from 'php-parser';
 
 export type ParameterType = {
@@ -25,7 +25,7 @@ export function getAst(code: string) {
 }
 
 export function stripPHPTag(code: string) {
-  return code.replace('<?php', '').replace('?>', '');
+  return code.replace('<?php', '').replace('?>', '').replace('<?=', '');
 }
 
 function getParserEngine() {
