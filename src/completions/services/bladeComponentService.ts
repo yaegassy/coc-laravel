@@ -7,6 +7,7 @@ import { ComponentMapValueType } from '../../projects/types';
 import {
   isBladeEchoRegionByOffset,
   isDirectiveWithParametersRegionByOffset,
+  isInlinePHPRegionByOffset,
   isPHPDirectiveRegionByOffset,
 } from '../shared';
 
@@ -97,6 +98,7 @@ export function canCompletionFromContext(code: string, editorOffset: number) {
   if (isBladeEchoRegionByOffset(code, editorOffset)) return false;
   if (isDirectiveWithParametersRegionByOffset(code, editorOffset)) return false;
   if (isPHPDirectiveRegionByOffset(code, editorOffset)) return false;
+  if (isInlinePHPRegionByOffset(code, editorOffset)) return false;
 
   return true;
 }

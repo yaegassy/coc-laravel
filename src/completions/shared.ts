@@ -1,5 +1,5 @@
 import { Call, Identifier, Name, Node, StaticLookup } from 'php-parser';
-import { BladeComponentNode, BladeEchoNode, DirectiveNode } from 'stillat-blade-parser/out/nodes/nodes';
+import { BladeComponentNode, BladeEchoNode, DirectiveNode, InlinePhpNode } from 'stillat-blade-parser/out/nodes/nodes';
 
 import * as bladeParser from '../parsers/blade/parser';
 import * as phpParser from '../parsers/php/parser';
@@ -70,6 +70,37 @@ export function isPHPDirectiveRegionByOffset(code: string, editorOffset: number)
 
         rangeOffsetsAll.push(...rangeOffsets);
       }
+    }
+  }
+
+  for (const rangeOffset of rangeOffsetsAll) {
+    if (rangeOffset.start <= editorOffset && rangeOffset.end >= editorOffset) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export function isInlinePHPRegionByOffset(code: string, editorOffset: number) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return false;
+
+  const rangeOffsetsAll: RangeOffset[] = [];
+
+  for (const node of bladeDoc.getAllNodes()) {
+    if (node instanceof InlinePhpNode) {
+      if (!node.startPosition) continue;
+      if (!node.endPosition) continue;
+
+      const rangeOffsets: RangeOffset[] = [
+        {
+          start: node.startPosition.offset,
+          end: node.endPosition.offset,
+        },
+      ];
+
+      rangeOffsetsAll.push(...rangeOffsets);
     }
   }
 
@@ -235,6 +266,45 @@ export function isCallNameFuncInPHPDirectiveFromOffset(code: string, editorOffse
         );
         rangeOffsetsAll.push(...rangeOffsets);
       }
+    }
+  }
+
+  for (const rangeOffset of rangeOffsetsAll) {
+    if (rangeOffset.start <= editorOffset && rangeOffset.end >= editorOffset) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export function isCallNameFuncInInlinePHPFromOffset(code: string, editorOffset: number, callName: string) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return false;
+
+  const rangeOffsetsAll: RangeOffset[] = [];
+
+  for (const node of bladeDoc.getAllNodes()) {
+    if (node instanceof InlinePhpNode) {
+      if (!node.startPosition) continue;
+
+      const phpCode = node.sourceContent;
+      const phpAst = phpParser.getAst(phpCode);
+      if (!phpAst) continue;
+
+      let adjustOffset = 0;
+      if (node.sourceContent.startsWith('<?php')) {
+        adjustOffset = 5;
+      } else if (node.sourceContent.startsWith('<?=')) {
+        adjustOffset = 3;
+      }
+
+      const rangeOffsets = getRangeOfsetsFromPHPParserByCallName(
+        phpAst,
+        node.startPosition.offset + adjustOffset,
+        callName
+      );
+      rangeOffsetsAll.push(...rangeOffsets);
     }
   }
 
@@ -503,6 +573,51 @@ export function isStaticMethodNameInPHPDirectiveFromOffset(
   return false;
 }
 
+export function isStaticMethodNameInInlinePHPFromOffset(
+  code: string,
+  editorOffset: number,
+  callStaticClassName: string,
+  callStaticMethodName: string
+) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return false;
+
+  const rangeOffsetsAll: RangeOffset[] = [];
+
+  for (const node of bladeDoc.getAllNodes()) {
+    if (node instanceof InlinePhpNode) {
+      if (!node.startPosition) continue;
+
+      const phpCode = node.sourceContent;
+      const phpAst = phpParser.getAst(phpCode);
+      if (!phpAst) continue;
+
+      let adjustOffset = 0;
+      if (node.sourceContent.startsWith('<?php')) {
+        adjustOffset = 5;
+      } else if (node.sourceContent.startsWith('<?=')) {
+        adjustOffset = 3;
+      }
+
+      const rangeOffsets = getRangeOffsetsFromPHPParserByStaticClassAndMethodName(
+        phpAst,
+        node.startPosition.offset + adjustOffset,
+        callStaticClassName,
+        callStaticMethodName
+      );
+      rangeOffsetsAll.push(...rangeOffsets);
+    }
+  }
+
+  for (const rangeOffset of rangeOffsetsAll) {
+    if (rangeOffset.start <= editorOffset && rangeOffset.end >= editorOffset) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 export function isStaticMethodNameInDirectiveWithParametersFromOffset(
   code: string,
   editorOffset: number,
@@ -718,6 +833,44 @@ export function isDenyKindNameInPHPDirectiveFromOffset(code: string, editorOffse
         );
         denyRangeOffsetsAll.push(...rangeOffsets);
       }
+    }
+  }
+
+  for (const denyRangeOffset of denyRangeOffsetsAll) {
+    if (denyRangeOffset.start <= editorOffset && denyRangeOffset.end >= editorOffset) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export function isDenyKindNameInInlinePHPFromOffset(code: string, editorOffset: number, denyKindName: string) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return false;
+
+  const denyRangeOffsetsAll: RangeOffset[] = [];
+
+  for (const node of bladeDoc.getAllNodes()) {
+    if (node instanceof InlinePhpNode) {
+      if (!node.startPosition) continue;
+      const phpCode = node.sourceContent;
+      const phpAst = phpParser.getAst(phpCode);
+      if (!phpAst) continue;
+
+      let adjustOffset = 0;
+      if (node.sourceContent.startsWith('<?php')) {
+        adjustOffset = 5;
+      } else if (node.sourceContent.startsWith('<?=')) {
+        adjustOffset = 3;
+      }
+
+      const rangeOffsets = getDenyRangeOffsetsFromPHPParserByKindName(
+        phpAst,
+        node.startPosition.offset + adjustOffset,
+        denyKindName
+      );
+      denyRangeOffsetsAll.push(...rangeOffsets);
     }
   }
 

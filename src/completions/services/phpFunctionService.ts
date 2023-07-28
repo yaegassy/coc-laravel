@@ -6,8 +6,10 @@ import {
   isDenyKindNameInBladeEchoFromOffset,
   isDenyKindNameInComponentPropsFromOffset,
   isDenyKindNameInDirectiveWithParametersFromOffset,
+  isDenyKindNameInInlinePHPFromOffset,
   isDenyKindNameInPHPDirectiveFromOffset,
   isDirectiveWithParametersRegionByOffset,
+  isInlinePHPRegionByOffset,
   isPHPDirectiveRegionByOffset,
 } from '../shared';
 
@@ -19,6 +21,7 @@ export function canCompletionFromPHPRegionInBladeByOffset(code: string, editorOf
 
   flags.push(isBladeEchoRegionByOffset(code, editorOffset));
   flags.push(isPHPDirectiveRegionByOffset(code, editorOffset));
+  flags.push(isInlinePHPRegionByOffset(code, editorOffset));
   flags.push(isDirectiveWithParametersRegionByOffset(code, editorOffset));
   flags.push(isComponentPropsValueRegionByOffset(code, editorOffset));
 
@@ -60,6 +63,14 @@ export function hasDenyKindNameFromPHPRegionInBladeByOffset(code: string, editor
   flags.push(isDenyKindNameInPHPDirectiveFromOffset(code, editorOffset, 'string'));
   flags.push(isDenyKindNameInPHPDirectiveFromOffset(code, editorOffset, 'staticlookup'));
   flags.push(isDenyKindNameInPHPDirectiveFromOffset(code, editorOffset, 'propertylookup'));
+
+  //
+  // Inline PHP
+  //
+
+  flags.push(isDenyKindNameInInlinePHPFromOffset(code, editorOffset, 'string'));
+  flags.push(isDenyKindNameInInlinePHPFromOffset(code, editorOffset, 'staticlookup'));
+  flags.push(isDenyKindNameInInlinePHPFromOffset(code, editorOffset, 'propertylookup'));
 
   //
   // Directive with parameters

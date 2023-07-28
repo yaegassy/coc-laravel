@@ -2,6 +2,7 @@ import {
   isCallNameFuncInBladeEchoFromOffset,
   isCallNameFuncInComponentPropsFromOffset,
   isCallNameFuncInDirectiveWithParametersFromOffset,
+  isCallNameFuncInInlinePHPFromOffset,
   isCallNameFuncInPHPDirectiveFromOffset,
   isTargetDirectiveWithParametersFromOffset,
 } from '../shared';
@@ -15,6 +16,7 @@ export function canCompletionFromContext(code: string, editorOffset: number) {
 
   flags.push(isCallNameFuncInBladeEchoFromOffset(code, editorOffset, 'view'));
   flags.push(isCallNameFuncInPHPDirectiveFromOffset(code, editorOffset, 'view'));
+  flags.push(isCallNameFuncInInlinePHPFromOffset(code, editorOffset, 'view'));
   flags.push(isCallNameFuncInDirectiveWithParametersFromOffset(code, editorOffset, 'view'));
   flags.push(isCallNameFuncInComponentPropsFromOffset(code, editorOffset, 'view'));
 

@@ -2,6 +2,7 @@ import {
   isStaticMethodNameInBladeEchoFromOffset,
   isStaticMethodNameInComponentPropsFromOffset,
   isStaticMethodNameInDirectiveWithParametersFromOffset,
+  isStaticMethodNameInInlinePHPFromOffset,
   isStaticMethodNameInPHPDirectiveFromOffset,
   isTargetDirectiveWithParametersFromOffset,
 } from '../shared';
@@ -15,6 +16,7 @@ export function canCompletionFromContext(code: string, editorOffset: number) {
 
   flags.push(isStaticMethodNameInBladeEchoFromOffset(code, editorOffset, 'Auth', 'guard'));
   flags.push(isStaticMethodNameInPHPDirectiveFromOffset(code, editorOffset, 'Auth', 'guard'));
+  flags.push(isStaticMethodNameInInlinePHPFromOffset(code, editorOffset, 'Auth', 'guard'));
   flags.push(isStaticMethodNameInDirectiveWithParametersFromOffset(code, editorOffset, 'Auth', 'guard'));
   flags.push(isStaticMethodNameInComponentPropsFromOffset(code, editorOffset, 'Auth', 'guard'));
 
