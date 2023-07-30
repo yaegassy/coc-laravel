@@ -16,6 +16,7 @@ export class BladeProjectsManager {
   workspaceRoot: string;
   initialized: boolean;
   bladeFiles: string[];
+  classBasedViewDir?: string;
 
   constructor(workspaceRoot: string) {
     this.workspaceRoot = workspaceRoot;
@@ -23,6 +24,7 @@ export class BladeProjectsManager {
     this.componentMapStore = new Map();
     this.initialized = false;
     this.bladeFiles = [];
+    this.classBasedViewDir = undefined;
   }
 
   async initialize() {
@@ -45,6 +47,7 @@ export class BladeProjectsManager {
 
     const appPath = await getAppPath(artisanPath);
     if (appPath) {
+      this.classBasedViewDir = path.join(appPath, 'View', 'Components');
       const relativeAppPath = this.getRelativePosixFilePath(appPath, this.workspaceRoot);
 
       const classBasedViewGlobPattern = `**/${relativeAppPath}/View/Components/**/*.php`;
@@ -92,9 +95,12 @@ export class BladeProjectsManager {
         const component: [string, string] = [pathName, file];
         await this.doSetComponentMap(component);
       } else if (file.endsWith('.php')) {
-        const fileWithoutExtName = path.basename(file).replace('.php', '');
-        const kebabCaseName = kebabCase(fileWithoutExtName);
-        const componentKey = 'x-' + kebabCaseName;
+        if (!this.classBasedViewDir) return;
+        const relativeClassComponentFilePath = file.replace(this.classBasedViewDir, '').replace(/^\//, '');
+        const relativeFilePathWithoutExtName = relativeClassComponentFilePath.replace('.php', '');
+        const splitRelativeClassComponentName = relativeFilePathWithoutExtName.split(path.sep);
+        const kebabedArr = splitRelativeClassComponentName.map((v) => kebabCase(v));
+        const componentKey = 'x-' + kebabedArr.join('.');
         const component: [string, string] = [componentKey, file];
         await this.doSetComponentMap(component);
       }
