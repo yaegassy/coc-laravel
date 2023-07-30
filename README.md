@@ -67,6 +67,7 @@ This coc-extension will provide various completion features and more features fo
   - [TODO]
     - Diagnostic features will be added as we come up with useful ones, based on projects already analyzed.
 - CodeActions
+  - Create blade component
   - Fix method directive parameter | [DEMO](https://github.com/yaegassy/coc-laravel/issues/6#issuecomment-1648914444)
   - [TODO]
     - CodeAction features will be added as we come up with useful ones, based on projects already analyzed.
@@ -152,6 +153,7 @@ nmap <silent> <leader>ac <Plug>(coc-codeaction-cursor)
 
 **Actions**:
 
+- `Create blade component`
 - `Fix method directive parameter`
 
 ## Recommended coc-extensions for php
