@@ -1,15 +1,16 @@
 import { Diagnostic, DiagnosticCollection, ExtensionContext, TextDocument, languages, workspace } from 'coc.nvim';
 
-import * as bladeMethodParameterDiagnosticHandler from './handlers/bladeMethodParameterHandler';
-
 import { SUPPORTED_LANGUAGE } from '../constant';
+import { type ProjectManagerType } from '../projects/types';
+import * as bladeMethodParameterDiagnosticHandler from './handlers/bladeMethodParameterHandler';
+import * as bladeMissingComponentDiagnosticHandler from './handlers/bladeMissingComponentHandler';
 
-export async function register(context: ExtensionContext) {
+export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
   if (!workspace.getConfiguration('laravel').get('diagnostic.enable')) return;
   const { document } = await workspace.getCurrentState();
   if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
 
-  const diagManager = new LaravelDiagnosticManager();
+  const diagManager = new LaravelDiagnosticManager(projectManager);
 
   // FistOpen and onOpen
   workspace.documents.map(async (doc) => {
@@ -54,17 +55,28 @@ export async function register(context: ExtensionContext) {
 
 class LaravelDiagnosticManager {
   private collection: DiagnosticCollection;
+  projectManager: ProjectManagerType;
 
-  constructor() {
+  constructor(projectManager: ProjectManagerType) {
+    this.projectManager = projectManager;
     this.collection = languages.createDiagnosticCollection('laravel');
   }
 
   async doValidate(textDocument: TextDocument): Promise<void> {
     const diagnostics: Diagnostic[] = [];
 
+    // blade missing component
+    const missingComponentDiagnostics = await bladeMissingComponentDiagnosticHandler.doValidate(
+      textDocument,
+      this.projectManager
+    );
+    if (missingComponentDiagnostics) diagnostics.push(...missingComponentDiagnostics);
+
+    // blade method parameter
     const methodParameterDiagnostics = await bladeMethodParameterDiagnosticHandler.doValidate(textDocument);
     if (methodParameterDiagnostics) diagnostics.push(...methodParameterDiagnostics);
 
+    // Set
     if (diagnostics.length === 0) this.collection.clear();
     this.collection.set(textDocument.uri, diagnostics);
   }

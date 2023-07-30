@@ -62,6 +62,7 @@ This coc-extension will provide various completion features and more features fo
   - ComponentTag Hover | [DEMO](https://github.com/yaegassy/coc-laravel/issues/4#issue-1816594130)
   - Blade Directive Hover
 - Diagnostics
+  - Missing component validation
   - Method directive parameter validation | [DEMO](https://github.com/yaegassy/coc-laravel/issues/5#issuecomment-1647636587)
   - [TODO]
     - Diagnostic features will be added as we come up with useful ones, based on projects already analyzed.
