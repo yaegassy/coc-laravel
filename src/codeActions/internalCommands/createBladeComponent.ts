@@ -22,7 +22,7 @@ enum PickedItemEnum {
   Cancel = -1,
   ClassBased = 0,
   Anonymouse = 1,
-  //Inline = 3, // Not required in the context of this feature
+  //Inline = 2, // Not required in the context of this feature
 }
 
 function doCommand() {
@@ -44,11 +44,6 @@ function doCommand() {
 
     const componentClassFilePath = path.join(componentBaseDir, relativeComponentClassFilePath);
     const componentClassFileDir = path.dirname(componentClassFilePath);
-    try {
-      await fs.promises.lstat(componentClassFileDir);
-    } catch (e) {
-      await fs.promises.mkdir(componentClassFileDir, { recursive: true });
-    }
 
     const composerJsonContent = await getComposerJsonContent();
     if (!composerJsonContent) return;
@@ -64,22 +59,31 @@ function doCommand() {
 
     const componentClassContent = generateComponentClassFileContent(componentKeyName, phpNamespace, phpClassName);
     if (picked === PickedItemEnum.ClassBased) {
+      try {
+        await fs.promises.lstat(componentClassFileDir);
+      } catch (e) {
+        await fs.promises.mkdir(componentClassFileDir, { recursive: true });
+      }
+
       await fs.promises.writeFile(componentClassFilePath, componentClassContent, { encoding: 'utf8' });
     }
 
     const bladeComponentPath =
       path.join(bladeComponentBaseDir, name.replace('x-', '').replace('.', path.sep)) + '.blade.php';
     const bladeComponentDir = path.dirname(bladeComponentPath);
-    try {
-      await fs.promises.lstat(bladeComponentDir);
-    } catch (e) {
-      await fs.promises.mkdir(bladeComponentDir, { recursive: true });
-    }
 
     const bladeComponentContent = generateBladeComponentFileContent();
     if (picked === PickedItemEnum.ClassBased || picked === PickedItemEnum.Anonymouse) {
+      try {
+        await fs.promises.lstat(bladeComponentDir);
+      } catch (e) {
+        await fs.promises.mkdir(bladeComponentDir, { recursive: true });
+      }
+
       await fs.promises.writeFile(bladeComponentPath, bladeComponentContent, { encoding: 'utf8' });
     }
+
+    window.showInformationMessage(`Successfully create new component.`);
   };
 }
 
