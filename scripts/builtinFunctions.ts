@@ -25,6 +25,8 @@ function getStubMapFunctionFilesFromCode(code: string) {
   const files: string[] = [];
 
   const ast = phpParser.getAst(code);
+  if (!ast) return;
+
   phpParser.walk((node) => {
     if (node.kind !== 'constant') return;
     const constantNode = node as ConstantNode;
@@ -64,6 +66,7 @@ function getStubMapFunctionFilesFromCode(code: string) {
     encoding: 'utf8',
   });
   const relativeFiles = getStubMapFunctionFilesFromCode(stubsMapPHPCode);
+  if (!relativeFiles) return;
   const abusoluteFiles = relativeFiles.map((f) => path.join(STUBS_PATH, f));
 
   for (const file of abusoluteFiles) {
@@ -71,6 +74,7 @@ function getStubMapFunctionFilesFromCode(code: string) {
 
     const phpCode = await fs.promises.readFile(file, { encoding: 'utf8' });
     const functions = phpFunctionProjectService.getPHPFunctions(phpCode, file);
+    if (!functions) continue;
 
     const convedPathFunctions = functions.map((f) => {
       f.path = f.path.replace(STUBS_PATH, '').replace(/\//, '');
