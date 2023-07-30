@@ -20,7 +20,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     definitionFeature.register(context, projectManager);
     referenceFeature.register(context, projectManager);
     hoverFeature.register(context, projectManager);
-    diagnosticFeature.register(context);
+    diagnosticFeature.register(context, projectManager);
     codeActionFeature.register(context);
 
     watcherFeature.register(context, projectManager);
