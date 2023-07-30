@@ -166,8 +166,9 @@ nmap <silent> <leader>ac <Plug>(coc-codeaction-cursor)
 
 ## Inspired Projects
 
-- [amir9480/vscode-laravel-extra-intellisense](https://github.com/amir9480/vscode-laravel-extra-intellisense)
-- [Laravel Idea](https://laravel-idea.com/)
+- [amir9480/vscode-laravel-extra-intellisense](https://github.com/amir9480/vscode-laravel-extra-intellisense) | (VSCode extension)
+- [Laravel Idea](https://laravel-idea.com/) | (PhpStorm plugin)
+- [haringsrob/laravel-dev-tools](https://github.com/haringsrob/laravel-dev-tools)
 - and More...
 
 ## Thanks
