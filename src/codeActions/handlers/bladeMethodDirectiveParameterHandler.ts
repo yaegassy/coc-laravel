@@ -25,7 +25,7 @@ export async function doAction(document: TextDocument, range: Range, context: Co
   if (lineRange(range) || cursorRange(range)) {
     for (const mdpDiag of methodDirectiveParameterDiags) {
       const codeAction: CodeAction = {
-        title: 'Fix MethodDirectiveParameter',
+        title: 'Fix Method directive parameter',
         kind: CodeActionKind.QuickFix,
         command: {
           title: '',

@@ -66,7 +66,7 @@ This coc-extension will provide various completion features and more features fo
   - [TODO]
     - Diagnostic features will be added as we come up with useful ones, based on projects already analyzed.
 - CodeActions
-  - Fix MethodDirectiveParameter | [DEMO](https://github.com/yaegassy/coc-laravel/issues/6#issuecomment-1648914444)
+  - Fix method directive parameter | [DEMO](https://github.com/yaegassy/coc-laravel/issues/6#issuecomment-1648914444)
   - [TODO]
     - CodeAction features will be added as we come up with useful ones, based on projects already analyzed.
 - Artisan and Sail commands integration
@@ -151,7 +151,7 @@ nmap <silent> <leader>ac <Plug>(coc-codeaction-cursor)
 
 **Actions**:
 
-- `Fix MethodDirectiveParameter`
+- `Fix method directive parameter`
 
 ## Recommended coc-extensions for php
 
