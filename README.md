@@ -32,7 +32,7 @@ This coc-extension will provide various completion features and more features fo
   - Component completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1650935001)
   - PHP Function completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1643359916)
     - Provides function completion within the PHP-related regions of the Blade file.
-  - Directive completion
+  - Directive completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1657000532)
   - Config completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635266998)
   - Env completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635267885)
   - Validation completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635268664)
@@ -60,14 +60,14 @@ This coc-extension will provide various completion features and more features fo
     - [PHP -> Blade] Reference to a PHP file that uses the same template in the view function.
 - Hovers
   - ComponentTag Hover | [DEMO](https://github.com/yaegassy/coc-laravel/issues/4#issue-1816594130)
-  - Blade Directive Hover
+  - Blade Directive Hover | [DEMO](https://github.com/yaegassy/coc-laravel/issues/4#issuecomment-1657000939)
 - Diagnostics
   - Missing component validation
   - Method directive parameter validation | [DEMO](https://github.com/yaegassy/coc-laravel/issues/5#issuecomment-1647636587)
   - [TODO]
     - Diagnostic features will be added as we come up with useful ones, based on projects already analyzed.
 - CodeActions
-  - Create blade component
+  - Create blade component | [DEMO](https://github.com/yaegassy/coc-laravel/issues/6#issuecomment-1657002340)
   - Fix method directive parameter | [DEMO](https://github.com/yaegassy/coc-laravel/issues/6#issuecomment-1648914444)
   - [TODO]
     - CodeAction features will be added as we come up with useful ones, based on projects already analyzed.
