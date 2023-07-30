@@ -11,6 +11,8 @@ import {
 
 import { DOCUMENT_SELECTOR, SUPPORTED_LANGUAGE } from '../constant';
 import * as bladeMethodDirectiveParameterHandler from './handlers/bladeMethodDirectiveParameterHandler';
+import * as bladeMissingComponentHandler from './handlers/bladeMissingComponentHandler';
+import * as createBladeComponentInternalCommand from './internalCommands/createBladeComponent';
 import * as fixMethodDirectiveParameterInternalCommand from './internalCommands/fixMethodDirectiveParameter';
 
 export async function register(context: ExtensionContext) {
@@ -24,6 +26,7 @@ export async function register(context: ExtensionContext) {
 
   // Register Internal Commands
   fixMethodDirectiveParameterInternalCommand.register(context);
+  createBladeComponentInternalCommand.register(context);
 }
 
 class LaravelCodeActionProvider implements CodeActionProvider {
@@ -32,6 +35,11 @@ class LaravelCodeActionProvider implements CodeActionProvider {
   async provideCodeActions(document: TextDocument, range: Range, context: CodeActionContext) {
     const codeActions: CodeAction[] = [];
 
+    // blade missing component
+    const bladeMissingComponentActions = await bladeMissingComponentHandler.doAction(document, range, context);
+    if (bladeMissingComponentActions) codeActions.push(...bladeMissingComponentActions);
+
+    // blade method directive parameter
     const bladeMethodDirectiveParameterActions = await bladeMethodDirectiveParameterHandler.doAction(
       document,
       range,
