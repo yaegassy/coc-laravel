@@ -97,6 +97,7 @@ class PHPFileExtentionWatcherManager {
     this.watcher.onDidCreate(async (e) => {
       if (this.bladeFileGlobPattern && minimatch(e.path, this.bladeFileGlobPattern)) {
         await this.projectManager.bladeProjectManager.setBlade([e.path]);
+        await this.projectManager.bladeProjectManager.setComponent([e.path]);
       }
 
       if (this.classBasedViewGlobPattern && minimatch(e.path, this.classBasedViewGlobPattern)) {
@@ -117,6 +118,7 @@ class PHPFileExtentionWatcherManager {
     this.watcher.onDidChange(async (e) => {
       if (this.bladeFileGlobPattern && minimatch(e.path, this.bladeFileGlobPattern)) {
         await this.projectManager.bladeProjectManager.setBlade([e.path]);
+        await this.projectManager.bladeProjectManager.setComponent([e.path]);
       }
 
       if (this.classBasedViewGlobPattern && minimatch(e.path, this.classBasedViewGlobPattern)) {
@@ -137,6 +139,7 @@ class PHPFileExtentionWatcherManager {
     this.watcher.onDidDelete(async (e) => {
       if (this.bladeFileGlobPattern && minimatch(e.path, this.bladeFileGlobPattern)) {
         this.projectManager.bladeProjectManager.deleteBlade([e.path]);
+        this.projectManager.bladeProjectManager.deleteComponent([e.path]);
       }
 
       if (this.classBasedViewGlobPattern && minimatch(e.path, this.classBasedViewGlobPattern)) {
