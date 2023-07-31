@@ -9,6 +9,8 @@ import {
   PropertyStatement,
   Return,
   String as StringNode,
+  Call,
+  Name,
 } from 'php-parser';
 
 import * as phpParser from '../parsers/php/parser';
@@ -121,4 +123,46 @@ export function getLivewireComponentMethodsFromClassNode(classNode: ClassNode) {
   }, classNode);
 
   return livewireComponentMethods;
+}
+
+export function getRenderMethodNodeFromClassNode(classNode: ClassNode) {
+  const renderMethodNodes: Method[] = [];
+
+  phpParser.walk((node) => {
+    if (node.kind !== 'method') return;
+    const methodNode = node as Method;
+
+    if (methodNode.visibility !== 'public') return;
+    if (typeof methodNode.name !== 'object') return;
+    const identifierNode = methodNode.name as Identifier;
+
+    if (identifierNode.name !== 'render') return;
+
+    renderMethodNodes.push(methodNode);
+  }, classNode);
+
+  return renderMethodNodes[0];
+}
+
+export function getTemplateKeyOfCallViewFuncArgumentsFromMethodNode(methodNode: Method) {
+  const values: string[] = [];
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  phpParser.walk((node, _parent) => {
+    if (node.kind !== 'call') return;
+    const callNode = node as Call;
+    if (callNode.what.kind !== 'name') return;
+    const nameNode = callNode.what as Name;
+    if (nameNode.name !== 'view') return;
+
+    if (callNode.arguments.length > 0) {
+      if (callNode.arguments[0].loc) {
+        if (callNode.arguments[0].kind !== 'string') return;
+        const stringNode = callNode.arguments[0] as StringNode;
+        values.push(stringNode.value);
+      }
+    }
+  }, methodNode);
+
+  return values[0];
 }

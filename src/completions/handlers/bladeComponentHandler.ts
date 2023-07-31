@@ -1,4 +1,4 @@
-import { CompletionItem, LinesTextDocument, Position, workspace } from 'coc.nvim';
+import { LinesTextDocument, Position, workspace } from 'coc.nvim';
 
 import { type BladeProjectsManagerType } from '../../projects/types';
 

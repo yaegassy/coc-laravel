@@ -26,6 +26,9 @@ import * as bladeViewCompletionHanlder from './handlers/bladeViewHandler';
 import * as configCompletionHandler from './handlers/configHandler';
 import * as envCompletionHandler from './handlers/envHandler';
 import * as guardCompletionHandler from './handlers/guardHandler';
+import * as livewireActionCompletionHandler from './handlers/livewireActionHandler';
+import * as livewireEventCompletionHandler from './handlers/livewireEventHandler';
+import * as livewireTagCompletionHandler from './handlers/livewireTagHandler';
 import * as middlewareCompletionHandler from './handlers/middlewareHandler';
 import * as phpFunctionCompletionHandler from './handlers/phpFunctionHandler';
 import * as routeCompletionHandler from './handlers/routeHandler';
@@ -34,6 +37,7 @@ import * as validationCompletionHandler from './handlers/validationHandler';
 import * as viewCompletionHandler from './handlers/viewHandler';
 
 import path from 'path';
+import { getArtisanPath, getViewPath } from '../common/shared';
 import { CompletionItemDataType } from './types';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -43,13 +47,19 @@ export async function register(context: ExtensionContext, projectManager: Projec
   const { document } = await workspace.getCurrentState();
   if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
 
+  const artisanPath = getArtisanPath();
+  if (!artisanPath) return;
+
+  const viewPath = await getViewPath(artisanPath);
+  if (!viewPath) return;
+
   // Register provider
   context.subscriptions.push(
     languages.registerCompletionItemProvider(
       'Laravel',
       'Laravel',
       DOCUMENT_SELECTOR,
-      new LaravelCompletionProvider(context, projectManager),
+      new LaravelCompletionProvider(context, projectManager, viewPath),
       [
         '@', // directive,
         '<', // component,
@@ -66,12 +76,14 @@ export async function register(context: ExtensionContext, projectManager: Projec
 class LaravelCompletionProvider implements CompletionItemProvider {
   private extensionContext: ExtensionContext;
   public projectManager: ProjectManagerType;
+  public viewPath: string;
 
   private isCocBladeCompletionEnableDirective: boolean;
 
-  constructor(context: ExtensionContext, projectManager: ProjectManagerType) {
+  constructor(context: ExtensionContext, projectManager: ProjectManagerType, viewPath: string) {
     this.extensionContext = context;
     this.projectManager = projectManager;
+    this.viewPath = viewPath;
 
     this.isCocBladeCompletionEnableDirective = false;
     if (extensions.all.find((e) => e.id === 'coc-blade')) {
@@ -251,6 +263,38 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       );
       if (bladeDirectiveCompletionItems) {
         items.push(...bladeDirectiveCompletionItems);
+      }
+    }
+
+    // livewire
+    if (workspace.getConfiguration('laravel').get('completion.livewireEnable')) {
+      const livewireTagCompletionItems = await livewireTagCompletionHandler.doCompletion(
+        document,
+        position,
+        this.projectManager.livewireProjectManager
+      );
+      if (livewireTagCompletionItems) {
+        items.push(...livewireTagCompletionItems);
+      }
+
+      const livewireActionCompletionItems = await livewireActionCompletionHandler.doCompletion(
+        document,
+        position,
+        this.projectManager.livewireProjectManager,
+        this.viewPath
+      );
+      if (livewireActionCompletionItems) {
+        items.push(...livewireActionCompletionItems);
+      }
+
+      const livewireEventCompletionItems = await livewireEventCompletionHandler.doCompletion(
+        document,
+        position,
+        this.projectManager.livewireProjectManager,
+        this.viewPath
+      );
+      if (livewireEventCompletionItems) {
+        items.push(...livewireEventCompletionItems);
       }
     }
 

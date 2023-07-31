@@ -70,4 +70,5 @@ export type LivewireMapValueType = {
   filePath: string;
   properties: LivewireComponentPropertyType[];
   methods: LivewireComponentMethodType[];
+  templateKey?: string;
 };

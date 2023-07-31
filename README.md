@@ -30,6 +30,10 @@ This coc-extension will provide various completion features and more features fo
 
 - Completions
   - Component completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1650935001)
+  - Livewire completion
+    - Livewire tag completion
+    - Livewire action completion
+    - Livewire event completion
   - PHP Function completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1643359916)
     - Provides function completion within the PHP-related regions of the Blade file.
   - Directive completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1657000532)
@@ -51,6 +55,8 @@ This coc-extension will provide various completion features and more features fo
     - [Blade -> Blade] Jump to the Blade template specified by the `@extends` and `@include` directives.
   - Component definition | [DEMO](https://github.com/yaegassy/coc-laravel/issues/2#issuecomment-1644974475)
     - [Blade -> PHP or Blade] Jump to the component file. Both class components and anonymous components are supported.
+  - Livewire tag definition
+    - [Blade -> PHP or Blade] Jump to the livewire file. Both livewire class and blade template are supported.
 - References
   - `laravel.view.findAllReferences` command | [DEMO](https://github.com/yaegassy/coc-laravel/issues/3#issuecomment-1645929779)
     - [Blade -> PHP] Show references to PHP files that use the current blade
@@ -126,6 +132,10 @@ For more information, check this coc.nvim's wiki.
 - `laravel.completion.componentEnable`: Enable component completion, default: `true`
 - `laravel.completion.phpFunctionEnable`: Enable php function completion, default: `true`
 - `laravel.completion.methodParameterEnable`: Enable method parameter completion, default: `true`
+- `laravel.completion.livewireEnable`: Enable livewire completion, default: `true`
+- `laravel.livewire.wireClickAttributes`: List of click related action to be added to `wire:xxxx`, default: `["click", "click.prefetch"]`
+- `laravel.livewire.wireModelAttributes`: List of model related action to be added to `wire:xxxx`, default: `["model", "model.debounce.100ms", "model.lazy", "model.defer"]`
+- `laravel.livewire.wireEventAttributes`: List of browser events to be added to `wire:xxxx`. No need for `wire:model` or `wire:click`. default: Omitted due to the large number of settings..., See configuration in [package.json](/package.json)
 - `laravel.definition.enable`: Enable definition, default `true`
 - `laravel.reference.enable`: Enable reference, default `true`
 - `laravel.hover.enable`: Enable hover, default `true`
