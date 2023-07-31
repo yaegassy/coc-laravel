@@ -31,9 +31,9 @@ This coc-extension will provide various completion features and more features fo
 - Completions
   - Component completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1650935001)
   - Livewire completion
-    - Livewire tag completion
-    - Livewire action completion
-    - Livewire event completion
+    - Livewire tag completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1658762452)
+    - Livewire action completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1658765335)
+    - Livewire event completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1658766120)
   - PHP Function completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1643359916)
     - Provides function completion within the PHP-related regions of the Blade file.
   - Directive completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1657000532)
@@ -55,7 +55,7 @@ This coc-extension will provide various completion features and more features fo
     - [Blade -> Blade] Jump to the Blade template specified by the `@extends` and `@include` directives.
   - Component definition | [DEMO](https://github.com/yaegassy/coc-laravel/issues/2#issuecomment-1644974475)
     - [Blade -> PHP or Blade] Jump to the component file. Both class components and anonymous components are supported.
-  - Livewire tag definition
+  - Livewire tag definition | [DEMO](https://github.com/yaegassy/coc-laravel/issues/2#issuecomment-1658759781)
     - [Blade -> PHP or Blade] Jump to the livewire file. Both livewire class and blade template are supported.
 - References
   - `laravel.view.findAllReferences` command | [DEMO](https://github.com/yaegassy/coc-laravel/issues/3#issuecomment-1645929779)
