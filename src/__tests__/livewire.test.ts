@@ -155,6 +155,44 @@ class Counter extends Component
   });
 });
 
+test('Get value of call view func arguments of livewire component class', () => {
+  // \\ -> \
+  const code = testUtils.stripInitialNewline(`
+<?php
+
+namespace App\\Http\\Livewire;
+
+use Livewire\\Component;
+
+class Counter extends Component
+{
+    public $count = 0;
+
+    public function increment()
+    {
+        $this->count++;
+    }
+
+    public function render()
+    {
+        return view('livewire.counter');
+    }
+}
+`);
+
+  const ast = phpParser.getAst(code);
+  if (!ast) return;
+
+  const livewireComponentClassNode = livewireCommon.getLivewireComponentClassNode(ast);
+  if (!livewireComponentClassNode) return;
+
+  const renderMethodNode = livewireCommon.getRenderMethodNodeFromClassNode(livewireComponentClassNode);
+
+  const value = livewireCommon.getTemplateKeyOfCallViewFuncArgumentsFromMethodNode(renderMethodNode);
+
+  expect(value).toBe('livewire.counter');
+});
+
 test('composer.json namaespace check', async () => {
   const composerJsonContent = await getComposerJsonContent(path.join(FIXTURES_DIR, 'json'));
   if (!composerJsonContent) return;

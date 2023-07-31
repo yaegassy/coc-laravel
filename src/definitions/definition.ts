@@ -15,6 +15,7 @@ import { type ProjectManagerType } from '../projects/types';
 import * as bladeComponentTagHandler from './handlers/bladeComponentTagHandler';
 import * as bladeViewHandler from './handlers/bladeViewHandler';
 import * as viewHandler from './handlers/viewHandler';
+import * as livewireTagHandler from './handlers/livewireTagHandler';
 
 export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
   if (!workspace.getConfiguration('laravel').get('definition.enable')) return;
@@ -61,6 +62,11 @@ class LaravelDefinitionProvider implements DefinitionProvider {
     const viewDefinitionItems = await viewHandler.doDefinition(document, position, this.projectManager);
     if (viewDefinitionItems) {
       locations.push(...viewDefinitionItems);
+    }
+
+    const livewireTagDefinitionItems = await livewireTagHandler.doDefinition(document, position, this.projectManager);
+    if (livewireTagDefinitionItems) {
+      locations.push(...livewireTagDefinitionItems);
     }
 
     return locations;

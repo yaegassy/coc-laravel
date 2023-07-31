@@ -91,12 +91,16 @@ export class LivewireProjectManager {
         const livewireComponentMethods =
           livewireCommon.getLivewireComponentMethodsFromClassNode(livewireComponentClassNode);
 
+        const renderMethodNode = livewireCommon.getRenderMethodNodeFromClassNode(livewireComponentClassNode);
+        const templateKey = livewireCommon.getTemplateKeyOfCallViewFuncArgumentsFromMethodNode(renderMethodNode);
+
         const livewireMapValue: LivewireMapValueType = {
           keyName: componentMap.key,
           namespacePathName: componentMap.value,
           filePath: absoluteClassFilePath,
           properties: livewireComponentProperties,
           methods: livewireComponentMethods,
+          templateKey,
         };
 
         this.livewireMapStore.set(componentMap.key, livewireMapValue);

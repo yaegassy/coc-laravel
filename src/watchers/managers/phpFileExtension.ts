@@ -48,7 +48,7 @@ class PHPFileExtentionWatcherManager {
   classBasedViewGlobPattern?: string;
   viewReferenceGlobPattern?: string;
   translationGlobPattern?: string;
-  livewireComponentMapsFileGlobPattern?: string;
+  livewireGlobPattern?: string;
 
   constructor(
     projectManager: ProjectManagerType,
@@ -69,7 +69,7 @@ class PHPFileExtentionWatcherManager {
 
       this.classBasedViewGlobPattern = `**/${relativeAppPath}/View/Components/**/*.php`;
       this.viewReferenceGlobPattern = `**/{routes,${relativeAppPath}/Http/{Controllers,Livewire},${relativeAppPath}/View/Components}/**/*.php`;
-      this.livewireComponentMapsFileGlobPattern = `**/{bootstrap/cache/livewire-components.php,${relativeAppPath}/Http/Livewire/**/*.php}`;
+      this.livewireGlobPattern = `**/{bootstrap/cache/livewire-components.php,${relativeAppPath}/Http/Livewire/**/*.php}`;
     }
 
     if (viewPath) {
@@ -114,7 +114,7 @@ class PHPFileExtentionWatcherManager {
         this.projectManager.translationProjectManager.set([e.path]);
       }
 
-      if (this.livewireComponentMapsFileGlobPattern && minimatch(e.path, this.livewireComponentMapsFileGlobPattern)) {
+      if (this.livewireGlobPattern && minimatch(e.path, this.livewireGlobPattern)) {
         this.projectManager.livewireProjectManager.set([e.path]);
       }
     });
@@ -139,7 +139,7 @@ class PHPFileExtentionWatcherManager {
         this.projectManager.translationProjectManager.restart();
       }
 
-      if (this.livewireComponentMapsFileGlobPattern && minimatch(e.path, this.livewireComponentMapsFileGlobPattern)) {
+      if (this.livewireGlobPattern && minimatch(e.path, this.livewireGlobPattern)) {
         this.projectManager.livewireProjectManager.set([e.path]);
       }
     });
@@ -164,7 +164,7 @@ class PHPFileExtentionWatcherManager {
         this.projectManager.translationProjectManager.restart();
       }
 
-      if (this.livewireComponentMapsFileGlobPattern && minimatch(e.path, this.livewireComponentMapsFileGlobPattern)) {
+      if (this.livewireGlobPattern && minimatch(e.path, this.livewireGlobPattern)) {
         this.projectManager.livewireProjectManager.restart();
       }
     });
