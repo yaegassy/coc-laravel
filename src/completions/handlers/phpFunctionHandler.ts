@@ -68,6 +68,14 @@ function getPHPFunctionItems(
   const phpFunctions = Array.from(phpFunctionProjectManager.list());
 
   for (const phpFunction of phpFunctions) {
+    // MEMO: No uppercase beginning function is needed in this context
+    // e.g. PS_UNRESERVE_PREFIX___halt_compiler()
+    if (
+      phpFunction[0].slice(0, 1).match(/[A-Za-z]/) &&
+      phpFunction[0].slice(0, 1) === phpFunction[0].slice(0, 1).toUpperCase()
+    )
+      continue;
+
     const adjustStartCharacter = wordWithExtraChars
       ? position.character - wordWithExtraChars.length
       : position.character;
