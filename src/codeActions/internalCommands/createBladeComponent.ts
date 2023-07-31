@@ -3,7 +3,8 @@ import { Document, ExtensionContext, Uri, commands, workspace, window } from 'co
 import fs from 'fs';
 import path from 'path';
 
-import { getAppPath, getArtisanPath, getComposerJsonContent, getViewPath } from '../../common/shared';
+import { getAppPath, getArtisanPath, getViewPath } from '../../common/shared';
+import { getComposerJsonContent } from '../../common/composer';
 import { ComposerJsonContentType, PhpNamespaceType } from '../../common/types';
 import { SUPPORTED_LANGUAGE } from '../../constant';
 
@@ -45,7 +46,7 @@ function doCommand() {
     const componentClassFilePath = path.join(componentBaseDir, relativeComponentClassFilePath);
     const componentClassFileDir = path.dirname(componentClassFilePath);
 
-    const composerJsonContent = await getComposerJsonContent();
+    const composerJsonContent = await getComposerJsonContent(workspace.root);
     if (!composerJsonContent) return;
 
     const projectNamespaces = getProjectNamespacesFromComposerJson(composerJsonContent);

@@ -4,8 +4,6 @@ import cp from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
-import { ComposerJsonContentType } from './types';
-
 export function getPhpPath() {
   const phpPath = workspace.getConfiguration('laravel').get('environment.phpPath', '');
   if (phpPath) return phpPath;
@@ -114,16 +112,4 @@ export function getRelativePosixFilePath(absoluteFilePath: string, rootPath: str
   const rootUri = Uri.parse(rootPath).toString();
   const abusoluteFileUri = Uri.parse(absoluteFilePath).toString();
   return abusoluteFileUri.replace(rootUri + '/', '');
-}
-
-export async function getComposerJsonContent() {
-  const composerJsonPath = path.join(workspace.root, 'composer.json');
-  let composerJsonContent: ComposerJsonContentType | null = null;
-  try {
-    composerJsonContent = JSON.parse(await fs.promises.readFile(composerJsonPath, 'utf8'));
-  } catch (error) {
-    composerJsonContent = null;
-  }
-
-  return composerJsonContent;
 }
