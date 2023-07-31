@@ -144,7 +144,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.hover.enable`: Enable hover, default `true`
 - `laravel.diagnostic.enable`: Enable diagnostic, default: `true`
 - `laravel.codeAction.enable`: Enable code action, default: `true`
-- `laravel.artisan.withoutArgumentsCommandList`: List of commands to quickly execute `laravel.artisan.run` or `laravel.sailArtisan.run` without prompting for arguments or options, e.g. `[\"route:list\", \"clear-compiled\"]`, default: `[]`
+- `laravel.artisan.withoutArgumentsCommandList`: List of commands to quickly execute `laravel.artisan.run` or `laravel.sailArtisan.run` without prompting for arguments or options, e.g. `["route:list", "clear-compiled"]`, default: `[]`
 - `laravel.artisan.enableSplitRight`: Use vertical belowright for artisan terminal window, default: `false`
 
 ## Commands
