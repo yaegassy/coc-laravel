@@ -58,6 +58,8 @@ This coc-extension will provide various completion features and more features fo
     - [Blade -> PHP or Blade] Jump to the component file. Both class components and anonymous components are supported.
   - Livewire tag definition | [DEMO](https://github.com/yaegassy/coc-laravel/issues/2#issuecomment-1658759781)
     - [Blade -> PHP or Blade] Jump to the livewire file. Both livewire class and blade template are supported.
+  - Livewire directive definition
+    - [Blade -> PHP or Blade] Jump to the livewire file. Both livewire class and blade template are supported.
 - References
   - `laravel.view.findAllReferences` command | [DEMO](https://github.com/yaegassy/coc-laravel/issues/3#issuecomment-1645929779)
     - [Blade -> PHP] Show references to PHP files that use the current blade
