@@ -1,4 +1,7 @@
 import {
+  Array as ArrayNode,
+  Bin,
+  Boolean as BooleanNode,
   Call,
   Class as ClassNode,
   Engine,
@@ -6,9 +9,19 @@ import {
   Method,
   Name,
   Node,
+  Number as NumberNode,
+  Parameter as ParameterNode,
   Location as ParserLocation,
+  Property as PropertyNode,
+  StaticLookup,
   String as StringNode,
+  TypeReference,
+  Unary,
+  UnionType,
+  UseItem,
 } from 'php-parser';
+
+import { ArgumentParameterType } from '../../common/types';
 
 export type ParameterType = {
   name: string;
@@ -88,6 +101,20 @@ export function canCompletion(documentOffset: number, parserLocations: ParserLoc
   return false;
 }
 
+export function existsUseItemFor(ast: Node, name: string) {
+  let exists = false;
+
+  walk((node) => {
+    if (node.kind === 'useitem') {
+      const useItemNode = node as UseItem;
+      if (useItemNode.name !== name) return;
+      exists = true;
+    }
+  }, ast);
+
+  return exists;
+}
+
 export function existsExtendsClassFor(ast: Node, name: string) {
   let exists = false;
 
@@ -101,6 +128,23 @@ export function existsExtendsClassFor(ast: Node, name: string) {
   }, ast);
 
   return exists;
+}
+
+export function getClassNodeExtendsFor(ast: Node, name: string) {
+  let returnClassNode: ClassNode | undefined = undefined;
+
+  const targetClassNodes: ClassNode[] = [];
+  walk((node) => {
+    if (node.kind === 'class') {
+      const classNode = node as ClassNode;
+      if (!classNode.extends) return;
+      if (classNode.extends.name !== name) return;
+      targetClassNodes.push(classNode);
+    }
+  }, ast);
+
+  if (targetClassNodes.length > 0) returnClassNode = targetClassNodes[0];
+  return returnClassNode;
 }
 
 export function getPublicParametersOfConstructor(ast: Node) {
@@ -177,4 +221,228 @@ export function getLocationOfCallFunctionArgumentsFor(ast: Node, callName: strin
   }, ast);
 
   return locations;
+}
+
+export function getPropertyValueFromPropertyNode(node: PropertyNode) {
+  let propertyValue: string | number | boolean | any[] | null | undefined = undefined;
+
+  if (!node.value) return;
+
+  if (node.value.kind === 'array') {
+    const arrayNode = node.value as ArrayNode;
+    if (arrayNode.items.length === 0) {
+      // e.g. $parameters = []
+      // MEMO: Sets '[]' as a string
+      propertyValue = '[]';
+    } else {
+      propertyValue = arrayNode.items;
+    }
+  } else if (node.value.kind === 'boolean') {
+    const booleanNode = node.value as BooleanNode;
+    propertyValue = booleanNode.value;
+  } else if (node.value.kind === 'string') {
+    const stringNode = node.value as StringNode;
+    propertyValue = stringNode.raw;
+  } else if (node.value.kind === 'number') {
+    const numberNode = node.value as NumberNode;
+    propertyValue = numberNode.value;
+  } else if (node.value.kind === 'nullkeyword') {
+    // e.g. ($idna_info = null)
+    // MEMO: Sets null as a string
+    propertyValue = 'null';
+  } else if (node.value.kind === 'staticlookup') {
+    // e.g. ($form = p\Normalizer::FORM_C)
+    const staticLookupNode = node.value as StaticLookup;
+    if (staticLookupNode.what.kind === 'name') {
+      const nameNode = staticLookupNode.what as Name;
+      propertyValue = nameNode.name;
+    }
+    if (staticLookupNode.offset) {
+      // e.g. (int $options = OutputInterface::OUTPUT_NORMAL)
+      if (typeof staticLookupNode.offset === 'object') {
+        const identifierNode = staticLookupNode.offset as Identifier;
+        propertyValue = propertyValue + '::' + identifierNode.name;
+      }
+    }
+  } else if (node.value.kind === 'name') {
+    // e.g. ($variant = \INTL_IDNA_VARIANT_2003)
+    const nameNode = node.value as Name;
+    propertyValue = nameNode.name;
+  } else if (node.value.kind === 'bin') {
+    const binNode = node.value as Bin;
+    const binValues: string[] = [];
+    if (binNode.left.kind === 'name') {
+      const nameNode = binNode.left as Name;
+      binValues.push(nameNode.name);
+    }
+    if (binNode.right.kind === 'name') {
+      const nameNode = binNode.right as Name;
+      binValues.push(nameNode.name);
+    }
+
+    if (binValues.length === 1) {
+      propertyValue = binValues[0];
+    } else if (binValues.length > 1) {
+      for (const [i, v] of binValues.entries()) {
+        if (i === 0) {
+          propertyValue = v;
+        } else {
+          propertyValue += '|' + v;
+        }
+      }
+    }
+  } else if (node.value.kind === 'unary') {
+    // e.g. (int $port = -1)
+    const unaryNode = node.value as Unary;
+    if (unaryNode.what.kind === 'number') {
+      const numberNode = unaryNode.what as NumberNode;
+      propertyValue = unaryNode.type + numberNode.value;
+    }
+  } else {
+    propertyValue = '=CHECK=';
+  }
+
+  return propertyValue;
+}
+
+export function getArgumentParametersFromMethodParametersNode(nodes: ParameterNode[]) {
+  const argumentsParameters: ArgumentParameterType[] = [];
+
+  if (nodes.length === 0) return [];
+  for (const node of nodes) {
+    let parameterTypeHint: string | undefined = undefined;
+
+    if (node.type) {
+      if (node.type.kind === 'typereference') {
+        const typereferenceNode = node.type as TypeReference;
+        parameterTypeHint = typereferenceNode.name;
+      } else if (node.type.kind === 'name') {
+        const nameNode = node.type as Name;
+        parameterTypeHint = nameNode.name;
+      } else if (node.type.kind === 'uniontype') {
+        const unionTypeNode = node.type as UnionType;
+        for (const uType of unionTypeNode.types) {
+          if (uType.kind === 'typereference') {
+            const typereferenceNode = uType as TypeReference;
+            if (parameterTypeHint) {
+              parameterTypeHint + parameterTypeHint + '|';
+            }
+            parameterTypeHint = typereferenceNode.name;
+          } else if (uType.kind === 'name') {
+            const nameNode = uType as Name;
+            if (parameterTypeHint) {
+              parameterTypeHint + parameterTypeHint + '|';
+            }
+            parameterTypeHint = nameNode.name;
+          }
+        } // for
+      }
+    }
+    if (typeof node.name !== 'object') continue;
+    const identifierNode = node.name as Identifier;
+
+    const funcArgParamName = identifierNode.name;
+    let funcArgParamValue: string | number | boolean | any[] | null | undefined = undefined;
+
+    if (node.value) {
+      if (node.value.kind === 'array') {
+        const arrayNode = node.value as ArrayNode;
+        if (arrayNode.items.length === 0) {
+          // e.g. $parameters = []
+          // MEMO: Sets '[]' as a string
+          funcArgParamValue = '[]';
+        } else {
+          funcArgParamValue = arrayNode.items;
+        }
+      } else if (node.value.kind === 'boolean') {
+        const booleanNode = node.value as BooleanNode;
+        funcArgParamValue = booleanNode.value;
+      } else if (node.value.kind === 'string') {
+        const stringNode = node.value as StringNode;
+        funcArgParamValue = stringNode.raw;
+      } else if (node.value.kind === 'number') {
+        const numberNode = node.value as NumberNode;
+        funcArgParamValue = numberNode.value;
+      } else if (node.value.kind === 'nullkeyword') {
+        // e.g. ($idna_info = null)
+        // MEMO: Sets null as a string
+        funcArgParamValue = 'null';
+      } else if (node.value.kind === 'staticlookup') {
+        // e.g. ($form = p\Normalizer::FORM_C)
+        const staticLookupNode = node.value as StaticLookup;
+        if (staticLookupNode.what.kind === 'name') {
+          const nameNode = staticLookupNode.what as Name;
+          funcArgParamValue = nameNode.name;
+        }
+        if (staticLookupNode.offset) {
+          // e.g. (int $options = OutputInterface::OUTPUT_NORMAL)
+          if (typeof staticLookupNode.offset === 'object') {
+            const identifierNode = staticLookupNode.offset as Identifier;
+            funcArgParamValue = funcArgParamValue + '::' + identifierNode.name;
+          }
+        }
+      } else if (node.value.kind === 'name') {
+        // e.g. ($variant = \INTL_IDNA_VARIANT_2003)
+        const nameNode = node.value as Name;
+        funcArgParamValue = nameNode.name;
+      } else if (node.value.kind === 'bin') {
+        const binNode = node.value as Bin;
+        const binValues: string[] = [];
+        if (binNode.left.kind === 'name') {
+          const nameNode = binNode.left as Name;
+          binValues.push(nameNode.name);
+        }
+        if (binNode.right.kind === 'name') {
+          const nameNode = binNode.right as Name;
+          binValues.push(nameNode.name);
+        }
+
+        if (binValues.length === 1) {
+          funcArgParamValue = binValues[0];
+        } else if (binValues.length > 1) {
+          for (const [i, v] of binValues.entries()) {
+            if (i === 0) {
+              funcArgParamValue = v;
+            } else {
+              funcArgParamValue += '|' + v;
+            }
+          }
+        }
+      } else if (node.value.kind === 'unary') {
+        // e.g. (int $port = -1)
+        const unaryNode = node.value as Unary;
+        if (unaryNode.what.kind === 'number') {
+          const numberNode = unaryNode.what as NumberNode;
+          funcArgParamValue = unaryNode.type + numberNode.value;
+        }
+      } else {
+        funcArgParamValue = '=CHECK=';
+      }
+    }
+
+    const argumentParameter: ArgumentParameterType = {
+      name: funcArgParamName,
+      value: funcArgParamValue ? funcArgParamValue : undefined,
+      byref: node.byref,
+      nullable: node.nullable,
+      variadic: node.variadic,
+      typehint: parameterTypeHint ? parameterTypeHint : undefined,
+    };
+
+    // **MEMO**:
+    // Duplicate argument parameter name exist when
+    // attributes are used. In that case, overwrite with new
+    // argument parameter.
+    const lastArgumentsParameter = argumentsParameters[argumentsParameters.length - 1];
+    if (lastArgumentsParameter) {
+      if (lastArgumentsParameter.name === funcArgParamName) {
+        argumentsParameters[argumentsParameters.length - 1] = argumentParameter;
+        continue;
+      }
+    }
+
+    argumentsParameters.push(argumentParameter);
+  } // for
+
+  return argumentsParameters;
 }

@@ -2,6 +2,7 @@ import { ExtensionContext, workspace } from 'coc.nvim';
 
 import { SUPPORTED_LANGUAGE } from '../constant';
 import { BladeProjectsManager } from './managers/blade';
+import { LivewireProjectManager } from './managers/livewire';
 import { PHPFunctionProjectManager } from './managers/phpFunction';
 import { TranslationProjectManager } from './managers/translation';
 import { ViewReferenceProjectManager } from './managers/viewReference';
@@ -16,6 +17,7 @@ export async function register(context: ExtensionContext) {
   const translationProjectManager = new TranslationProjectManager();
   const phpFunctionProjectManager = new PHPFunctionProjectManager();
   const viewReferenceProjectManager = new ViewReferenceProjectManager(workspace.root);
+  const livewireProjectManager = new LivewireProjectManager(workspace.root);
 
   // FIRST OPEN
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -32,6 +34,9 @@ export async function register(context: ExtensionContext) {
       }
       if (!phpFunctionProjectManager.isInitialized()) {
         await phpFunctionProjectManager.initialize();
+      }
+      if (!livewireProjectManager.isInitialized()) {
+        await livewireProjectManager.initialize();
       }
     }
   });
@@ -52,6 +57,9 @@ export async function register(context: ExtensionContext) {
         if (!phpFunctionProjectManager.isInitialized()) {
           await phpFunctionProjectManager.initialize();
         }
+        if (!livewireProjectManager.isInitialized()) {
+          await livewireProjectManager.initialize();
+        }
       }
     },
     null,
@@ -63,6 +71,7 @@ export async function register(context: ExtensionContext) {
     viewReferenceProjectManager,
     translationProjectManager,
     phpFunctionProjectManager,
+    livewireProjectManager,
   };
 
   return projectManagers;

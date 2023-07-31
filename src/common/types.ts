@@ -16,3 +16,27 @@ export type ComposerJsonContentType = {
 };
 
 export type PhpNamespaceType = { [key: string]: string };
+
+export type LivewireComponentMapType = {
+  key: string;
+  value: string;
+};
+
+export type LivewireComponentPropertyType = {
+  name: string;
+  value?: any;
+};
+
+export type LivewireComponentMethodType = {
+  name: string;
+  arguments?: ArgumentParameterType[];
+};
+
+export type ArgumentParameterType = {
+  name: string;
+  value?: string | number | boolean | any[] | null;
+  byref: boolean;
+  nullable: boolean;
+  variadic: boolean;
+  typehint?: string;
+};

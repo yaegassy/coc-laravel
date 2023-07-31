@@ -23,6 +23,10 @@ export async function register(context: ExtensionContext, projectManagers: Proje
       const componentProjectContent =
         '### Component\n\n' + '```json\n' + JSON.stringify(componentProjectList, null, 2) + '\n```\n\n';
 
+      const livewireProjectList = Array.from(projectManagers.livewireProjectManager.list());
+      const livewireProjectContent =
+        '### Livewire\n\n' + '```json\n' + JSON.stringify(livewireProjectList, null, 2) + '\n```\n\n';
+
       const translationProjectList = Array.from(projectManagers.translationProjectManager.list());
       const translationProjectContent =
         '### Translation\n\n' + '```json\n' + JSON.stringify(translationProjectList, null, 2) + '\n```\n\n';
@@ -35,6 +39,7 @@ export async function register(context: ExtensionContext, projectManagers: Proje
         blaceProjectContent +
         viewReferenceContent +
         componentProjectContent +
+        livewireProjectContent +
         translationProjectContent +
         phpFunctionProjectContent;
 

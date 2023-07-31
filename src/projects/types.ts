@@ -1,18 +1,23 @@
 import { BladeProjectsManager } from './managers/blade';
+import { LivewireProjectManager } from './managers/livewire';
 import { PHPFunctionProjectManager } from './managers/phpFunction';
 import { TranslationProjectManager } from './managers/translation';
 import { ViewReferenceProjectManager } from './managers/viewReference';
+
+import { LivewireComponentMethodType, LivewireComponentPropertyType } from '../common/types';
 
 export type BladeProjectsManagerType = BladeProjectsManager;
 export type TranslationProjectManagerType = TranslationProjectManager;
 export type PHPFunctionProjectManagerType = PHPFunctionProjectManager;
 export type ViewReferenceProjectManagerType = ViewReferenceProjectManager;
+export type LivewireProjectManagerType = LivewireProjectManager;
 
 export type ProjectManagerType = {
   bladeProjectManager: BladeProjectsManagerType;
   translationProjectManager: TranslationProjectManagerType;
   phpFunctionProjectManager: PHPFunctionProjectManagerType;
   viewReferenceProjectManager: ViewReferenceProjectManagerType;
+  livewireProjectManager: LivewireProjectManagerType;
 };
 
 export type PropsType = {
@@ -57,4 +62,12 @@ export type CallViewFunctionType = {
 export type ViewReferenceMapValueType = {
   path: string;
   callViewFunctions: CallViewFunctionType[];
+};
+
+export type LivewireMapValueType = {
+  keyName: string;
+  namespacePathName: string;
+  filePath: string;
+  properties: LivewireComponentPropertyType[];
+  methods: LivewireComponentMethodType[];
 };
