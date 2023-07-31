@@ -11,8 +11,6 @@ export async function doCompletion(
 ) {
   if (document.languageId !== 'blade') return [];
 
-  const items: CompletionItem[] = [];
-
   const doc = workspace.getDocument(document.uri);
   if (!doc) return [];
 
@@ -32,7 +30,9 @@ export async function doCompletion(
     position
   );
   if (!componentCompletionItems) return [];
-  items.push(...componentCompletionItems);
+
+  // Exclude item containing the close tag
+  const items = componentCompletionItems.filter((item) => !item.label.startsWith('/'));
 
   return items;
 }
