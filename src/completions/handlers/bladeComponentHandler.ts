@@ -31,8 +31,12 @@ export async function doCompletion(
   );
   if (!componentCompletionItems) return [];
 
-  // Exclude item containing the close tag
-  const items = componentCompletionItems.filter((item) => !item.label.startsWith('/'));
+  // Exclude item containing the close tag and data- attribute
+  const items = componentCompletionItems.filter((item) => {
+    if (!item.label.startsWith('/') && !item.label.startsWith('data-')) {
+      return item;
+    }
+  });
 
   return items;
 }
