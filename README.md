@@ -34,6 +34,7 @@ This coc-extension will provide various completion features and more features fo
     - Livewire tag completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1658762452)
     - Livewire action completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1658765335)
     - Livewire event completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1658766120)
+    - Livewire directive completion
   - PHP Function completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1643359916)
     - Provides function completion within the PHP-related regions of the Blade file.
   - Directive completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1657000532)

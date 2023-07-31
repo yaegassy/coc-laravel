@@ -27,6 +27,7 @@ import * as configCompletionHandler from './handlers/configHandler';
 import * as envCompletionHandler from './handlers/envHandler';
 import * as guardCompletionHandler from './handlers/guardHandler';
 import * as livewireActionCompletionHandler from './handlers/livewireActionHandler';
+import * as livewireDirectiveCompletionHandler from './handlers/livewireDirectiveHandler';
 import * as livewireEventCompletionHandler from './handlers/livewireEventHandler';
 import * as livewireTagCompletionHandler from './handlers/livewireTagHandler';
 import * as middlewareCompletionHandler from './handlers/middlewareHandler';
@@ -295,6 +296,15 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       );
       if (livewireEventCompletionItems) {
         items.push(...livewireEventCompletionItems);
+      }
+
+      const livewireDirectiveCompletionItems = await livewireDirectiveCompletionHandler.doCompletion(
+        document,
+        position,
+        this.projectManager.livewireProjectManager
+      );
+      if (livewireDirectiveCompletionItems) {
+        items.push(...livewireDirectiveCompletionItems);
       }
     }
 
