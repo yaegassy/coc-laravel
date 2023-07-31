@@ -191,6 +191,7 @@ nmap <silent> <leader>ac <Plug>(coc-codeaction-cursor)
 - [JetBrains/phpstorm-stubs](https://github.com/JetBrains/phpstorm-stubs)
 - [microsoft/vscode-html-languageservice](https://github.com/microsoft/vscode-html-languageservice)
 - [web-tree-sitter](https://www.npmjs.com/package/web-tree-sitter)
+- [claytonrcarter/tree-sitter-phpdoc](https://github.com/claytonrcarter/tree-sitter-phpdoc)
 
 ## License
 
