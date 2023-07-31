@@ -34,7 +34,7 @@ This coc-extension will provide various completion features and more features fo
     - Livewire tag completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1658762452)
     - Livewire action completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1658765335)
     - Livewire event completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1658766120)
-    - Livewire directive completion
+    - Livewire directive completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1659296731)
   - PHP Function completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1643359916)
     - Provides function completion within the PHP-related regions of the Blade file.
   - Directive completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1657000532)
@@ -58,7 +58,7 @@ This coc-extension will provide various completion features and more features fo
     - [Blade -> PHP or Blade] Jump to the component file. Both class components and anonymous components are supported.
   - Livewire tag definition | [DEMO](https://github.com/yaegassy/coc-laravel/issues/2#issuecomment-1658759781)
     - [Blade -> PHP or Blade] Jump to the livewire file. Both livewire class and blade template are supported.
-  - Livewire directive definition
+  - Livewire directive definition | [DEMO](https://github.com/yaegassy/coc-laravel/issues/2#issuecomment-1659297842)
     - [Blade -> PHP or Blade] Jump to the livewire file. Both livewire class and blade template are supported.
 - References
   - `laravel.view.findAllReferences` command | [DEMO](https://github.com/yaegassy/coc-laravel/issues/3#issuecomment-1645929779)
