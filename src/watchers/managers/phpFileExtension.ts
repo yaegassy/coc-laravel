@@ -68,7 +68,7 @@ class PHPFileExtentionWatcherManager {
       const relativeAppPath = this.getRelativePosixFilePath(appPath, this.workspaceRoot);
 
       this.classBasedViewGlobPattern = `**/${relativeAppPath}/View/Components/**/*.php`;
-      this.viewReferenceGlobPattern = `**/{routes,${relativeAppPath}/Http/{Controllers,Livewire},${relativeAppPath}/View/Components}/**/*.php`;
+      this.viewReferenceGlobPattern = `**/{routes,${relativeAppPath}/Http/{Controllers,Livewire},${relativeAppPath}/View/Components,${relativeAppPath}/Livewire}/**/*.php`;
       this.livewireGlobPattern = `**/{bootstrap/cache/livewire-components.php,${relativeAppPath}/Http/Livewire/**/*.php,${relativeAppPath}/Livewire/**/*.php}`;
     }
 
