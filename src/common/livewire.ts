@@ -102,8 +102,22 @@ export function getLivewireComponentPropertiesFromClassNode(classNode: ClassNode
 export function getLivewireComponentMethodsFromClassNode(classNode: ClassNode) {
   const livewireComponentMethods: LivewireComponentMethodType[] = [];
 
-  // Exclude render and mount methods as they are special methods in the context of livewire
-  const DENY_METHOD_NAMES = ['render', 'mount'];
+  // Exclude Lifecycle Hooks methods
+  const DENY_METHOD_NAMES = ['boot', 'booted', 'mount', 'render'];
+  // e.g. hydrateFoo, dehydrateFoo, updatingFoo,  updatedFoo
+  const DENY_METHOD_PREFIX_NAMES = ['hydrate', 'dehydrate', 'updating', 'updated'];
+
+  function isDenyPrefixMethod(name: string, denies: string[]) {
+    const flags: boolean[] = [];
+
+    for (const d of denies) {
+      if (name.startsWith(d)) continue;
+      flags.push(true);
+    }
+
+    if (flags.includes(true)) return true;
+    return false;
+  }
 
   phpParser.walk((node) => {
     if (node.kind !== 'method') return;
@@ -114,6 +128,7 @@ export function getLivewireComponentMethodsFromClassNode(classNode: ClassNode) {
     const identifierNode = methodNode.name as Identifier;
 
     if (DENY_METHOD_NAMES.includes(identifierNode.name)) return;
+    if (isDenyPrefixMethod(identifierNode.name, DENY_METHOD_PREFIX_NAMES)) return;
 
     const livewireComponentMethod: LivewireComponentMethodType = { name: identifierNode.name };
     const argumentsParameters = phpParser.getArgumentParametersFromMethodParametersNode(methodNode.arguments);
