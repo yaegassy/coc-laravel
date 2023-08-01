@@ -26,7 +26,7 @@ export class ViewReferenceProjectManager {
     if (appPath) {
       const relativeAppPath = this.getRelativePosixFilePath(appPath, this.rootDir);
 
-      const globPattern = `**/{routes,${relativeAppPath}/Http/{Controllers,Livewire},${relativeAppPath}/View/Components}/**/*.php`;
+      const globPattern = `**/{routes,${relativeAppPath}/Http/{Controllers,Livewire},${relativeAppPath}/View/Components,${relativeAppPath}/Livewire}/**/*.php`;
 
       const files = await fg(globPattern, {
         ignore: ['**/.git/**', '**/vendor/**', '**/node_modules/**'],

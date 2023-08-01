@@ -55,3 +55,21 @@ export function getRelativeClassFilePathFromNamespaces(namespaces: PhpNamespaceT
     }
   }
 }
+
+export function getFileNamespace(namespaces: PhpNamespaceType[], relativeFilePath: string) {
+  const fileName = path.basename(relativeFilePath);
+
+  for (const namespace of namespaces) {
+    for (const k of Object.keys(namespace)) {
+      if (relativeFilePath.startsWith(namespace[k])) {
+        const fileNamespace = relativeFilePath
+          .replace(namespace[k], k)
+          .replace(/\//g, '\\')
+          .replace(fileName, '')
+          .replace(/\\$/, '');
+
+        return fileNamespace;
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { Uri, workspace } from 'coc.nvim';
+import { Uri } from 'coc.nvim';
 
 import { kebabCase } from 'case-anything';
 import fg from 'fast-glob';
@@ -39,7 +39,7 @@ export class BladeProjectsManager {
       this.bladeFiles = await fg(bladeFileGlobPattern, {
         ignore: ['**/.git/**', '**/vendor/**', '**/node_modules/**'],
         absolute: true,
-        cwd: workspace.root,
+        cwd: this.workspaceRoot,
       });
 
       await this.setBlade(this.bladeFiles);
@@ -55,7 +55,7 @@ export class BladeProjectsManager {
       const classBasedViewFiles = await fg(classBasedViewGlobPattern, {
         ignore: ['**/.git/**', '**/vendor/**', '**/node_modules/**'],
         absolute: true,
-        cwd: workspace.root,
+        cwd: this.workspaceRoot,
       });
 
       const componentFiles: string[] = [];
