@@ -158,7 +158,11 @@
           "type": "array",
           "default": [
             "click",
-            "click.prefetch"
+            "click.prefetch",
+            "submit",
+            "submit.prevent",
+            "keydown",
+            "keydown.enter"
           ],
           "description": "List of click related action to be added to `wire:xxxx`."
         },
@@ -236,8 +240,6 @@
             "hashchange",
             "input",
             "invalid",
-            "keydown",
-            "keydown.enter",
             "keypress",
             "keyup",
             "load",
@@ -273,8 +275,6 @@
             "show",
             "stalled",
             "storage",
-            "submit",
-            "submit.prevent",
             "suspend",
             "timeupdate",
             "toggle",
