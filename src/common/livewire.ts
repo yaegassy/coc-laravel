@@ -111,8 +111,9 @@ export function getLivewireComponentMethodsFromClassNode(classNode: ClassNode) {
     const flags: boolean[] = [];
 
     for (const d of denies) {
-      if (name.startsWith(d)) continue;
-      flags.push(true);
+      if (name.startsWith(d)) {
+        flags.push(true);
+      }
     }
 
     if (flags.includes(true)) return true;
