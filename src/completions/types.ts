@@ -1,3 +1,11 @@
+import { Node } from 'php-parser';
+
+export type BladeWithPhpNodesRange = {
+  startOffset: number;
+  endOffset: number;
+  phpNodes: Node[];
+};
+
 export type RangeOffset = {
   start: number;
   end: number;

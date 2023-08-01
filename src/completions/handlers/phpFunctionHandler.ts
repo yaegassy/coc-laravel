@@ -27,19 +27,7 @@ export async function doCompletion(
 
   const code = document.getText();
   const offset = document.offsetAt(position);
-  if (!phpFunctionCompletionService.canCompletionFromPHPRegionInBladeByOffset(code, offset)) return [];
-
-  // **MEMO**:
-  //
-  // If the cursor is on one of the following php ast nodes, completion stops!
-  //
-  // - string node
-  //   - "|", '|'
-  // - staticlookup node
-  //   - XXXX::|
-  // - propertylookup node
-  //   - XXXX()->|
-  if (phpFunctionCompletionService.hasDenyKindNameFromPHPRegionInBladeByOffset(code, offset)) return [];
+  if (!phpFunctionCompletionService.canCompletionFromContext(code, offset)) return [];
 
   let wordWithExtraChars: string | undefined = undefined;
   const wordWithExtraCharsRange = doc.getWordRangeAtPosition(

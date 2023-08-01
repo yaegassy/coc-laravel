@@ -27,8 +27,7 @@ export async function doCompletion(
 
   const code = document.getText();
   const offset = document.offsetAt(position);
-  if (!livewirePropertyService.canCompletionFromPHPRegionInBladeByOffset(code, offset)) return [];
-  if (livewirePropertyService.hasDenyKindNameFromPHPRegionInBladeByOffset(code, offset)) return [];
+  if (!livewirePropertyService.canCompletionFromContext(code, offset)) return [];
 
   const viewUri = Uri.parse(viewPath).toString();
   const templateKey = document.uri
