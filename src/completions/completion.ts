@@ -29,6 +29,7 @@ import * as guardCompletionHandler from './handlers/guardHandler';
 import * as livewireActionCompletionHandler from './handlers/livewireActionHandler';
 import * as livewireDirectiveCompletionHandler from './handlers/livewireDirectiveHandler';
 import * as livewireEventCompletionHandler from './handlers/livewireEventHandler';
+import * as livewirePropertyHandler from './handlers/livewirePropertyHandler';
 import * as livewireTagCompletionHandler from './handlers/livewireTagHandler';
 import * as middlewareCompletionHandler from './handlers/middlewareHandler';
 import * as phpFunctionCompletionHandler from './handlers/phpFunctionHandler';
@@ -62,6 +63,7 @@ export async function register(context: ExtensionContext, projectManager: Projec
       DOCUMENT_SELECTOR,
       new LaravelCompletionProvider(context, projectManager, viewPath),
       [
+        '$', // livewire property completion, php related
         '@', // directive,
         '<', // component,
         ':', // guard,
@@ -305,6 +307,16 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       );
       if (livewireDirectiveCompletionItems) {
         items.push(...livewireDirectiveCompletionItems);
+      }
+
+      const livewirePropertyCompletionItems = await livewirePropertyHandler.doCompletion(
+        document,
+        position,
+        this.projectManager.livewireProjectManager,
+        this.viewPath
+      );
+      if (livewirePropertyCompletionItems) {
+        items.push(...livewirePropertyCompletionItems);
       }
     }
 
