@@ -30,7 +30,7 @@ This coc-extension will provide various completion features and more features fo
 
 - Completions
   - Component completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1650935001)
-  - Livewire completion
+  - Livewire completion (Also compatible with Livewire `v3`!)
     - Livewire tag completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1658762452)
     - Livewire action completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1658765335)
     - Livewire event completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1658766120)
