@@ -7,15 +7,15 @@ import * as viewReferenceProjectService from '../services/viewReference';
 import { ViewReferenceMapValueType } from '../types';
 
 export class ViewReferenceProjectManager {
-  rootDir: string;
+  workspaceRoot: string;
   initialized: boolean;
   viewReferenceMapStore: Map<string, ViewReferenceMapValueType>;
 
   private isReady: boolean = false;
   private readyCallbacks: (() => void)[] = [];
 
-  constructor(rootDir: string) {
-    this.rootDir = rootDir;
+  constructor(workspaceRoot: string) {
+    this.workspaceRoot = workspaceRoot;
     this.initialized = false;
     this.viewReferenceMapStore = new Map();
   }
@@ -43,14 +43,14 @@ export class ViewReferenceProjectManager {
     const appPath = await getAppPath(artisanPath);
 
     if (appPath) {
-      const relativeAppPath = this.getRelativePosixFilePath(appPath, this.rootDir);
+      const relativeAppPath = this.getRelativePosixFilePath(appPath, this.workspaceRoot);
 
       const globPattern = `**/{routes,${relativeAppPath}/Http/{Controllers,Livewire},${relativeAppPath}/View/Components,${relativeAppPath}/Livewire}/**/*.php`;
 
       const files = await fg(globPattern, {
         ignore: ['**/.git/**', '**/vendor/**', '**/node_modules/**'],
         absolute: true,
-        cwd: this.rootDir,
+        cwd: this.workspaceRoot,
       });
 
       await this.set(files);
@@ -67,14 +67,14 @@ export class ViewReferenceProjectManager {
     for (const file of files) {
       const viewReferenceMapValue = await viewReferenceProjectService.getViewReferenceMapValue(file);
       if (!viewReferenceMapValue) continue;
-      const relativeFilePath = this.getRelativePosixFilePath(file, this.rootDir);
+      const relativeFilePath = this.getRelativePosixFilePath(file, this.workspaceRoot);
       this.viewReferenceMapStore.set(relativeFilePath, viewReferenceMapValue);
     }
   }
 
   async delete(files: string[]) {
     for (const file of files) {
-      const relativeFilePath = this.getRelativePosixFilePath(file, this.rootDir);
+      const relativeFilePath = this.getRelativePosixFilePath(file, this.workspaceRoot);
       this.viewReferenceMapStore.delete(relativeFilePath);
     }
   }

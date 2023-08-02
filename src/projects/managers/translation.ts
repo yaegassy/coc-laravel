@@ -1,8 +1,6 @@
-import path from 'path';
-
 import fg from 'fast-glob';
-////import fs from 'node:fs/promises';
 import fs from 'fs';
+import path from 'path';
 import { Array as ArrayNode, Entry, Return, String as StringNode } from 'php-parser';
 
 import { getArtisanPath, runTinker } from '../../common/shared';

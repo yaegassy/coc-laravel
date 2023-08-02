@@ -17,7 +17,7 @@ import * as phpParser from '../../parsers/php/parser';
 import { LivewireMapValueType } from '../types';
 
 export class LivewireProjectManager {
-  rootDir: string;
+  workspaceRoot: string;
   initialized: boolean;
   livewireMapStore: Map<string, LivewireMapValueType>;
   projectNamespaces: PhpNamespaceType[];
@@ -25,8 +25,8 @@ export class LivewireProjectManager {
   private isReady: boolean = false;
   private readyCallbacks: (() => void)[] = [];
 
-  constructor(rootDir: string) {
-    this.rootDir = rootDir;
+  constructor(workspaceRoot: string) {
+    this.workspaceRoot = workspaceRoot;
     this.initialized = false;
     this.livewireMapStore = new Map();
 
@@ -50,7 +50,7 @@ export class LivewireProjectManager {
   }
 
   async initialize() {
-    const composerJsonContent = await getComposerJsonContent(this.rootDir);
+    const composerJsonContent = await getComposerJsonContent(this.workspaceRoot);
     if (!composerJsonContent) return;
     const projectNamespaces = getProjectNamespacesFromComposerJson(composerJsonContent);
     if (!projectNamespaces) return;
@@ -75,7 +75,7 @@ export class LivewireProjectManager {
         );
         if (!relativeClassFilePath) continue;
 
-        const absoluteClassFilePath = path.join(this.rootDir, relativeClassFilePath);
+        const absoluteClassFilePath = path.join(this.workspaceRoot, relativeClassFilePath);
         files.push(absoluteClassFilePath);
       }
     }
@@ -87,13 +87,13 @@ export class LivewireProjectManager {
     if (livewireComponentMaps.length === 0) {
       const appPath = await getAppPath(artisanPath);
       if (appPath) {
-        const relativeAppPath = this.getRelativePosixFilePath(appPath, this.rootDir);
+        const relativeAppPath = this.getRelativePosixFilePath(appPath, this.workspaceRoot);
         const livewire3GlobPattern = `**/${relativeAppPath}/Livewire/**/*.php`;
 
         const resFiles = await fg(livewire3GlobPattern, {
           ignore: ['**/.git/**', '**/vendor/**', '**/node_modules/**'],
           absolute: true,
-          cwd: this.rootDir,
+          cwd: this.workspaceRoot,
         });
         files.push(...resFiles);
       }
@@ -132,7 +132,7 @@ export class LivewireProjectManager {
         );
         if (!relativeClassFilePath) continue;
 
-        const absoluteClassFilePath = path.join(this.rootDir, relativeClassFilePath);
+        const absoluteClassFilePath = path.join(this.workspaceRoot, relativeClassFilePath);
 
         if (file !== absoluteClassFilePath) continue;
 
@@ -177,7 +177,7 @@ export class LivewireProjectManager {
   private async _doSetV3(files: string[]) {
     for (const file of files) {
       const className = path.basename(file).replace('.php', '');
-      const relativeFilePath = this.getRelativePosixFilePath(file, this.rootDir);
+      const relativeFilePath = this.getRelativePosixFilePath(file, this.workspaceRoot);
       const fileNamespace = getFileNamespace(this.projectNamespaces, relativeFilePath);
       const namespacePathName = fileNamespace + '\\' + className;
 
@@ -240,7 +240,7 @@ export class LivewireProjectManager {
         );
         if (!relativeClassFilePath) continue;
 
-        const absoluteClassFilePath = path.join(this.rootDir, relativeClassFilePath);
+        const absoluteClassFilePath = path.join(this.workspaceRoot, relativeClassFilePath);
 
         if (file !== absoluteClassFilePath) continue;
 
@@ -275,7 +275,7 @@ export class LivewireProjectManager {
   }
 
   async getLivewireComponentMapsWrapper() {
-    const livewireComponentMapFilePath = path.join(this.rootDir, 'bootstrap', 'cache', 'livewire-components.php');
+    const livewireComponentMapFilePath = path.join(this.workspaceRoot, 'bootstrap', 'cache', 'livewire-components.php');
     let componentMapPhpCode: string | undefined = undefined;
     try {
       componentMapPhpCode = await fs.promises.readFile(livewireComponentMapFilePath, { encoding: 'utf8' });

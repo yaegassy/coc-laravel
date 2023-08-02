@@ -15,7 +15,7 @@ export async function register(context: ExtensionContext) {
 
   const bladeProjectManager = new BladeProjectsManager(workspace.root);
   const translationProjectManager = new TranslationProjectManager();
-  const phpFunctionProjectManager = new PHPFunctionProjectManager();
+  const phpFunctionProjectManager = new PHPFunctionProjectManager(workspace.root);
   const viewReferenceProjectManager = new ViewReferenceProjectManager(workspace.root);
   const livewireProjectManager = new LivewireProjectManager(workspace.root);
 

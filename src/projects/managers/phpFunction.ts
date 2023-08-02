@@ -1,5 +1,3 @@
-import { workspace } from 'coc.nvim';
-
 import fs from 'fs';
 import path from 'path';
 
@@ -10,13 +8,15 @@ import { getArtisanPath } from '../../common/shared';
 
 export class PHPFunctionProjectManager {
   phpFunctionMapStore: Map<string, PHPFunctionType>;
+  workspaceRoot: string;
 
   initialized: boolean;
 
   private isReady: boolean = false;
   private readyCallbacks: (() => void)[] = [];
 
-  constructor() {
+  constructor(workspaceRoot: string) {
+    this.workspaceRoot = workspaceRoot;
     this.phpFunctionMapStore = new Map();
     this.initialized = false;
   }
@@ -58,7 +58,7 @@ export class PHPFunctionProjectManager {
     // autoloadedFunctions
     //
 
-    const autoloadFunctionFilePath = path.join(workspace.root, 'vendor', 'composer', 'autoload_files.php');
+    const autoloadFunctionFilePath = path.join(this.workspaceRoot, 'vendor', 'composer', 'autoload_files.php');
 
     let fileExists = false;
     try {
@@ -70,13 +70,13 @@ export class PHPFunctionProjectManager {
     const autoloadFunctionFilePHPCode = await fs.promises.readFile(autoloadFunctionFilePath, { encoding: 'utf8' });
     const abusoluteAutoloadedFunctionsFiles = phpFunctionProjectService.getAbusoluteAutoloadFunctionFilesFromCode(
       autoloadFunctionFilePHPCode,
-      workspace.root
+      this.workspaceRoot
     );
 
     // Some of the PATHs read do not exist or cause errors
     try {
       for (const autoloadedFunctionFile of abusoluteAutoloadedFunctionsFiles) {
-        const relativeFilePath = autoloadedFunctionFile.replace(workspace.root, '').replace(/^\//, '');
+        const relativeFilePath = autoloadedFunctionFile.replace(this.workspaceRoot, '').replace(/^\//, '');
         const targetPHPCode = await fs.promises.readFile(autoloadedFunctionFile, { encoding: 'utf8' });
         const autoloadedFunctions = phpFunctionProjectService.getPHPFunctions(targetPHPCode, relativeFilePath);
         if (autoloadedFunctions) {
