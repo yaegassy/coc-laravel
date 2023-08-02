@@ -1,9 +1,13 @@
 import { LinesTextDocument, Position, workspace } from 'coc.nvim';
 
 import * as bladeParser from '../../parsers/blade/parser';
-import { type ProjectManagerType } from '../../projects/types';
+import { type BladeProjectsManagerType } from '../../projects/types';
 
-export async function doHover(document: LinesTextDocument, position: Position, projectManager: ProjectManagerType) {
+export async function doHover(
+  document: LinesTextDocument,
+  position: Position,
+  bladeProjectManager: BladeProjectsManagerType
+) {
   let value: string | null = null;
 
   const doc = workspace.getDocument(document.uri);
@@ -17,7 +21,7 @@ export async function doHover(document: LinesTextDocument, position: Position, p
   const isComponentRegion = bladeParser.isComponentRegion(code, position);
   if (!isComponentRegion) return null;
 
-  const component = projectManager.bladeProjectManager.componentMapStore.get(text);
+  const component = bladeProjectManager.componentMapStore.get(text);
   if (component) {
     const relativeComponentPathPath = component.path.replace(workspace.root, '').replace(/^\//, '');
 

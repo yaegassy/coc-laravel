@@ -47,7 +47,11 @@ class LaravelReferenceProvider implements ReferenceProvider {
   ): Promise<Location[]> {
     const locations: Location[] = [];
 
-    const viewReferenceItems = await viewReferenceHandler.doReference(document, position, this.projectManager);
+    const viewReferenceItems = await viewReferenceHandler.doReference(
+      document,
+      position,
+      this.projectManager.viewReferenceProjectManager
+    );
     if (viewReferenceItems) {
       locations.push(...viewReferenceItems);
     }

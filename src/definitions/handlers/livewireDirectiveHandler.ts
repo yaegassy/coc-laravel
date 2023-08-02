@@ -1,12 +1,13 @@
 import { Location, Position, Range, TextDocument, Uri, workspace } from 'coc.nvim';
 
-import { type ProjectManagerType } from '../../projects/types';
 import { isTargetDirectiveWithParametersFromOffset } from '../../completions/shared';
+import { type BladeProjectsManagerType, type LivewireProjectManagerType } from '../../projects/types';
 
 export async function doDefinition(
   document: TextDocument,
   position: Position,
-  projectManager: ProjectManagerType
+  livewireProjectManager: LivewireProjectManagerType,
+  bladeProjectManager: BladeProjectsManagerType
 ): Promise<Location[]> {
   if (document.languageId !== 'blade') return [];
   const locations: Location[] = [];
@@ -25,7 +26,7 @@ export async function doDefinition(
 
   if (!isTargetDirectiveWithParametersFromOffset(code, offset, 'livewire')) return [];
 
-  const livewire = projectManager.livewireProjectManager.livewireMapStore.get(text);
+  const livewire = livewireProjectManager.livewireMapStore.get(text);
   if (!livewire) return [];
 
   const location: Location = {
@@ -35,7 +36,7 @@ export async function doDefinition(
   locations.push(location);
 
   if (livewire.templateKey) {
-    const bladeFilePath = projectManager.bladeProjectManager.bladeMapStore.get(livewire.templateKey);
+    const bladeFilePath = bladeProjectManager.bladeMapStore.get(livewire.templateKey);
     if (bladeFilePath) {
       const location: Location = {
         uri: Uri.parse(bladeFilePath).toString(),

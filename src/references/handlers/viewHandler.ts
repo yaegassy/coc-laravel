@@ -1,12 +1,12 @@
 import { LinesTextDocument, Location, Position, Uri, workspace } from 'coc.nvim';
 
-import { type ProjectManagerType } from '../../projects/types';
+import { type ViewReferenceProjectManagerType } from '../../projects/types';
 import * as viewService from '../services/viewService';
 
 export async function doReference(
   document: LinesTextDocument,
   position: Position,
-  projectManager: ProjectManagerType
+  viewReferenceProjectManager: ViewReferenceProjectManagerType
 ): Promise<Location[]> {
   const locations: Location[] = [];
 
@@ -33,7 +33,7 @@ export async function doReference(
   const canProvideService = viewService.canProvideService(offset, serviceLocations);
   if (!canProvideService) return [];
 
-  const viewReferences = Array.from(projectManager.viewReferenceProjectManager.list());
+  const viewReferences = Array.from(viewReferenceProjectManager.list());
   for (const [, v] of viewReferences) {
     if (v.callViewFunctions.length === 0) continue;
 

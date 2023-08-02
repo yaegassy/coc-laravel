@@ -71,7 +71,7 @@ class LaravelDiagnosticManager {
     // blade missing component
     const missingComponentDiagnostics = await bladeMissingComponentDiagnosticHandler.doValidate(
       textDocument,
-      this.projectManager
+      this.projectManager.bladeProjectManager
     );
     if (missingComponentDiagnostics) diagnostics.push(...missingComponentDiagnostics);
 

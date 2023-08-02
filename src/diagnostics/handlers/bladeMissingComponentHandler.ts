@@ -4,9 +4,9 @@ import { BladeComponentNode } from 'stillat-blade-parser/out/nodes/nodes';
 
 import { type DiagnosticDataType } from '../../common/types';
 import * as bladeParser from '../../parsers/blade/parser';
-import { type ProjectManagerType } from '../../projects/types';
+import { type BladeProjectsManagerType } from '../../projects/types';
 
-export async function doValidate(textDocument: TextDocument, projectManager: ProjectManagerType) {
+export async function doValidate(textDocument: TextDocument, bladeProjectManager: BladeProjectsManagerType) {
   if (textDocument.languageId !== 'blade') return;
 
   const diagnostics: Diagnostic[] = [];
@@ -35,8 +35,8 @@ export async function doValidate(textDocument: TextDocument, projectManager: Pro
 
   for (const documentComponent of documentComponents) {
     if (documentComponent.name === 'x-slot') continue;
-    if (!projectManager.bladeProjectManager.isInitialized()) continue;
-    if (projectManager.bladeProjectManager.componentMapStore.get(documentComponent.name)) continue;
+    if (!bladeProjectManager.isInitialized()) continue;
+    if (bladeProjectManager.componentMapStore.get(documentComponent.name)) continue;
 
     const diagnostic: Diagnostic = {
       source: 'laravel',

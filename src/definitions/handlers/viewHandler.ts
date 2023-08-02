@@ -1,12 +1,12 @@
 import { Location, Position, Range, TextDocument, Uri, workspace } from 'coc.nvim';
 
-import { type ProjectManagerType } from '../../projects/types';
+import { type BladeProjectsManagerType } from '../../projects/types';
 import * as viewService from '../services/viewService';
 
 export async function doDefinition(
   document: TextDocument,
   position: Position,
-  projectManager: ProjectManagerType
+  bladeProjectManager: BladeProjectsManagerType
 ): Promise<Location[]> {
   if (document.languageId !== 'php') return [];
   const locations: Location[] = [];
@@ -34,7 +34,7 @@ export async function doDefinition(
   const canProvideService = viewService.canProvideService(offset, serviceLocations);
   if (!canProvideService) return [];
 
-  const bladeFile = projectManager.bladeProjectManager.bladeMapStore.get(text);
+  const bladeFile = bladeProjectManager.bladeMapStore.get(text);
   if (bladeFile) {
     const location: Location = {
       uri: Uri.parse(bladeFile).toString(),

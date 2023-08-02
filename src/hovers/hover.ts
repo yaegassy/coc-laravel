@@ -45,7 +45,11 @@ class LaravelHoverProvider implements HoverProvider {
       value: '',
     };
 
-    const bladeComponentTagValue = await bladeComponentTagHandler.doHover(document, position, this.projectManager);
+    const bladeComponentTagValue = await bladeComponentTagHandler.doHover(
+      document,
+      position,
+      this.projectManager.bladeProjectManager
+    );
     if (bladeComponentTagValue) {
       contents.value += `${bladeComponentTagValue}\n\n`;
     }

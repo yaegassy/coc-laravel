@@ -2,13 +2,13 @@ import { Location, Position, Range, TextDocument, Uri, workspace } from 'coc.nvi
 
 import fs from 'fs';
 
-import { type ProjectManagerType } from '../../projects/types';
+import { type BladeProjectsManagerType } from '../../projects/types';
 import * as bladeComponentTagHandlerService from '../services/bladeComponentTagHandlerService';
 
 export async function doDefinition(
   document: TextDocument,
   position: Position,
-  projectManager: ProjectManagerType
+  bladeProjectManager: BladeProjectsManagerType
 ): Promise<Location[]> {
   if (document.languageId !== 'blade') return [];
   const locations: Location[] = [];
@@ -24,7 +24,7 @@ export async function doDefinition(
 
   if (!text.startsWith('x-')) return [];
 
-  const component = projectManager.bladeProjectManager.componentMapStore.get(text);
+  const component = bladeProjectManager.componentMapStore.get(text);
   if (!component) return [];
 
   let componentFileType: string | undefined;
@@ -67,7 +67,7 @@ export async function doDefinition(
 
     const bladeMapValue = await bladeComponentTagHandlerService.getCallViewOfViewValue(component.path);
     if (bladeMapValue) {
-      const bladeFilePath = projectManager.bladeProjectManager.bladeMapStore.get(bladeMapValue);
+      const bladeFilePath = bladeProjectManager.bladeMapStore.get(bladeMapValue);
       if (bladeFilePath) {
         const location: Location = {
           uri: Uri.parse(bladeFilePath).toString(),

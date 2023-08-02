@@ -52,23 +52,36 @@ class LaravelDefinitionProvider implements DefinitionProvider {
     const bladeComponentTagDefinitionItems = await bladeComponentTagHandler.doDefinition(
       document,
       position,
-      this.projectManager
+      this.projectManager.bladeProjectManager
     );
     if (bladeComponentTagDefinitionItems) {
       locations.push(...bladeComponentTagDefinitionItems);
     }
 
-    const bladeViewDefinitionItems = await bladeViewHandler.doDefinition(document, position, this.projectManager);
+    const bladeViewDefinitionItems = await bladeViewHandler.doDefinition(
+      document,
+      position,
+      this.projectManager.bladeProjectManager
+    );
     if (bladeViewDefinitionItems) {
       locations.push(...bladeViewDefinitionItems);
     }
 
-    const viewDefinitionItems = await viewHandler.doDefinition(document, position, this.projectManager);
+    const viewDefinitionItems = await viewHandler.doDefinition(
+      document,
+      position,
+      this.projectManager.bladeProjectManager
+    );
     if (viewDefinitionItems) {
       locations.push(...viewDefinitionItems);
     }
 
-    const livewireTagDefinitionItems = await livewireTagHandler.doDefinition(document, position, this.projectManager);
+    const livewireTagDefinitionItems = await livewireTagHandler.doDefinition(
+      document,
+      position,
+      this.projectManager.livewireProjectManager,
+      this.projectManager.bladeProjectManager
+    );
     if (livewireTagDefinitionItems) {
       locations.push(...livewireTagDefinitionItems);
     }
@@ -76,7 +89,8 @@ class LaravelDefinitionProvider implements DefinitionProvider {
     const livewireDirectiveDefinitionItems = await livewireDirectiveHandler.doDefinition(
       document,
       position,
-      this.projectManager
+      this.projectManager.livewireProjectManager,
+      this.projectManager.bladeProjectManager
     );
     if (livewireDirectiveDefinitionItems) {
       locations.push(...livewireDirectiveDefinitionItems);
