@@ -24,6 +24,9 @@ export async function register(context: ExtensionContext, projectManager: Projec
   const { document } = await workspace.getCurrentState();
   if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
 
+  await projectManager.bladeProjectManager.onReady(() => {});
+  await projectManager.livewireProjectManager.onReady(() => {});
+
   context.subscriptions.push(
     languages.registerDefinitionProvider(DOCUMENT_SELECTOR, new LaravelDefinitionProvider(context, projectManager))
   );

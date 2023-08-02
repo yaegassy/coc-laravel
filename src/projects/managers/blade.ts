@@ -18,6 +18,9 @@ export class BladeProjectsManager {
   bladeFiles: string[];
   classBasedViewDir?: string;
 
+  private isReady: boolean = false;
+  private readyCallbacks: (() => void)[] = [];
+
   constructor(workspaceRoot: string) {
     this.workspaceRoot = workspaceRoot;
     this.bladeMapStore = new Map();
@@ -25,6 +28,22 @@ export class BladeProjectsManager {
     this.initialized = false;
     this.bladeFiles = [];
     this.classBasedViewDir = undefined;
+  }
+
+  private setReady() {
+    this.isReady = true;
+    this.initialized = true;
+
+    this.readyCallbacks.forEach((callback) => callback());
+    this.readyCallbacks = [];
+  }
+
+  async onReady(callback: () => void) {
+    if (this.isReady) {
+      callback();
+    } else {
+      this.readyCallbacks.push(callback);
+    }
   }
 
   async initialize() {
@@ -69,7 +88,7 @@ export class BladeProjectsManager {
       await this.setComponent(componentFiles);
     }
 
-    this.initialized = true;
+    this.setReady();
   }
 
   isInitialized() {
@@ -193,6 +212,9 @@ export class BladeProjectsManager {
   async restart() {
     this.bladeMapStore.clear();
     this.componentMapStore.clear();
+
+    this.isReady = false;
+    this.initialized = false;
 
     await this.initialize();
   }

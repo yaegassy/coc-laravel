@@ -14,9 +14,28 @@ export class TranslationProjectManager {
   langPath?: string;
   locale?: string;
 
+  private isReady: boolean = false;
+  private readyCallbacks: (() => void)[] = [];
+
   constructor() {
     this.mapStore = new Map();
     this.initialized = false;
+  }
+
+  private setReady() {
+    this.isReady = true;
+    this.initialized = true;
+
+    this.readyCallbacks.forEach((callback) => callback());
+    this.readyCallbacks = [];
+  }
+
+  async onReady(callback: () => void) {
+    if (this.isReady) {
+      callback();
+    } else {
+      this.readyCallbacks.push(callback);
+    }
   }
 
   async initialize() {
@@ -41,7 +60,8 @@ export class TranslationProjectManager {
     });
 
     this.set(files);
-    this.initialized = true;
+
+    this.setReady();
   }
 
   isInitialized() {
@@ -108,6 +128,10 @@ export class TranslationProjectManager {
 
   async restart() {
     this.mapStore.clear();
+
+    this.isReady = false;
+    this.initialized = false;
+
     await this.initialize();
   }
 

@@ -18,6 +18,8 @@ import * as bladeDirectiveHandler from './handlers/bladeDirectiveHandler';
 import path from 'path';
 
 export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
+  await projectManager.bladeProjectManager.onReady(() => {});
+
   context.subscriptions.push(
     languages.registerHoverProvider(DOCUMENT_SELECTOR, new LaravelHoverProvider(context, projectManager))
   );

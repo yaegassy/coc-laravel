@@ -12,7 +12,7 @@ import {
 } from '../../common/composer';
 import * as livewireCommon from '../../common/livewire';
 import { getAppPath, getArtisanPath } from '../../common/shared';
-import { PhpNamespaceType } from '../../common/types';
+import { LivewireComponentMapType, PhpNamespaceType } from '../../common/types';
 import * as phpParser from '../../parsers/php/parser';
 import { LivewireMapValueType } from '../types';
 
@@ -22,12 +22,31 @@ export class LivewireProjectManager {
   livewireMapStore: Map<string, LivewireMapValueType>;
   projectNamespaces: PhpNamespaceType[];
 
+  private isReady: boolean = false;
+  private readyCallbacks: (() => void)[] = [];
+
   constructor(rootDir: string) {
     this.rootDir = rootDir;
     this.initialized = false;
     this.livewireMapStore = new Map();
 
     this.projectNamespaces = [];
+  }
+
+  private setReady() {
+    this.isReady = true;
+    this.initialized = true;
+
+    this.readyCallbacks.forEach((callback) => callback());
+    this.readyCallbacks = [];
+  }
+
+  async onReady(callback: () => void) {
+    if (this.isReady) {
+      callback();
+    } else {
+      this.readyCallbacks.push(callback);
+    }
   }
 
   async initialize() {
@@ -45,7 +64,7 @@ export class LivewireProjectManager {
     const livewireComponentMaps = await this.getLivewireComponentMapsWrapper();
 
     //
-    // livewire v2
+    // livewire v2 or earlier
     //
 
     if (livewireComponentMaps.length > 0) {
@@ -82,7 +101,7 @@ export class LivewireProjectManager {
 
     await this.set(files);
 
-    this.initialized = true;
+    this.setReady();
   }
 
   isInitialized() {
@@ -92,74 +111,34 @@ export class LivewireProjectManager {
   async set(files: string[]) {
     const livewireComponentMaps = await this.getLivewireComponentMapsWrapper();
 
-    //
-    // livewire v2
-    //
-
+    // livewire v2 or earlier
     if (livewireComponentMaps.length > 0) {
-      for (const file of files) {
-        for (const componentMap of livewireComponentMaps) {
-          const relativeClassFilePath = getRelativeClassFilePathFromNamespaces(
-            this.projectNamespaces,
-            componentMap.value
-          );
-          if (!relativeClassFilePath) continue;
-
-          const absoluteClassFilePath = path.join(this.rootDir, relativeClassFilePath);
-
-          if (file !== absoluteClassFilePath) continue;
-
-          let targetClassFilePhpCode: string | undefined = undefined;
-          try {
-            targetClassFilePhpCode = await fs.promises.readFile(absoluteClassFilePath, { encoding: 'utf8' });
-          } catch (e) {
-            //
-          }
-          if (!targetClassFilePhpCode) continue;
-
-          const targetClassAst = phpParser.getAst(targetClassFilePhpCode);
-          if (!targetClassAst) continue;
-
-          const livewireComponentClassNode = livewireCommon.getLivewireComponentClassNode(targetClassAst);
-          if (!livewireComponentClassNode) continue;
-
-          const livewireComponentProperties =
-            livewireCommon.getLivewireComponentPropertiesFromClassNode(livewireComponentClassNode);
-
-          const livewireComponentMethods =
-            livewireCommon.getLivewireComponentMethodsFromClassNode(livewireComponentClassNode);
-
-          const renderMethodNode = livewireCommon.getRenderMethodNodeFromClassNode(livewireComponentClassNode);
-          const templateKey = livewireCommon.getTemplateKeyOfCallViewFuncArgumentsFromMethodNode(renderMethodNode);
-
-          const livewireMapValue: LivewireMapValueType = {
-            keyName: componentMap.key,
-            namespacePathName: componentMap.value,
-            filePath: absoluteClassFilePath,
-            properties: livewireComponentProperties,
-            methods: livewireComponentMethods,
-            templateKey,
-          };
-
-          this.livewireMapStore.set(componentMap.key, livewireMapValue);
-        }
-      }
+      await this._doSetV2(files, livewireComponentMaps);
     }
 
-    //
     // livewire v3
-    //
-
     if (livewireComponentMaps.length === 0) {
-      for (const file of files) {
-        const className = path.basename(file).replace('.php', '');
-        const relativeFilePath = this.getRelativePosixFilePath(file, this.rootDir);
-        const fileNamespace = getFileNamespace(this.projectNamespaces, relativeFilePath);
-        const namespacePathName = fileNamespace + '\\' + className;
+      await this._doSetV3(files);
+    }
+  }
+
+  // livewire v2 or earlier
+  private async _doSetV2(files: string[], livewireComponentMaps: LivewireComponentMapType[]) {
+    for (const file of files) {
+      for (const componentMap of livewireComponentMaps) {
+        const relativeClassFilePath = getRelativeClassFilePathFromNamespaces(
+          this.projectNamespaces,
+          componentMap.value
+        );
+        if (!relativeClassFilePath) continue;
+
+        const absoluteClassFilePath = path.join(this.rootDir, relativeClassFilePath);
+
+        if (file !== absoluteClassFilePath) continue;
 
         let targetClassFilePhpCode: string | undefined = undefined;
         try {
-          targetClassFilePhpCode = await fs.promises.readFile(file, { encoding: 'utf8' });
+          targetClassFilePhpCode = await fs.promises.readFile(absoluteClassFilePath, { encoding: 'utf8' });
         } catch (e) {
           //
         }
@@ -167,68 +146,116 @@ export class LivewireProjectManager {
 
         const targetClassAst = phpParser.getAst(targetClassFilePhpCode);
         if (!targetClassAst) continue;
+
         const livewireComponentClassNode = livewireCommon.getLivewireComponentClassNode(targetClassAst);
         if (!livewireComponentClassNode) continue;
 
         const livewireComponentProperties =
           livewireCommon.getLivewireComponentPropertiesFromClassNode(livewireComponentClassNode);
+
         const livewireComponentMethods =
           livewireCommon.getLivewireComponentMethodsFromClassNode(livewireComponentClassNode);
+
         const renderMethodNode = livewireCommon.getRenderMethodNodeFromClassNode(livewireComponentClassNode);
         const templateKey = livewireCommon.getTemplateKeyOfCallViewFuncArgumentsFromMethodNode(renderMethodNode);
 
-        const keyName = templateKey.replace('livewire.', '');
-
         const livewireMapValue: LivewireMapValueType = {
-          keyName,
-          namespacePathName,
-          filePath: file,
+          keyName: componentMap.key,
+          namespacePathName: componentMap.value,
+          filePath: absoluteClassFilePath,
           properties: livewireComponentProperties,
           methods: livewireComponentMethods,
           templateKey,
         };
 
-        this.livewireMapStore.set(keyName, livewireMapValue);
+        this.livewireMapStore.set(componentMap.key, livewireMapValue);
       }
+    }
+  }
+
+  // livewire v3
+  private async _doSetV3(files: string[]) {
+    for (const file of files) {
+      const className = path.basename(file).replace('.php', '');
+      const relativeFilePath = this.getRelativePosixFilePath(file, this.rootDir);
+      const fileNamespace = getFileNamespace(this.projectNamespaces, relativeFilePath);
+      const namespacePathName = fileNamespace + '\\' + className;
+
+      let targetClassFilePhpCode: string | undefined = undefined;
+      try {
+        targetClassFilePhpCode = await fs.promises.readFile(file, { encoding: 'utf8' });
+      } catch (e) {
+        //
+      }
+      if (!targetClassFilePhpCode) continue;
+
+      const targetClassAst = phpParser.getAst(targetClassFilePhpCode);
+      if (!targetClassAst) continue;
+      const livewireComponentClassNode = livewireCommon.getLivewireComponentClassNode(targetClassAst);
+      if (!livewireComponentClassNode) continue;
+
+      const livewireComponentProperties =
+        livewireCommon.getLivewireComponentPropertiesFromClassNode(livewireComponentClassNode);
+      const livewireComponentMethods =
+        livewireCommon.getLivewireComponentMethodsFromClassNode(livewireComponentClassNode);
+      const renderMethodNode = livewireCommon.getRenderMethodNodeFromClassNode(livewireComponentClassNode);
+      const templateKey = livewireCommon.getTemplateKeyOfCallViewFuncArgumentsFromMethodNode(renderMethodNode);
+
+      const keyName = templateKey.replace('livewire.', '');
+
+      const livewireMapValue: LivewireMapValueType = {
+        keyName,
+        namespacePathName,
+        filePath: file,
+        properties: livewireComponentProperties,
+        methods: livewireComponentMethods,
+        templateKey,
+      };
+
+      this.livewireMapStore.set(keyName, livewireMapValue);
     }
   }
 
   async delete(files: string[]) {
     const livewireComponentMaps = await this.getLivewireComponentMapsWrapper();
 
-    //
-    // livewire v2
-    //
-
+    // livewire v2 or earlier
     if (livewireComponentMaps.length > 0) {
-      for (const file of files) {
-        for (const componentMap of livewireComponentMaps) {
-          const relativeClassFilePath = getRelativeClassFilePathFromNamespaces(
-            this.projectNamespaces,
-            componentMap.value
-          );
-          if (!relativeClassFilePath) continue;
-
-          const absoluteClassFilePath = path.join(this.rootDir, relativeClassFilePath);
-
-          if (file !== absoluteClassFilePath) continue;
-
-          this.livewireMapStore.delete(componentMap.key);
-        }
-      }
+      await this._doDeleteV2(files, livewireComponentMaps);
     }
 
-    //
     // livewire v3
-    //
-
     if (livewireComponentMaps.length === 0) {
-      for (const file of files) {
-        const stores = Array.from(this.list());
-        for (const store of stores) {
-          if (store[1].filePath === file) {
-            this.livewireMapStore.delete(store[0]);
-          }
+      await this._doDeleteV3(files);
+    }
+  }
+
+  // livewire v2 or earlier
+  private async _doDeleteV2(files: string[], livewireComponentMaps: LivewireComponentMapType[]) {
+    for (const file of files) {
+      for (const componentMap of livewireComponentMaps) {
+        const relativeClassFilePath = getRelativeClassFilePathFromNamespaces(
+          this.projectNamespaces,
+          componentMap.value
+        );
+        if (!relativeClassFilePath) continue;
+
+        const absoluteClassFilePath = path.join(this.rootDir, relativeClassFilePath);
+
+        if (file !== absoluteClassFilePath) continue;
+
+        this.livewireMapStore.delete(componentMap.key);
+      }
+    }
+  }
+
+  // livewire v3
+  private async _doDeleteV3(files: string[]) {
+    for (const file of files) {
+      const stores = Array.from(this.list());
+      for (const store of stores) {
+        if (store[1].filePath === file) {
+          this.livewireMapStore.delete(store[0]);
         }
       }
     }
@@ -236,6 +263,8 @@ export class LivewireProjectManager {
 
   async restart() {
     this.livewireMapStore.clear();
+
+    this.isReady = false;
     this.initialized = false;
 
     await this.initialize();

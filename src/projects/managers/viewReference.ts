@@ -11,10 +11,29 @@ export class ViewReferenceProjectManager {
   initialized: boolean;
   viewReferenceMapStore: Map<string, ViewReferenceMapValueType>;
 
+  private isReady: boolean = false;
+  private readyCallbacks: (() => void)[] = [];
+
   constructor(rootDir: string) {
     this.rootDir = rootDir;
     this.initialized = false;
     this.viewReferenceMapStore = new Map();
+  }
+
+  private setReady() {
+    this.isReady = true;
+    this.initialized = true;
+
+    this.readyCallbacks.forEach((callback) => callback());
+    this.readyCallbacks = [];
+  }
+
+  async onReady(callback: () => void) {
+    if (this.isReady) {
+      callback();
+    } else {
+      this.readyCallbacks.push(callback);
+    }
   }
 
   async initialize() {
@@ -37,7 +56,7 @@ export class ViewReferenceProjectManager {
       await this.set(files);
     }
 
-    this.initialized = true;
+    this.setReady();
   }
 
   isInitialized() {
@@ -62,6 +81,8 @@ export class ViewReferenceProjectManager {
 
   async restart() {
     this.viewReferenceMapStore.clear();
+
+    this.isReady = false;
     this.initialized = false;
 
     await this.initialize();

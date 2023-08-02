@@ -7,8 +7,11 @@ import * as bladeMissingComponentDiagnosticHandler from './handlers/bladeMissing
 
 export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
   if (!workspace.getConfiguration('laravel').get('diagnostic.enable')) return;
+
   const { document } = await workspace.getCurrentState();
   if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
+
+  await projectManager.bladeProjectManager.onReady(() => {});
 
   const diagManager = new LaravelDiagnosticManager(projectManager);
 

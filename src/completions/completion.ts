@@ -46,6 +46,11 @@ import { CompletionItemDataType } from './types';
 export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
   if (!workspace.getConfiguration('laravel').get('completion.enable')) return;
 
+  await projectManager.bladeProjectManager.onReady(() => {});
+  await projectManager.phpFunctionProjectManager.onReady(() => {});
+  await projectManager.translationProjectManager.onReady(() => {});
+  await projectManager.livewireProjectManager.onReady(() => {});
+
   const { document } = await workspace.getCurrentState();
   if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
 

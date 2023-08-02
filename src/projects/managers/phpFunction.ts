@@ -13,9 +13,28 @@ export class PHPFunctionProjectManager {
 
   initialized: boolean;
 
+  private isReady: boolean = false;
+  private readyCallbacks: (() => void)[] = [];
+
   constructor() {
     this.phpFunctionMapStore = new Map();
     this.initialized = false;
+  }
+
+  private setReady() {
+    this.isReady = true;
+    this.initialized = true;
+
+    this.readyCallbacks.forEach((callback) => callback());
+    this.readyCallbacks = [];
+  }
+
+  async onReady(callback: () => void) {
+    if (this.isReady) {
+      callback();
+    } else {
+      this.readyCallbacks.push(callback);
+    }
   }
 
   async initialize() {
@@ -75,7 +94,7 @@ export class PHPFunctionProjectManager {
     }
 
     // FIN
-    this.initialized = true;
+    this.setReady();
   }
 
   isInitialized() {
@@ -84,6 +103,8 @@ export class PHPFunctionProjectManager {
 
   async restart() {
     this.phpFunctionMapStore.clear();
+
+    this.isReady = false;
     this.initialized = false;
 
     await this.initialize();
