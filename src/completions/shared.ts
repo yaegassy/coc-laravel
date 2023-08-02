@@ -148,21 +148,25 @@ export function isEditorOffsetInInlinePHPRegionOfPhpNodeKind(code: string, edito
 
   const contextRanges: BladeWithPhpNodesRange[] = [];
 
-  let addAdjustOffset = 0;
+  let adjustOffset = 0;
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof InlinePhpNode) {
       if (!node.startPosition) continue;
       if (!node.endPosition) continue;
 
-      const phpCode = node.sourceContent;
+      let phpCode = node.sourceContent;
 
       if (phpCode.startsWith('<?php')) {
-        // Number of `<?php ` characters is 6
-        addAdjustOffset = 6;
-        // Number of `<?= ` characters is 4
+        // Number of `<?php ` characters is 6 including spaces.
+        adjustOffset = 6;
       } else if (phpCode.startsWith('<?=')) {
-        addAdjustOffset = 4;
+        // In this context, we first replace the content itself
+        phpCode = node.sourceContent.replace('<?=', '<?php echo');
+        // Number of `<?php` characters is 5.
+        // Number of ` echo ` characters is 6 including spaces.
+        // 5 - 6 = -1
+        adjustOffset = -1;
       }
 
       const phpAst = phpParser.getAst(phpCode);
@@ -190,8 +194,8 @@ export function isEditorOffsetInInlinePHPRegionOfPhpNodeKind(code: string, edito
       for (const nameNode of contextRange.phpNodes) {
         if (!nameNode.loc) continue;
         if (
-          nameNode.loc.start.offset + addAdjustOffset + contextRange.startOffset <= editorOffset &&
-          nameNode.loc.end.offset + addAdjustOffset + contextRange.startOffset >= editorOffset
+          nameNode.loc.start.offset + adjustOffset + contextRange.startOffset <= editorOffset &&
+          nameNode.loc.end.offset + adjustOffset + contextRange.startOffset >= editorOffset
         ) {
           return true;
         }
