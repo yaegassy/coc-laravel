@@ -8,6 +8,8 @@ export async function register(context: ExtensionContext, projectManager: Projec
       await projectManager.bladeProjectManager.restart();
       await projectManager.translationProjectManager.restart();
       await projectManager.phpFunctionProjectManager.restart();
+      await projectManager.viewReferenceProjectManager.restart();
+      await projectManager.livewireProjectManager.restart();
 
       window.showInformationMessage('SUCCESS');
     })
