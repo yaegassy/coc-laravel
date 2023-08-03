@@ -155,6 +155,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.artisan.run`: Run artisan command
 - `laravel.sailArtisan.run`: Run sail artisan command
 - `laravel.view.findAllReferences`: Find view file references
+- `laravel.showOutput`: Show laravel output channel
 
 ## CodeActions
 
