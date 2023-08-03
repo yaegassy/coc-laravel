@@ -14,10 +14,19 @@ export async function register(context: ExtensionContext, outputChannel: OutputC
   if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
 
   const bladeProjectManager = new BladeProjectsManager(workspace.root, outputChannel);
-  const translationProjectManager = new TranslationProjectManager(workspace.root, outputChannel);
-  const phpFunctionProjectManager = new PHPFunctionProjectManager(workspace.root, outputChannel);
+  await bladeProjectManager.initialize();
+
   const viewReferenceProjectManager = new ViewReferenceProjectManager(workspace.root, outputChannel);
+  await viewReferenceProjectManager.initialize();
+
+  const translationProjectManager = new TranslationProjectManager(workspace.root, outputChannel);
+  await translationProjectManager.initialize();
+
+  const phpFunctionProjectManager = new PHPFunctionProjectManager(workspace.root, outputChannel);
+  await phpFunctionProjectManager.initialize();
+
   const livewireProjectManager = new LivewireProjectManager(workspace.root, outputChannel);
+  await livewireProjectManager.initialize();
 
   // FIRST OPEN
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
