@@ -27,11 +27,9 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
   const ast = middlewareService.getAst(code);
   if (!ast) return [];
 
-  const serviceLocations = middlewareService.getServiceLocations(ast);
-  if (serviceLocations.length === 0) return [];
-
   const offset = document.offsetAt(position) - diffOffset;
-  const canCompletion = middlewareService.canCompletion(offset, serviceLocations);
+
+  const canCompletion = middlewareService.canCompletionFromContext(ast, offset);
   if (!canCompletion) return [];
 
   const artisanPath = getArtisanPath();
