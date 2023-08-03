@@ -1,4 +1,4 @@
-import { ExtensionContext, workspace } from 'coc.nvim';
+import { ExtensionContext, workspace, window } from 'coc.nvim';
 
 import * as codeActionFeature from './codeActions/codeAction';
 import * as commandFeature from './commands/command';
@@ -13,9 +13,11 @@ import * as watcherFeature from './watchers/watcher';
 export async function activate(context: ExtensionContext): Promise<void> {
   if (!workspace.getConfiguration('laravel').get<boolean>('enable')) return;
 
-  const projectManager = await projectManagerFeature.register(context);
+  const outputChannel = window.createOutputChannel('laravel');
+
+  const projectManager = await projectManagerFeature.register(context, outputChannel);
   if (projectManager) {
-    commandFeature.register(context, projectManager);
+    commandFeature.register(context, projectManager, outputChannel);
     completionFeature.register(context, projectManager);
     definitionFeature.register(context, projectManager);
     referenceFeature.register(context, projectManager);

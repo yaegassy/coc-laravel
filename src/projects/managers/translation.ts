@@ -1,21 +1,32 @@
+import { OutputChannel } from 'coc.nvim';
+
 import fg from 'fast-glob';
 import fs from 'fs';
 import path from 'path';
 import { Array as ArrayNode, Entry, Return, String as StringNode } from 'php-parser';
 
 import { getArtisanPath, runTinker } from '../../common/shared';
+import { elapsed } from '../../common/utils';
 import * as parser from '../../parsers/php/parser';
 
 export class TranslationProjectManager {
   mapStore: Map<string, string>;
+  workspaceRoot: string;
+  outputChannel: OutputChannel;
   initialized: boolean;
+  initializedAt: [number, number];
   langPath?: string;
   locale?: string;
 
   private isReady: boolean = false;
   private readyCallbacks: (() => void)[] = [];
 
-  constructor() {
+  constructor(workspaceRoot: string, outputChannel: OutputChannel) {
+    this.initializedAt = process.hrtime();
+
+    this.workspaceRoot = workspaceRoot;
+    this.outputChannel = outputChannel;
+
     this.mapStore = new Map();
     this.initialized = false;
   }
@@ -23,6 +34,9 @@ export class TranslationProjectManager {
   private setReady() {
     this.isReady = true;
     this.initialized = true;
+
+    this.outputChannel.appendLine(`[Translation] Initialized in ${elapsed(this.initializedAt).toFixed()} ms`);
+    this.outputChannel.appendLine(`[Translation] Store count is ${this.mapStore.size}`);
 
     this.readyCallbacks.forEach((callback) => callback());
     this.readyCallbacks = [];
@@ -37,6 +51,8 @@ export class TranslationProjectManager {
   }
 
   async initialize() {
+    this.outputChannel.appendLine('[Translation] Initializing...');
+
     const artisanPath = getArtisanPath();
     if (!artisanPath) return;
 
@@ -129,6 +145,7 @@ export class TranslationProjectManager {
 
     this.isReady = false;
     this.initialized = false;
+    this.initializedAt = process.hrtime();
 
     await this.initialize();
   }

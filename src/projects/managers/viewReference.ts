@@ -1,28 +1,38 @@
-import { Uri } from 'coc.nvim';
+import { OutputChannel, Uri } from 'coc.nvim';
 
 import fg from 'fast-glob';
 
 import { getAppPath, getArtisanPath } from '../../common/shared';
+import { elapsed } from '../../common/utils';
 import * as viewReferenceProjectService from '../services/viewReference';
 import { ViewReferenceMapValueType } from '../types';
 
 export class ViewReferenceProjectManager {
   workspaceRoot: string;
+  outputChannel: OutputChannel;
+  initializedAt: [number, number];
   initialized: boolean;
   viewReferenceMapStore: Map<string, ViewReferenceMapValueType>;
 
   private isReady: boolean = false;
   private readyCallbacks: (() => void)[] = [];
 
-  constructor(workspaceRoot: string) {
-    this.workspaceRoot = workspaceRoot;
+  constructor(workspaceRoot: string, outputChannel: OutputChannel) {
+    this.initializedAt = process.hrtime();
     this.initialized = false;
+
+    this.workspaceRoot = workspaceRoot;
+    this.outputChannel = outputChannel;
+
     this.viewReferenceMapStore = new Map();
   }
 
   private setReady() {
     this.isReady = true;
     this.initialized = true;
+
+    this.outputChannel.appendLine(`[ViewReference] Initialized in ${elapsed(this.initializedAt).toFixed()} ms`);
+    this.outputChannel.appendLine(`[ViewReference] Store count is ${this.viewReferenceMapStore.size}`);
 
     this.readyCallbacks.forEach((callback) => callback());
     this.readyCallbacks = [];
@@ -37,6 +47,8 @@ export class ViewReferenceProjectManager {
   }
 
   async initialize() {
+    this.outputChannel.appendLine('[ViewReference] Initializing...');
+
     const artisanPath = getArtisanPath();
     if (!artisanPath) return;
 
@@ -84,6 +96,7 @@ export class ViewReferenceProjectManager {
 
     this.isReady = false;
     this.initialized = false;
+    this.initializedAt = process.hrtime();
 
     await this.initialize();
   }

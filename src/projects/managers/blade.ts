@@ -1,4 +1,4 @@
-import { Uri } from 'coc.nvim';
+import { OutputChannel, Uri } from 'coc.nvim';
 
 import { kebabCase } from 'case-anything';
 import fg from 'fast-glob';
@@ -6,26 +6,32 @@ import fs from 'fs';
 import path from 'path';
 
 import { getAppPath, getArtisanPath, getViewPath, runTinker } from '../../common/shared';
+import { elapsed } from '../../common/utils';
 import * as bladeProjectService from '../services/blade';
 import { ComponentMapValueType, PropsType } from '../types';
 
 export class BladeProjectsManager {
   bladeMapStore: Map<string, string>;
   componentMapStore: Map<string, ComponentMapValueType>;
-
   workspaceRoot: string;
+  outputChannel: OutputChannel;
   initialized: boolean;
+  initializedAt: [number, number];
   bladeFiles: string[];
   classBasedViewDir?: string;
 
   private isReady: boolean = false;
   private readyCallbacks: (() => void)[] = [];
 
-  constructor(workspaceRoot: string) {
+  constructor(workspaceRoot: string, outputChannel: OutputChannel) {
+    this.initializedAt = process.hrtime();
+    this.initialized = false;
+
     this.workspaceRoot = workspaceRoot;
+    this.outputChannel = outputChannel;
+
     this.bladeMapStore = new Map();
     this.componentMapStore = new Map();
-    this.initialized = false;
     this.bladeFiles = [];
     this.classBasedViewDir = undefined;
   }
@@ -33,6 +39,10 @@ export class BladeProjectsManager {
   private setReady() {
     this.isReady = true;
     this.initialized = true;
+
+    this.outputChannel.appendLine(`[Blade] Initialized in ${elapsed(this.initializedAt).toFixed()} ms`);
+    this.outputChannel.appendLine(`[Blade:File] Store count is ${this.bladeMapStore.size}`);
+    this.outputChannel.appendLine(`[Blade:Component] Store count is ${this.componentMapStore.size}`);
 
     this.readyCallbacks.forEach((callback) => callback());
     this.readyCallbacks = [];
@@ -47,6 +57,8 @@ export class BladeProjectsManager {
   }
 
   async initialize() {
+    this.outputChannel.appendLine('[Blade] Initializing...');
+
     const artisanPath = getArtisanPath();
     if (!artisanPath) return;
 
@@ -215,6 +227,7 @@ export class BladeProjectsManager {
 
     this.isReady = false;
     this.initialized = false;
+    this.initializedAt = process.hrtime();
 
     await this.initialize();
   }

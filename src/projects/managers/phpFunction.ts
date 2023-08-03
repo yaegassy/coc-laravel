@@ -1,29 +1,40 @@
+import { OutputChannel } from 'coc.nvim';
+
 import fs from 'fs';
 import path from 'path';
 
+import { getArtisanPath } from '../../common/shared';
+import { elapsed } from '../../common/utils';
 import { BUILTIN_FUNCTIONS_JSON_PATH } from '../../constant';
 import * as phpFunctionProjectService from '../services/phpFunction';
 import { PHPFunctionType } from '../types';
-import { getArtisanPath } from '../../common/shared';
 
 export class PHPFunctionProjectManager {
   phpFunctionMapStore: Map<string, PHPFunctionType>;
   workspaceRoot: string;
-
+  outputChannel: OutputChannel;
+  initializedAt: [number, number];
   initialized: boolean;
 
   private isReady: boolean = false;
   private readyCallbacks: (() => void)[] = [];
 
-  constructor(workspaceRoot: string) {
-    this.workspaceRoot = workspaceRoot;
-    this.phpFunctionMapStore = new Map();
+  constructor(workspaceRoot: string, outputChannel: OutputChannel) {
+    this.initializedAt = process.hrtime();
     this.initialized = false;
+
+    this.workspaceRoot = workspaceRoot;
+    this.outputChannel = outputChannel;
+
+    this.phpFunctionMapStore = new Map();
   }
 
   private setReady() {
     this.isReady = true;
     this.initialized = true;
+
+    this.outputChannel.appendLine(`[PHPFunction] Initialized in ${elapsed(this.initializedAt).toFixed()} ms`);
+    this.outputChannel.appendLine(`[PHPFunction] Store count is ${this.phpFunctionMapStore.size}`);
 
     this.readyCallbacks.forEach((callback) => callback());
     this.readyCallbacks = [];
@@ -38,6 +49,8 @@ export class PHPFunctionProjectManager {
   }
 
   async initialize() {
+    this.outputChannel.appendLine('[PHPFunction] Initializing...');
+
     // Checking artisan to determine if it is a laravel project
     const artisanPath = getArtisanPath();
     if (!artisanPath) return;
@@ -106,6 +119,7 @@ export class PHPFunctionProjectManager {
 
     this.isReady = false;
     this.initialized = false;
+    this.initializedAt = process.hrtime();
 
     await this.initialize();
   }

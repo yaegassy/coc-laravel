@@ -1,4 +1,4 @@
-import { Uri } from 'coc.nvim';
+import { OutputChannel, Uri } from 'coc.nvim';
 
 import fg from 'fast-glob';
 import fs from 'fs';
@@ -13,11 +13,14 @@ import {
 import * as livewireCommon from '../../common/livewire';
 import { getAppPath, getArtisanPath } from '../../common/shared';
 import { LivewireComponentMapType, PhpNamespaceType } from '../../common/types';
+import { elapsed } from '../../common/utils';
 import * as phpParser from '../../parsers/php/parser';
 import { LivewireMapValueType } from '../types';
 
 export class LivewireProjectManager {
   workspaceRoot: string;
+  outputChannel: OutputChannel;
+  initializedAt: [number, number];
   initialized: boolean;
   livewireMapStore: Map<string, LivewireMapValueType>;
   projectNamespaces: PhpNamespaceType[];
@@ -25,9 +28,13 @@ export class LivewireProjectManager {
   private isReady: boolean = false;
   private readyCallbacks: (() => void)[] = [];
 
-  constructor(workspaceRoot: string) {
-    this.workspaceRoot = workspaceRoot;
+  constructor(workspaceRoot: string, outputChannel: OutputChannel) {
+    this.initializedAt = process.hrtime();
     this.initialized = false;
+
+    this.workspaceRoot = workspaceRoot;
+    this.outputChannel = outputChannel;
+
     this.livewireMapStore = new Map();
 
     this.projectNamespaces = [];
@@ -36,6 +43,9 @@ export class LivewireProjectManager {
   private setReady() {
     this.isReady = true;
     this.initialized = true;
+
+    this.outputChannel.appendLine(`[Livewire] Initialized in ${elapsed(this.initializedAt).toFixed()} ms`);
+    this.outputChannel.appendLine(`[Livewire] Store count is ${this.livewireMapStore.size}`);
 
     this.readyCallbacks.forEach((callback) => callback());
     this.readyCallbacks = [];
@@ -50,6 +60,8 @@ export class LivewireProjectManager {
   }
 
   async initialize() {
+    this.outputChannel.appendLine('[Livewire] Initializing...');
+
     const composerJsonContent = await getComposerJsonContent(this.workspaceRoot);
     if (!composerJsonContent) return;
     const projectNamespaces = getProjectNamespacesFromComposerJson(composerJsonContent);
@@ -266,6 +278,7 @@ export class LivewireProjectManager {
 
     this.isReady = false;
     this.initialized = false;
+    this.initializedAt = process.hrtime();
 
     await this.initialize();
   }
