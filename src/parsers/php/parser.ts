@@ -5,6 +5,8 @@ import {
   Call,
   Class as ClassNode,
   Engine,
+  Expression,
+  ExpressionStatement,
   Identifier,
   Method,
   Name,
@@ -12,6 +14,7 @@ import {
   Number as NumberNode,
   Parameter as ParameterNode,
   Location as ParserLocation,
+  PropertyLookup,
   Property as PropertyNode,
   StaticLookup,
   String as StringNode,
@@ -19,6 +22,7 @@ import {
   Unary,
   UnionType,
   UseItem,
+  Variable,
 } from 'php-parser';
 
 import { ArgumentParameterType } from '../../common/types';
@@ -26,6 +30,27 @@ import { ArgumentParameterType } from '../../common/types';
 export type ParameterType = {
   name: string;
   value?: string;
+};
+
+export type CallKindNameWithChainType = {
+  name: string;
+  startOffset?: number;
+  endOffset?: number;
+  methods: CallMethodType[];
+  functionArguments?: CallArgumentsType[];
+};
+
+export type CallArgumentsType = {
+  value: string | number | boolean;
+  startOffset?: number;
+  endOffset?: number;
+};
+
+export type CallMethodType = {
+  name: string;
+  startOffset?: number;
+  endOffset?: number;
+  arguments: CallArgumentsType[];
 };
 
 export function getAst(code: string) {
@@ -445,4 +470,369 @@ export function getArgumentParametersFromMethodParametersNode(nodes: ParameterNo
   } // for
 
   return argumentsParameters;
+}
+
+export function getCallVariableNameWithChainFrom(expressionStatementNode: ExpressionStatement) {
+  let callVariableName: string | undefined = undefined;
+  let callVariableNameStartOffset: number | undefined = undefined;
+  let callVariableNameEndOffset: number | undefined = undefined;
+
+  const callMethods: CallMethodType[] = [];
+
+  walk((node, parent) => {
+    if (!parent) return;
+
+    if (
+      // $myObject->...()->...(|);
+      (node.kind === 'call' && parent.kind === 'expressionstatement') ||
+      // $myObject->...(|)->...();
+      (node.kind === 'call' && parent.kind === 'propertylookup')
+    ) {
+      let callName: string | undefined = undefined;
+      let callNameStartOffset: number | undefined = undefined;
+      let callNameEndOffset: number | undefined = undefined;
+
+      const callArguments: CallArgumentsType[] = [];
+
+      const callNode = node as Call;
+      if (callNode.what.kind === 'propertylookup') {
+        const propertyLookupNode = callNode.what as unknown as PropertyLookup;
+        // $myObject
+        if (propertyLookupNode.what.kind === 'variable') {
+          const variableNode = propertyLookupNode.what as Variable;
+          if (typeof variableNode.name === 'string') {
+            if (!callVariableName) {
+              callVariableName = variableNode.name;
+              if (variableNode.loc) {
+                callVariableNameStartOffset = variableNode.loc.start.offset;
+                callVariableNameEndOffset = variableNode.loc.end.offset;
+              }
+            }
+          }
+        }
+        // ...->Method
+        if (propertyLookupNode.offset.kind === 'identifier') {
+          const identifierNode = propertyLookupNode.offset as Identifier;
+          callName = identifierNode.name;
+          if (identifierNode.loc) {
+            callNameStartOffset = identifierNode.loc.start.offset;
+            callNameEndOffset = identifierNode.loc.end.offset;
+          }
+        }
+      }
+
+      if (callNode.arguments.length > 0) {
+        for (const arg of callNode.arguments) {
+          const argumentItem = retrieveCallArgumentTypeItemFromExpression(arg);
+          if (argumentItem) {
+            if (arg.loc) {
+              const argStartOffset = arg.loc.start.offset;
+              const argEndOffset = arg.loc.end.offset;
+
+              callArguments.push({
+                value: argumentItem,
+                startOffset: argStartOffset,
+                endOffset: argEndOffset,
+              });
+            }
+          }
+        }
+      }
+
+      if (!callName) return;
+
+      callMethods.push({
+        name: callName,
+        startOffset: callNameStartOffset,
+        endOffset: callNameEndOffset,
+        arguments: callArguments,
+      });
+    }
+  }, expressionStatementNode);
+
+  if (!callVariableName) return;
+  if (callMethods.length === 0) return;
+
+  const callVariableNameWithChainMethods: CallKindNameWithChainType = {
+    name: callVariableName,
+    startOffset: callVariableNameStartOffset,
+    endOffset: callVariableNameEndOffset,
+    methods: callMethods,
+  };
+
+  return callVariableNameWithChainMethods;
+}
+
+export function getExpressionStatementNodes(ast: Node) {
+  const exprStmtNodes: ExpressionStatement[] = [];
+
+  walk((node) => {
+    if (node.kind !== 'expressionstatement') return;
+    const expressionStatementNode = node as ExpressionStatement;
+    exprStmtNodes.push(expressionStatementNode);
+  }, ast);
+
+  return exprStmtNodes;
+}
+
+export function getCallStaticLookupNameWithChainFrom(expressionStatementNode: ExpressionStatement) {
+  let callStaticLookupName: string | undefined = undefined;
+  let callStaticLookupNameStartOffset: number | undefined = undefined;
+  let callStaticLookupNameEndOffset: number | undefined = undefined;
+
+  const callMethods: CallMethodType[] = [];
+
+  walk((node, parent) => {
+    if (!parent) return;
+
+    if (
+      // Route::...()->...(|);
+      (node.kind === 'call' && parent.kind === 'expressionstatement') ||
+      // Route::...(|)->...();
+      (node.kind === 'call' && parent.kind === 'propertylookup')
+    ) {
+      let callName: string | undefined = undefined;
+      let callNameStartOffset: number | undefined = undefined;
+      let callNameEndOffset: number | undefined = undefined;
+
+      const callArguments: CallArgumentsType[] = [];
+
+      const callNode = node as Call;
+      if (callNode.what.kind === 'propertylookup') {
+        const propertyLookupNode = callNode.what as unknown as PropertyLookup;
+        if (propertyLookupNode.offset.kind === 'identifier') {
+          const identifierNode = propertyLookupNode.offset as Identifier;
+          callName = identifierNode.name;
+          if (identifierNode.loc) {
+            callNameStartOffset = identifierNode.loc.start.offset;
+            callNameEndOffset = identifierNode.loc.end.offset;
+          }
+        }
+      }
+
+      // MyStatic::
+      if (callNode.what.kind === 'staticlookup') {
+        const staticLookupNode = callNode.what as unknown as StaticLookup;
+        // MyStatic
+        if (staticLookupNode.what.kind === 'name') {
+          const nameNode = staticLookupNode.what as Name;
+          if (!callStaticLookupName) {
+            callStaticLookupName = nameNode.name;
+            if (staticLookupNode.loc) {
+              callStaticLookupNameStartOffset = staticLookupNode.loc.start.offset;
+              callStaticLookupNameEndOffset = staticLookupNode.loc.end.offset;
+            }
+          }
+        }
+        // ...::method
+        if (staticLookupNode.offset.kind === 'identifier') {
+          const identifierNode = staticLookupNode.offset as Identifier;
+          callName = identifierNode.name;
+          if (identifierNode.loc) {
+            callNameStartOffset = identifierNode.loc.start.offset;
+            callNameEndOffset = identifierNode.loc.end.offset;
+          }
+        }
+      }
+
+      if (callNode.arguments.length > 0) {
+        for (const arg of callNode.arguments) {
+          const argumentItem = retrieveCallArgumentTypeItemFromExpression(arg);
+          if (argumentItem) {
+            if (arg.loc) {
+              const argStartOffset = arg.loc.start.offset;
+              const argEndOffset = arg.loc.end.offset;
+
+              callArguments.push({
+                value: argumentItem,
+                startOffset: argStartOffset,
+                endOffset: argEndOffset,
+              });
+            }
+          }
+        }
+      }
+
+      if (!callName) return;
+
+      callMethods.push({
+        name: callName,
+        startOffset: callNameStartOffset,
+        endOffset: callNameEndOffset,
+        arguments: callArguments,
+      });
+    }
+  }, expressionStatementNode);
+
+  if (!callStaticLookupName) return;
+  if (callMethods.length === 0) return;
+
+  const callStaticLookupNameWithChainMethods: CallKindNameWithChainType = {
+    name: callStaticLookupName,
+    startOffset: callStaticLookupNameStartOffset,
+    endOffset: callStaticLookupNameEndOffset,
+    methods: callMethods,
+  };
+
+  return callStaticLookupNameWithChainMethods;
+}
+
+export function getCallNameNameWithChainFrom(expressionStatementNode: ExpressionStatement) {
+  let callNameName: string | undefined = undefined;
+  let callNameNameStartOffset: number | undefined = undefined;
+  let callNameNameEndOffset: number | undefined = undefined;
+
+  const callMethods: CallMethodType[] = [];
+
+  // Arguments of the first function to be called must be stored at the top level
+  // e.g. one(|)->...
+  const callFunctionArguments: CallArgumentsType[] = [];
+
+  walk((node, parent) => {
+    if (!parent) return;
+
+    if (
+      (node.kind === 'call' && parent.kind === 'expressionstatement') ||
+      (node.kind === 'call' && parent.kind === 'propertylookup')
+    ) {
+      let callName: string | undefined = undefined;
+      let callNameStartOffset: number | undefined = undefined;
+      let callNameEndOffset: number | undefined = undefined;
+
+      const callArguments: CallArgumentsType[] = [];
+
+      const callNode = node as Call;
+      if (callNode.what.kind === 'propertylookup') {
+        const propertyLookupNode = callNode.what as unknown as PropertyLookup;
+        if (propertyLookupNode.offset.kind === 'identifier') {
+          const identifierNode = propertyLookupNode.offset as Identifier;
+          callName = identifierNode.name;
+          if (identifierNode.loc) {
+            callNameStartOffset = identifierNode.loc.start.offset;
+            callNameEndOffset = identifierNode.loc.end.offset;
+          }
+        }
+      }
+
+      // ===
+      if (callNode.what.kind === 'name') {
+        const nameNode = callNode.what as Name;
+        callNameName = nameNode.name;
+        if (nameNode.loc) {
+          callNameNameStartOffset = nameNode.loc.start.offset;
+          callNameNameEndOffset = nameNode.loc.end.offset;
+        }
+
+        // ===
+        if (callNode.arguments.length > 0) {
+          for (const arg of callNode.arguments) {
+            const argumentItem = retrieveCallArgumentTypeItemFromExpression(arg);
+            if (argumentItem) {
+              if (arg.loc) {
+                const argStartOffset = arg.loc.start.offset;
+                const argEndOffset = arg.loc.end.offset;
+
+                callFunctionArguments.push({
+                  value: argumentItem,
+                  startOffset: argStartOffset,
+                  endOffset: argEndOffset,
+                });
+              }
+            }
+          }
+        }
+      }
+
+      if (callNode.arguments.length > 0) {
+        for (const arg of callNode.arguments) {
+          const argumentItem = retrieveCallArgumentTypeItemFromExpression(arg);
+          if (argumentItem) {
+            if (arg.loc) {
+              const argStartOffset = arg.loc.start.offset;
+              const argEndOffset = arg.loc.end.offset;
+
+              callArguments.push({
+                value: argumentItem,
+                startOffset: argStartOffset,
+                endOffset: argEndOffset,
+              });
+            }
+          }
+        }
+      }
+
+      if (!callName) return;
+
+      callMethods.push({
+        name: callName,
+        startOffset: callNameStartOffset,
+        endOffset: callNameEndOffset,
+        arguments: callArguments,
+      });
+    }
+  }, expressionStatementNode);
+
+  if (!callNameName) return;
+  if (callMethods.length === 0) return;
+
+  const callStaticLookupNameWithChainMethods: CallKindNameWithChainType = {
+    name: callNameName,
+    startOffset: callNameNameStartOffset,
+    endOffset: callNameNameEndOffset,
+    methods: callMethods,
+    functionArguments: callFunctionArguments,
+  };
+
+  return callStaticLookupNameWithChainMethods;
+}
+
+function retrieveCallArgumentTypeItemFromExpression(expression: Expression) {
+  if (expression.kind === 'string') {
+    const stringNode = expression as StringNode;
+    return stringNode.value;
+  } else if (expression.kind === 'array') {
+    const arrayNode = expression as ArrayNode;
+    if (arrayNode.items.length === 0) {
+      return '[]';
+    } else {
+      // MEMO
+      return '[...]';
+    }
+  } else if (expression.kind === 'boolean') {
+    const booleanNode = expression as BooleanNode;
+    return `"${booleanNode.value}"`;
+  } else if (expression.kind === 'number') {
+    const numberNode = expression as NumberNode;
+    return numberNode.value;
+  } else if (expression.kind === 'nullkeyword') {
+    return 'null';
+  } else if (expression.kind === 'name') {
+    const nameNode = expression as Name;
+    return nameNode.name;
+  } else if (expression.kind === 'bin') {
+    const binNode = expression as Bin;
+    const binValues: string[] = [];
+    if (binNode.left.kind === 'name') {
+      const nameNode = binNode.left as Name;
+      binValues.push(nameNode.name);
+    }
+    if (binNode.right.kind === 'name') {
+      const nameNode = binNode.right as Name;
+      binValues.push(nameNode.name);
+    }
+    if (binValues.length === 1) {
+      return binValues[0];
+    } else if (binValues.length > 1) {
+      let binArgValue = '';
+      for (const [i, v] of binValues.entries()) {
+        if (i === 0) {
+          binArgValue = v;
+        } else {
+          binArgValue += '|' + v;
+        }
+
+        return binArgValue;
+      }
+    }
+  }
 }
