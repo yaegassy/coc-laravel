@@ -152,7 +152,6 @@ class LaravelCompletionProvider implements CompletionItemProvider {
         items.push(...routeCompletionItems);
       }
 
-      // TODO: Use blade parser to determine if the cursor position is completable.
       const bladeRouteCompletionItems = await bladeRouteCompletionHandler.doCompletion(document, position);
       if (bladeRouteCompletionItems) {
         items.push(...bladeRouteCompletionItems);
