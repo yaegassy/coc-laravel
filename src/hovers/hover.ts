@@ -6,6 +6,7 @@ import {
   LinesTextDocument,
   MarkupContent,
   MarkupKind,
+  OutputChannel,
   Position,
   languages,
 } from 'coc.nvim';
@@ -17,21 +18,29 @@ import * as bladeDirectiveHandler from './handlers/bladeDirectiveHandler';
 
 import path from 'path';
 
-export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
+export async function register(
+  context: ExtensionContext,
+  projectManager: ProjectManagerType,
+  outputChannel: OutputChannel
+) {
   await projectManager.bladeProjectManager.onReady(() => {});
 
+  outputChannel.appendLine('Start registration for hover feature');
+
   context.subscriptions.push(
-    languages.registerHoverProvider(DOCUMENT_SELECTOR, new LaravelHoverProvider(context, projectManager))
+    languages.registerHoverProvider(DOCUMENT_SELECTOR, new LaravelHoverProvider(context, projectManager, outputChannel))
   );
 }
 
 class LaravelHoverProvider implements HoverProvider {
   extensionContext: ExtensionContext;
   projectManager: ProjectManagerType;
+  outputChannel: OutputChannel;
 
-  constructor(context: ExtensionContext, projectManager: ProjectManagerType) {
+  constructor(context: ExtensionContext, projectManager: ProjectManagerType, outputChannel: OutputChannel) {
     this.extensionContext = context;
     this.projectManager = projectManager;
+    this.outputChannel = outputChannel;
   }
 
   async provideHover(

@@ -4,6 +4,7 @@ import {
   CodeActionProvider,
   ExtensionContext,
   languages,
+  OutputChannel,
   Range,
   TextDocument,
   workspace,
@@ -15,13 +16,15 @@ import * as bladeMissingComponentHandler from './handlers/bladeMissingComponentH
 import * as createBladeComponentInternalCommand from './internalCommands/createBladeComponent';
 import * as fixMethodDirectiveParameterInternalCommand from './internalCommands/fixMethodDirectiveParameter';
 
-export async function register(context: ExtensionContext) {
+export async function register(context: ExtensionContext, outputChannel: OutputChannel) {
   if (!workspace.getConfiguration('laravel').get('codeAction.enable')) return;
   const { document } = await workspace.getCurrentState();
   if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
 
+  outputChannel.appendLine('Start registration for codeAction feature');
+
   context.subscriptions.push(
-    languages.registerCodeActionProvider(DOCUMENT_SELECTOR, new LaravelCodeActionProvider(), 'laravel')
+    languages.registerCodeActionProvider(DOCUMENT_SELECTOR, new LaravelCodeActionProvider(outputChannel), 'laravel')
   );
 
   // Register Internal Commands
@@ -30,7 +33,11 @@ export async function register(context: ExtensionContext) {
 }
 
 class LaravelCodeActionProvider implements CodeActionProvider {
-  constructor() {}
+  outputChannel: OutputChannel;
+
+  constructor(outputChannel: OutputChannel) {
+    this.outputChannel = outputChannel;
+  }
 
   async provideCodeActions(document: TextDocument, range: Range, context: CodeActionContext) {
     const codeActions: CodeAction[] = [];

@@ -17,16 +17,14 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   const projectManager = await projectManagerFeature.register(outputChannel);
   if (projectManager) {
-    outputChannel.appendLine(`Start registration for each feature`);
-
     commandFeature.register(context, projectManager, outputChannel);
-    completionFeature.register(context, projectManager);
-    definitionFeature.register(context, projectManager);
-    referenceFeature.register(context, projectManager);
-    hoverFeature.register(context, projectManager);
-    diagnosticFeature.register(context, projectManager);
-    codeActionFeature.register(context);
+    completionFeature.register(context, projectManager, outputChannel);
+    definitionFeature.register(context, projectManager, outputChannel);
+    referenceFeature.register(context, projectManager, outputChannel);
+    hoverFeature.register(context, projectManager, outputChannel);
+    diagnosticFeature.register(context, projectManager, outputChannel);
+    codeActionFeature.register(context, outputChannel);
 
-    watcherFeature.register(context, projectManager);
+    watcherFeature.register(context, projectManager, outputChannel);
   }
 }

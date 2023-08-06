@@ -13,6 +13,8 @@ export async function register(
   projectManager: ProjectManagerType,
   outputChannel: OutputChannel
 ) {
+  outputChannel.appendLine('Start registration for command feature');
+
   showOutputCommandFeature.register(context, outputChannel);
 
   artisanRunCommandFeature.register(context);

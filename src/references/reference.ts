@@ -3,6 +3,7 @@ import {
   ExtensionContext,
   LinesTextDocument,
   Location,
+  OutputChannel,
   Position,
   ReferenceContext,
   ReferenceProvider,
@@ -14,7 +15,11 @@ import { DOCUMENT_SELECTOR, SUPPORTED_LANGUAGE } from '../constant';
 import { type ProjectManagerType } from '../projects/types';
 import * as viewReferenceHandler from './handlers/viewHandler';
 
-export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
+export async function register(
+  context: ExtensionContext,
+  projectManager: ProjectManagerType,
+  outputChannel: OutputChannel
+) {
   if (!workspace.getConfiguration('laravel').get('reference.enable')) return;
 
   const { document } = await workspace.getCurrentState();
@@ -23,18 +28,25 @@ export async function register(context: ExtensionContext, projectManager: Projec
   await projectManager.bladeProjectManager.onReady(() => {});
   await projectManager.viewReferenceProjectManager.onReady(() => {});
 
+  outputChannel.appendLine('Start registration for reference feature');
+
   context.subscriptions.push(
-    languages.registerReferencesProvider(DOCUMENT_SELECTOR, new LaravelReferenceProvider(context, projectManager))
+    languages.registerReferencesProvider(
+      DOCUMENT_SELECTOR,
+      new LaravelReferenceProvider(context, projectManager, outputChannel)
+    )
   );
 }
 
 class LaravelReferenceProvider implements ReferenceProvider {
   _context: ExtensionContext;
   projectManager: ProjectManagerType;
+  outputChannel: OutputChannel;
 
-  constructor(context: ExtensionContext, projectManager: ProjectManagerType) {
+  constructor(context: ExtensionContext, projectManager: ProjectManagerType, outputChannel: OutputChannel) {
     this._context = context;
     this.projectManager = projectManager;
+    this.outputChannel = outputChannel;
   }
 
   async provideReferences(

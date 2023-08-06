@@ -1,11 +1,23 @@
-import { Diagnostic, DiagnosticCollection, ExtensionContext, TextDocument, languages, workspace } from 'coc.nvim';
+import {
+  Diagnostic,
+  DiagnosticCollection,
+  ExtensionContext,
+  OutputChannel,
+  TextDocument,
+  languages,
+  workspace,
+} from 'coc.nvim';
 
 import { SUPPORTED_LANGUAGE } from '../constant';
 import { type ProjectManagerType } from '../projects/types';
 import * as bladeMethodParameterDiagnosticHandler from './handlers/bladeMethodParameterHandler';
 import * as bladeMissingComponentDiagnosticHandler from './handlers/bladeMissingComponentHandler';
 
-export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
+export async function register(
+  context: ExtensionContext,
+  projectManager: ProjectManagerType,
+  outputChannel: OutputChannel
+) {
   if (!workspace.getConfiguration('laravel').get('diagnostic.enable')) return;
 
   const { document } = await workspace.getCurrentState();
@@ -13,7 +25,9 @@ export async function register(context: ExtensionContext, projectManager: Projec
 
   await projectManager.bladeProjectManager.onReady(() => {});
 
-  const diagManager = new LaravelDiagnosticManager(projectManager);
+  outputChannel.appendLine('Start registration for diagnostic feature');
+
+  const diagManager = new LaravelDiagnosticManager(projectManager, outputChannel);
 
   // FistOpen and onOpen
   workspace.documents.map(async (doc) => {
@@ -59,10 +73,12 @@ export async function register(context: ExtensionContext, projectManager: Projec
 class LaravelDiagnosticManager {
   private collection: DiagnosticCollection;
   projectManager: ProjectManagerType;
+  outputChannel: OutputChannel;
 
-  constructor(projectManager: ProjectManagerType) {
+  constructor(projectManager: ProjectManagerType, outputChannel: OutputChannel) {
     this.projectManager = projectManager;
     this.collection = languages.createDiagnosticCollection('laravel');
+    this.outputChannel = outputChannel;
   }
 
   async doValidate(textDocument: TextDocument): Promise<void> {

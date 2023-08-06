@@ -5,6 +5,7 @@ import {
   ExtensionContext,
   languages,
   Location,
+  OutputChannel,
   Position,
   TextDocument,
   workspace,
@@ -18,7 +19,11 @@ import * as livewireDirectiveHandler from './handlers/livewireDirectiveHandler';
 import * as livewireTagHandler from './handlers/livewireTagHandler';
 import * as viewHandler from './handlers/viewHandler';
 
-export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
+export async function register(
+  context: ExtensionContext,
+  projectManager: ProjectManagerType,
+  outputChannel: OutputChannel
+) {
   if (!workspace.getConfiguration('laravel').get('definition.enable')) return;
 
   const { document } = await workspace.getCurrentState();
@@ -27,18 +32,25 @@ export async function register(context: ExtensionContext, projectManager: Projec
   await projectManager.bladeProjectManager.onReady(() => {});
   await projectManager.livewireProjectManager.onReady(() => {});
 
+  outputChannel.appendLine(`Start registration for definition feature`);
+
   context.subscriptions.push(
-    languages.registerDefinitionProvider(DOCUMENT_SELECTOR, new LaravelDefinitionProvider(context, projectManager))
+    languages.registerDefinitionProvider(
+      DOCUMENT_SELECTOR,
+      new LaravelDefinitionProvider(context, projectManager, outputChannel)
+    )
   );
 }
 
 class LaravelDefinitionProvider implements DefinitionProvider {
   _context: ExtensionContext;
   projectManager: ProjectManagerType;
+  outputChannel: OutputChannel;
 
-  constructor(context: ExtensionContext, projectManager: ProjectManagerType) {
+  constructor(context: ExtensionContext, projectManager: ProjectManagerType, outputChannel: OutputChannel) {
     this._context = context;
     this.projectManager = projectManager;
+    this.outputChannel = outputChannel;
   }
 
   async provideDefinition(

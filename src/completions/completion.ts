@@ -6,6 +6,7 @@ import {
   CompletionList,
   ExtensionContext,
   LinesTextDocument,
+  OutputChannel,
   Position,
   extensions,
   languages,
@@ -43,16 +44,22 @@ import { getArtisanPath, getViewPath } from '../common/shared';
 import { CompletionItemDataType } from './types';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
+export async function register(
+  context: ExtensionContext,
+  projectManager: ProjectManagerType,
+  outputChannel: OutputChannel
+) {
   if (!workspace.getConfiguration('laravel').get('completion.enable')) return;
+
+  const { document } = await workspace.getCurrentState();
+  if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
 
   await projectManager.bladeProjectManager.onReady(() => {});
   await projectManager.phpFunctionProjectManager.onReady(() => {});
   await projectManager.translationProjectManager.onReady(() => {});
   await projectManager.livewireProjectManager.onReady(() => {});
 
-  const { document } = await workspace.getCurrentState();
-  if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
+  outputChannel.appendLine('Start registration for completion feature');
 
   const artisanPath = getArtisanPath();
   if (!artisanPath) return;
@@ -66,7 +73,7 @@ export async function register(context: ExtensionContext, projectManager: Projec
       'Laravel',
       'Laravel',
       DOCUMENT_SELECTOR,
-      new LaravelCompletionProvider(context, projectManager, viewPath),
+      new LaravelCompletionProvider(context, projectManager, viewPath, outputChannel),
       [
         '$', // livewire property completion, php related
         '@', // directive,
@@ -82,16 +89,23 @@ export async function register(context: ExtensionContext, projectManager: Projec
 }
 
 class LaravelCompletionProvider implements CompletionItemProvider {
-  private extensionContext: ExtensionContext;
-  public projectManager: ProjectManagerType;
-  public viewPath: string;
+  extensionContext: ExtensionContext;
+  projectManager: ProjectManagerType;
+  viewPath: string;
+  outputChannel: OutputChannel;
 
   private isCocBladeCompletionEnableDirective: boolean;
 
-  constructor(context: ExtensionContext, projectManager: ProjectManagerType, viewPath: string) {
+  constructor(
+    context: ExtensionContext,
+    projectManager: ProjectManagerType,
+    viewPath: string,
+    outputChannel: OutputChannel
+  ) {
     this.extensionContext = context;
     this.projectManager = projectManager;
     this.viewPath = viewPath;
+    this.outputChannel = outputChannel;
 
     this.isCocBladeCompletionEnableDirective = false;
     if (extensions.all.find((e) => e.id === 'coc-blade')) {
