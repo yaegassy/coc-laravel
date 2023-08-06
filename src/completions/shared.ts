@@ -20,8 +20,12 @@ export function isEditorOffsetInBladeEchoRegionOfPhpNodeKind(code: string, edito
       if (!node.offset) continue;
 
       // blade echo
-      const phpCode = 'echo ' + node.content;
-      const phpAst = phpParser.getAst(phpCode);
+      let phpCode = 'echo ' + node.content;
+      let phpAst = phpParser.getAst(phpCode);
+      if (!phpAst) {
+        phpCode = phpCode + ' ; ';
+      }
+      phpAst = phpParser.getAst(phpCode);
       if (!phpAst) continue;
 
       const phpNodes: Node[] = [];
@@ -81,8 +85,12 @@ export function isEditorOffsetInPHPDirectiveRegionOfPhpNodeKind(
       if (endPhpDirectiveNode.directiveName === 'endphp') {
         if (!endPhpDirectiveNode.offset?.end) continue;
 
-        const phpCode = node.documentContent;
-        const phpAst = phpParser.getAst(phpCode);
+        let phpCode = node.documentContent;
+        let phpAst = phpParser.getAst(phpCode);
+        if (!phpAst) {
+          phpCode = phpCode + ' ; ';
+        }
+        phpAst = phpParser.getAst(phpCode);
         if (!phpAst) continue;
 
         const phpNodes: Node[] = [];
@@ -100,8 +108,12 @@ export function isEditorOffsetInPHPDirectiveRegionOfPhpNodeKind(
 
         contextRanges.push(contextRange);
       } else if (endPhpDirectiveNode.directiveName === 'php') {
-        const phpCode = node.getInnerContent();
-        const phpAst = phpParser.getAst(phpCode);
+        let phpCode = node.getInnerContent();
+        let phpAst = phpParser.getAst(phpCode);
+        if (!phpAst) {
+          phpCode = phpCode + ' ; ';
+        }
+        phpAst = phpParser.getAst(phpCode);
         if (!phpAst) continue;
 
         const phpNodes: Node[] = [];
@@ -169,7 +181,11 @@ export function isEditorOffsetInInlinePHPRegionOfPhpNodeKind(code: string, edito
         adjustOffset = -1;
       }
 
-      const phpAst = phpParser.getAst(phpCode);
+      let phpAst = phpParser.getAst(phpCode);
+      if (!phpAst) {
+        phpCode = phpCode + ' ; ';
+      }
+      phpAst = phpParser.getAst(phpCode);
       if (!phpAst) continue;
 
       const phpNodes: Node[] = [];
@@ -241,9 +257,12 @@ export function isEditorOffsetInDirectiveWithParametersRegionOfPhpNodeKind(
         if (!node.directiveParametersPosition.start?.offset) continue;
         if (!node.directiveParametersPosition.end?.offset) continue;
 
-        const phpCode = node.directiveParameters.replace(/^\(/, '').replace(/\)$/, '');
-
-        const phpAst = phpParser.getAst(phpCode);
+        let phpCode = node.directiveParameters.replace(/^\(/, '').replace(/\)$/, '');
+        let phpAst = phpParser.getAst(phpCode);
+        if (!phpAst) {
+          phpCode = phpCode + ' ; ';
+        }
+        phpAst = phpParser.getAst(phpCode);
         if (!phpAst) continue;
 
         const phpNodes: Node[] = [];
@@ -303,8 +322,12 @@ export function isEditorOffsetInPropsValueRegionOfPhpNodeKind(code: string, edit
         if (!parameter.valuePosition.start?.offset) continue;
         if (!parameter.valuePosition.end?.offset) continue;
 
-        const phpCode = parameter.value;
-        const phpAst = phpParser.getAst(phpCode);
+        let phpCode = parameter.value;
+        let phpAst = phpParser.getAst(phpCode);
+        if (!phpAst) {
+          phpCode = phpCode + ' ; ';
+        }
+        phpAst = phpParser.getAst(phpCode);
         if (!phpAst) continue;
 
         const phpNodes: Node[] = [];
