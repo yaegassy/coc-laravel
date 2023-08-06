@@ -86,17 +86,20 @@ export class PHPFunctionProjectManager {
       this.workspaceRoot
     );
 
-    // Some of the PATHs read do not exist or cause errors
-    try {
-      for (const autoloadedFunctionFile of abusoluteAutoloadedFunctionsFiles) {
-        const relativeFilePath = autoloadedFunctionFile.replace(this.workspaceRoot, '').replace(/^\//, '');
-        const targetPHPCode = await fs.promises.readFile(autoloadedFunctionFile, { encoding: 'utf8' });
+    for (const autoloadedFunctionFile of abusoluteAutoloadedFunctionsFiles) {
+      const relativeFilePath = autoloadedFunctionFile.replace(this.workspaceRoot, '').replace(/^\//, '');
+      const targetPHPCode = await fs.promises.readFile(autoloadedFunctionFile, { encoding: 'utf8' });
+
+      // Some of the PATHs read do not exist or cause errors
+      try {
         const autoloadedFunctions = phpFunctionProjectService.getPHPFunctions(targetPHPCode, relativeFilePath);
         if (autoloadedFunctions) {
           phpFunctions.push(...autoloadedFunctions);
         }
+      } catch (e: any) {
+        this.outputChannel.appendLine(`[PHPFunction:parse_autoload_file_error] ${JSON.stringify(e)}`);
       }
-    } catch (e) {}
+    }
 
     //
     // Set MapStore
