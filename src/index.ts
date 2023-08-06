@@ -1,5 +1,7 @@
 import { ExtensionContext, workspace, window } from 'coc.nvim';
 
+import fs from 'fs';
+
 import * as codeActionFeature from './codeActions/codeAction';
 import * as commandFeature from './commands/command';
 import * as completionFeature from './completions/completion';
@@ -12,6 +14,10 @@ import * as watcherFeature from './watchers/watcher';
 
 export async function activate(context: ExtensionContext): Promise<void> {
   if (!workspace.getConfiguration('laravel').get<boolean>('enable')) return;
+
+  if (!fs.existsSync(context.storagePath)) {
+    fs.mkdirSync(context.storagePath, { recursive: true });
+  }
 
   const outputChannel = window.createOutputChannel('laravel');
 

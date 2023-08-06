@@ -123,7 +123,8 @@ For more information, check this coc.nvim's wiki.
 ## Configuration options
 
 - `laravel.enable`: Enable coc-laravel extension, default: `true`
-- `laravel.environment.phpPath`: Path to PHP, you can use a custom version of PHP. If there is no setting, `php` of the execution environment will be used. default: `""`
+- `laravel.environment.phpPath`: Path to PHP, you can use a custom version of PHP. If there is no setting, `php` of the execution environment will be used, default: `""`
+- `laravel.stubs.customVersion`: Specify the version of stubs to download with the `laravel.stubs.download` command. If not set, the `stubsVersion` defined in `package.json` will be used, default: `""`
 - `laravel.completion.enable`: Enable all completion feature, default: `true`
 - `laravel.completion.directiveEnable`: Enable directive completion, default: `true`
 - `laravel.completion.configEnable`: Enable config completion, default: `true`
@@ -154,6 +155,8 @@ For more information, check this coc.nvim's wiki.
 
 - `laravel.project.restart`: Run project restart
 - `laravel.project.stats`: (Develop) Show project stats
+- `laravel.stubs.download`: Download stubs
+- `laravel.stubs.version`: Show the version of stubs
 - `laravel.artisan.run`: Run artisan command
 - `laravel.sailArtisan.run`: Run sail artisan command
 - `laravel.view.findAllReferences`: Find view file references

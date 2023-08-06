@@ -1,6 +1,7 @@
 {
   "name": "@yaegassy/coc-laravel",
   "version": "0.6.11",
+  "stubsVersion": "v2023.2",
   "description": "Laravel extension for coc.nvim",
   "author": "yaegassy <yosstools@gmail.com>",
   "license": "MIT",
@@ -40,6 +41,8 @@
   },
   "devDependencies": {
     "@types/node": "^18.17.1",
+    "@types/node-fetch": "^2.6.2",
+    "@types/rimraf": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "^6.2.0",
     "@typescript-eslint/parser": "^6.2.0",
     "coc.nvim": "^0.0.83-next.17",
@@ -47,6 +50,9 @@
     "eslint": "^8.45.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "extract-zip": "^2.0.1",
+    "https-proxy-agent": "^5.0.1",
+    "node-fetch": "^2.6.7",
     "prettier": "^2.8.8",
     "rimraf": "^3.0.2",
     "typescript": "~5.0.4",
@@ -84,6 +90,11 @@
           "type": "string",
           "default": "",
           "description": "Path to PHP, you can use a custom version of PHP. If there is no setting, `php` of the execution environment will be used."
+        },
+        "laravel.stubs.customVersion": {
+          "type": "string",
+          "default": "",
+          "description": "Specify the version of stubs to download with the `laravel.stubs.download` command. If not set, the `stubsVersion` defined in `package.json` will be used."
         },
         "laravel.completion.enable": {
           "type": "boolean",
@@ -341,6 +352,14 @@
       {
         "command": "laravel.project.stats",
         "title": "(Develop) Show project stats"
+      },
+      {
+        "command": "laravel.stubs.download",
+        "title": "Download stubs"
+      },
+      {
+        "command": "laravel.stubs.version",
+        "title": "Show the version of stubs"
       },
       {
         "command": "laravel.artisan.run",

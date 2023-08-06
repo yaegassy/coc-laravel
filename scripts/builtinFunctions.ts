@@ -8,7 +8,7 @@ import * as phpFunctionProjectService from '../src/projects/services/phpFunction
 import { PHPFunctionType } from '../src/projects/types';
 
 const STUBS_PATH = path.resolve(path.join(__dirname, '../stubs'));
-const BUILTIN_FUNCTION_JSON_PATH = path.resolve(path.join(__dirname, '../resources/jsonData/builtinFunctions.json'));
+const OUTPUT_JSON_PATH = path.resolve(path.join(__dirname, '../resources/jsonData/builtinFunctions.json'));
 const ALLOW_STUBS = ['Core', 'date', 'standard'];
 
 function isAllowStubFile(file: string) {
@@ -84,5 +84,5 @@ function getStubMapFunctionFilesFromCode(code: string) {
     phpFunctions.push(...convedPathFunctions);
   }
 
-  fs.promises.writeFile(BUILTIN_FUNCTION_JSON_PATH, JSON.stringify(phpFunctions, null, 2));
+  fs.promises.writeFile(OUTPUT_JSON_PATH, JSON.stringify(phpFunctions, null, 2));
 })();

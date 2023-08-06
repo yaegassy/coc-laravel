@@ -6,6 +6,8 @@ import * as artisanRunCommandFeature from './features/artisanRun';
 import * as projectRestartCommandFeature from './features/projectRestart';
 import * as projectStatsCommandFeature from './features/projectStats';
 import * as showOutputCommandFeature from './features/showOutput';
+import * as stubsDownloadCommandFeature from './features/stubsDownload';
+import * as stubsVersionCommandFeature from './features/stubsVersion';
 import * as viewFindAllReferencesCommandFeature from './features/viewFindAllReferences';
 
 export async function register(
@@ -21,4 +23,6 @@ export async function register(
   projectStatsCommandFeature.register(context, projectManager);
   projectRestartCommandFeature.register(context, projectManager);
   viewFindAllReferencesCommandFeature.register(context, projectManager);
+  stubsDownloadCommandFeature.register(context);
+  stubsVersionCommandFeature.register(context);
 }
