@@ -2,7 +2,7 @@ import { expect, test, describe } from 'vitest';
 
 import * as testUtils from './testUtils';
 
-type ReflectorFuncitonsParameterType = {
+type ReflectorParameterType = {
   name: string;
   default: string | null;
   type: string | null;
@@ -28,7 +28,7 @@ echo json_encode(\\$reflector->getParameters(), JSON_PRETTY_PRINT);
 
     const resJsonStr = await testUtils.runTinker(code, artisanPath);
     if (!resJsonStr) return;
-    const reflectorFunctionParameters = JSON.parse(resJsonStr) as ReflectorFuncitonsParameterType[];
+    const reflectorFunctionParameters = JSON.parse(resJsonStr) as ReflectorParameterType[];
 
     const expected = [{ name: 'boolean' }, { name: 'code' }, { name: 'message' }, { name: 'headers' }];
 
@@ -57,7 +57,7 @@ echo json_encode(
 
     const resJsonStr = await testUtils.runTinker(code, artisanPath);
     if (!resJsonStr) return;
-    const reflectorFunctionParameters = JSON.parse(resJsonStr) as ReflectorFuncitonsParameterType[];
+    const reflectorFunctionParameters = JSON.parse(resJsonStr) as ReflectorParameterType[];
 
     const expected = [
       {
