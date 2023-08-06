@@ -145,6 +145,11 @@
           "default": true,
           "description": "Enable php function completion."
         },
+        "laravel.completion.phpKeywordEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable php keyword completion."
+        },
         "laravel.completion.methodParameterEnable": {
           "type": "boolean",
           "default": true,

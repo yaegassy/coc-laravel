@@ -34,6 +34,7 @@ import * as livewirePropertyHandler from './handlers/livewirePropertyHandler';
 import * as livewireTagCompletionHandler from './handlers/livewireTagHandler';
 import * as middlewareCompletionHandler from './handlers/middlewareHandler';
 import * as phpFunctionCompletionHandler from './handlers/phpFunctionHandler';
+import * as phpKeywordCompletionHandler from './handlers/phpKeywordHandler';
 import * as routeCompletionHandler from './handlers/routeHandler';
 import * as translationCompletionHandler from './handlers/translationHandler';
 import * as validationCompletionHandler from './handlers/validationHandler';
@@ -78,7 +79,7 @@ export async function register(
         '$', // livewire property completion, php related
         '@', // directive,
         '<', // component,
-        ':', // guard,
+        ':', // guard, php related
         '.', // route, view
         '"', // config, validation, env, route, view, middleware
         "'", // config, validation, env, route, view, middleware
@@ -256,6 +257,14 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       );
       if (phpFunctionCompletionItems) {
         items.push(...phpFunctionCompletionItems);
+      }
+    }
+
+    // php keyword
+    if (workspace.getConfiguration('laravel').get('completion.phpKeywordEnable')) {
+      const phpKeywordCompletionItems = await phpKeywordCompletionHandler.doCompletion(document, position);
+      if (phpKeywordCompletionItems) {
+        items.push(...phpKeywordCompletionItems);
       }
     }
 

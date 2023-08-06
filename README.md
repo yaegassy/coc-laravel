@@ -36,8 +36,9 @@ This coc-extension will provide various completion features and more features fo
     - Livewire event completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1658766120)
     - Livewire property completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1659497932)
     - Livewire directive completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1659296731)
-  - PHP Function completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1643359916)
-    - Provides function completion within the PHP-related regions of the Blade file.
+  - PHP completion in PHP-related region of Blade file
+    - PHP Function completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1643359916)
+    - PHP Keyword completion
   - Directive completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1657000532)
   - Config completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635266998)
   - Env completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635267885)
@@ -135,6 +136,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.completion.translationEnable`: Enable translation completion, default: `true`
 - `laravel.completion.componentEnable`: Enable component completion, default: `true`
 - `laravel.completion.phpFunctionEnable`: Enable php function completion, default: `true`
+- `laravel.completion.phpKeywordEnable`: Enable php keyword completion, default: `true`
 - `laravel.completion.methodParameterEnable`: Enable method parameter completion, default: `true`
 - `laravel.completion.livewireEnable`: Enable livewire completion, default: `true`
 - `laravel.livewire.wireClickAttributes`: List of click related action to be added to `wire:xxxx`, default: `["click", "click.prefetch"]`
