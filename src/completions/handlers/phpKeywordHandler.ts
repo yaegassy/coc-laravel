@@ -66,7 +66,7 @@ function getKeywordCompletionItems(position: Position, wordWithExtraChars: strin
     'eval',
     'exit',
     'extends',
-    'false',
+    //'false', // Exclude this keyword because it is provided in the php constant completion
     'final',
     'finally',
     'for',
@@ -85,7 +85,7 @@ function getKeywordCompletionItems(position: Position, wordWithExtraChars: strin
     'list',
     'namespace',
     'new',
-    'null',
+    //'null', // Exclude this keyword because it is provided in the php constant completion
     'or',
     'print',
     'private',
@@ -98,7 +98,7 @@ function getKeywordCompletionItems(position: Position, wordWithExtraChars: strin
     'switch',
     'throw',
     'trait',
-    'true',
+    //'true', // Exclude this keyword because it is provided in the php constant completion
     'try',
     'unset',
     'use',
