@@ -129,6 +129,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.stubs.useStubs`: List of stubs to be used, default: `["Core", "date", "standard"]`
 - `laravel.completion.enable`: Enable all completion feature, default: `true`
 - `laravel.completion.directiveEnable`: Enable directive completion, default: `true`
+- `laravel.completion.directiveList`: List of directive used in directive completion, default: Omitted due to the large number of settings, See configuration in [package.json](/package.json)
 - `laravel.completion.configEnable`: Enable config completion, default: `true`
 - `laravel.completion.envEnable`: Enable env completion, default: true
 - `laravel.completion.validationEnable`: Enable validation completion.
@@ -145,7 +146,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.completion.livewireEnable`: Enable livewire completion, default: `true`
 - `laravel.livewire.wireClickAttributes`: List of click related action to be added to `wire:xxxx`, default: `["click", "click.prefetch"]`
 - `laravel.livewire.wireModelAttributes`: List of model related action to be added to `wire:xxxx`, default: `["model", "model.debounce.100ms", "model.lazy", "model.defer"]`
-- `laravel.livewire.wireEventAttributes`: List of browser events to be added to `wire:xxxx`. No need for `wire:model` or `wire:click`. default: Omitted due to the large number of settings..., See configuration in [package.json](/package.json)
+- `laravel.livewire.wireEventAttributes`: List of browser events to be added to `wire:xxxx`. No need for `wire:model` or `wire:click`. default: Omitted due to the large number of settings, See configuration in [package.json](/package.json)
 - `laravel.definition.enable`: Enable definition, default `true`
 - `laravel.reference.enable`: Enable reference, default `true`
 - `laravel.hover.enable`: Enable hover, default `true`
