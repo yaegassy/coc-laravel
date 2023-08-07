@@ -1,14 +1,15 @@
-import { OutputChannel, workspace } from 'coc.nvim';
+import { ExtensionContext, OutputChannel, workspace } from 'coc.nvim';
 
 import { SUPPORTED_LANGUAGE } from '../constant';
 import { BladeProjectsManager } from './managers/blade';
 import { LivewireProjectManager } from './managers/livewire';
+import { PHPConstantProjectManager } from './managers/phpConstant';
 import { PHPFunctionProjectManager } from './managers/phpFunction';
 import { TranslationProjectManager } from './managers/translation';
 import { ViewReferenceProjectManager } from './managers/viewReference';
 import { type ProjectManagerType } from './types';
 
-export async function register(outputChannel: OutputChannel) {
+export async function register(context: ExtensionContext, outputChannel: OutputChannel) {
   const { document } = await workspace.getCurrentState();
 
   if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
@@ -25,6 +26,9 @@ export async function register(outputChannel: OutputChannel) {
   const phpFunctionProjectManager = new PHPFunctionProjectManager(workspace.root, outputChannel);
   await phpFunctionProjectManager.initialize();
 
+  const phpConstantProjectManager = new PHPConstantProjectManager(context, workspace.root, outputChannel);
+  await phpConstantProjectManager.initialize();
+
   const livewireProjectManager = new LivewireProjectManager(workspace.root, outputChannel);
   await livewireProjectManager.initialize();
 
@@ -33,6 +37,7 @@ export async function register(outputChannel: OutputChannel) {
     viewReferenceProjectManager,
     translationProjectManager,
     phpFunctionProjectManager,
+    phpConstantProjectManager,
     livewireProjectManager,
   };
 

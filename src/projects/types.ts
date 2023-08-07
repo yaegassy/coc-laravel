@@ -1,5 +1,6 @@
 import { BladeProjectsManager } from './managers/blade';
 import { LivewireProjectManager } from './managers/livewire';
+import { PHPConstantProjectManager } from './managers/phpConstant';
 import { PHPFunctionProjectManager } from './managers/phpFunction';
 import { TranslationProjectManager } from './managers/translation';
 import { ViewReferenceProjectManager } from './managers/viewReference';
@@ -9,6 +10,7 @@ import { LivewireComponentMethodType, LivewireComponentPropertyType } from '../c
 export type BladeProjectsManagerType = BladeProjectsManager;
 export type TranslationProjectManagerType = TranslationProjectManager;
 export type PHPFunctionProjectManagerType = PHPFunctionProjectManager;
+export type PHPConstantProjectManagerType = PHPConstantProjectManager;
 export type ViewReferenceProjectManagerType = ViewReferenceProjectManager;
 export type LivewireProjectManagerType = LivewireProjectManager;
 
@@ -16,6 +18,7 @@ export type ProjectManagerType = {
   bladeProjectManager: BladeProjectsManagerType;
   translationProjectManager: TranslationProjectManagerType;
   phpFunctionProjectManager: PHPFunctionProjectManagerType;
+  phpConstantProjectManager: PHPConstantProjectManagerType;
   viewReferenceProjectManager: ViewReferenceProjectManagerType;
   livewireProjectManager: LivewireProjectManagerType;
 };
@@ -37,6 +40,12 @@ export type ArgumentParameterType = {
   nullable: boolean;
   variadic: boolean;
   typehint?: string;
+};
+
+export type PHPConstantType = {
+  name: string;
+  path: string;
+  isStubs: boolean;
 };
 
 export type PHPFunctionType = {

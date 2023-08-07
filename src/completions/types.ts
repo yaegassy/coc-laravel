@@ -11,19 +11,11 @@ export type RangeOffset = {
   end: number;
 };
 
-// TODO: Refactoring to follow, as it was ported from coc-blade.
 export type CompletionItemDataType = {
   source: CompletionItemSource;
-  snippetsText?: string;
+  filePath?: string; // phpConstant
+  isStubs?: boolean; // phpConstant
+  snippetsText?: string; // blade-directive
 };
 
-type CompletionItemSource =
-  | 'laravel-blade-directive'
-  //  | 'blade-directive'
-  | 'blade-snippets'
-  | 'livewire-directive-component'
-  | 'livewire-tag'
-  | 'livewire-tag-component'
-  | 'livewire-wire'
-  | 'livewire-wire-action'
-  | 'livewire-wire-event';
+type CompletionItemSource = 'laravel-blade-directive' | 'laravel-php-constant';

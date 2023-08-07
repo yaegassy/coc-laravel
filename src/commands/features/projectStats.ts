@@ -35,13 +35,18 @@ export async function register(context: ExtensionContext, projectManagers: Proje
       const phpFunctionProjectContent =
         '### PHP Function\n\n' + '```json\n' + JSON.stringify(phpFunctionProjectList, null, 2) + '\n```\n\n';
 
+      const phpConstantProjectList = Array.from(projectManagers.phpConstantProjectManager.list());
+      const phpConstantProjectContent =
+        '### PHP Constant\n\n' + '```json\n' + JSON.stringify(phpConstantProjectList, null, 2) + '\n```\n\n';
+
       outputText +=
         blaceProjectContent +
         viewReferenceContent +
         componentProjectContent +
         livewireProjectContent +
         translationProjectContent +
-        phpFunctionProjectContent;
+        phpFunctionProjectContent +
+        phpConstantProjectContent;
 
       await workspace.nvim
         .command('belowright vnew blade-stats | setlocal buftype=nofile bufhidden=hide noswapfile filetype=markdown')

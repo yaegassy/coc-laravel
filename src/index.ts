@@ -21,7 +21,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   const outputChannel = window.createOutputChannel('laravel');
 
-  const projectManager = await projectManagerFeature.register(outputChannel);
+  const projectManager = await projectManagerFeature.register(context, outputChannel);
   if (projectManager) {
     commandFeature.register(context, projectManager, outputChannel);
     completionFeature.register(context, projectManager, outputChannel);

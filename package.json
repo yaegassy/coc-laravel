@@ -96,6 +96,15 @@
           "default": "",
           "description": "Specify the version of stubs to download with the `laravel.stubs.download` command. If not set, the `stubsVersion` defined in `package.json` will be used."
         },
+        "laravel.stubs.useStubs": {
+          "type": "array",
+          "default": [
+            "Core",
+            "date",
+            "standard"
+          ],
+          "description": "List of stubs to be used."
+        },
         "laravel.completion.enable": {
           "type": "boolean",
           "default": true,
@@ -160,6 +169,11 @@
           "type": "boolean",
           "default": true,
           "description": "Enable php keyword completion."
+        },
+        "laravel.completion.phpConstantEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable php constant completion."
         },
         "laravel.completion.methodParameterEnable": {
           "type": "boolean",

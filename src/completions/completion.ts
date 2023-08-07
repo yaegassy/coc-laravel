@@ -33,6 +33,7 @@ import * as livewireEventCompletionHandler from './handlers/livewireEventHandler
 import * as livewirePropertyHandler from './handlers/livewirePropertyHandler';
 import * as livewireTagCompletionHandler from './handlers/livewireTagHandler';
 import * as middlewareCompletionHandler from './handlers/middlewareHandler';
+import * as phpConstantCompletionHandler from './handlers/phpConstantHandler';
 import * as phpFunctionCompletionHandler from './handlers/phpFunctionHandler';
 import * as phpKeywordCompletionHandler from './handlers/phpKeywordHandler';
 import * as routeCompletionHandler from './handlers/routeHandler';
@@ -268,6 +269,18 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       }
     }
 
+    // php constant
+    if (workspace.getConfiguration('laravel').get('completion.phpConstantEnable')) {
+      const phpConstantCompletionItems = await phpConstantCompletionHandler.doCompletion(
+        document,
+        position,
+        this.projectManager.phpConstantProjectManager
+      );
+      if (phpConstantCompletionItems) {
+        items.push(...phpConstantCompletionItems);
+      }
+    }
+
     // method parameter
     if (workspace.getConfiguration('laravel').get('completion.methodParameterEnable')) {
       const methodParameterCompletionItems = await bladeMethodParameterHandler.doCompletion(document, position);
@@ -358,6 +371,13 @@ class LaravelCompletionProvider implements CompletionItemProvider {
     if (itemData.source === 'laravel-blade-directive') {
       const docDataDir = path.join(this.extensionContext.extensionPath, 'resources', 'markdownData', 'blade');
       const resolveItem = await bladeDirectiveCompletionHandler.doResolveCompletionItem(item, _token, docDataDir);
+      return resolveItem;
+    } else if (itemData.source === 'laravel-php-constant') {
+      const resolveItem = await phpConstantCompletionHandler.doResolveCompletionItem(
+        item,
+        _token,
+        this.extensionContext
+      );
       return resolveItem;
     }
 

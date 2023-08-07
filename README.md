@@ -37,8 +37,10 @@ This coc-extension will provide various completion features and more features fo
     - Livewire property completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1659497932)
     - Livewire directive completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1659296731)
   - PHP completion in PHP-related region of Blade file
+    - **[NOTE]**: To use this feature, please execute the `laravel.stubs.download` command.
     - PHP Function completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1643359916)
     - PHP Keyword completion
+    - PHP Constant completion
   - Directive completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1657000532)
   - Config completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635266998)
   - Env completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635267885)
@@ -125,6 +127,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.enable`: Enable coc-laravel extension, default: `true`
 - `laravel.environment.phpPath`: Path to PHP, you can use a custom version of PHP. If there is no setting, `php` of the execution environment will be used, default: `""`
 - `laravel.stubs.customVersion`: Specify the version of stubs to download with the `laravel.stubs.download` command. If not set, the `stubsVersion` defined in `package.json` will be used, default: `""`
+- `laravel.stubs.useStubs`: List of stubs to be used, default: `["Core", "date", "standard"]`
 - `laravel.completion.enable`: Enable all completion feature, default: `true`
 - `laravel.completion.directiveEnable`: Enable directive completion, default: `true`
 - `laravel.completion.configEnable`: Enable config completion, default: `true`
@@ -138,6 +141,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.completion.componentEnable`: Enable component completion, default: `true`
 - `laravel.completion.phpFunctionEnable`: Enable php function completion, default: `true`
 - `laravel.completion.phpKeywordEnable`: Enable php keyword completion, default: `true`
+- `laravel.completion.phpConstantEnable`: Enable php constant completion, default: `true`
 - `laravel.completion.methodParameterEnable`: Enable method parameter completion, default: `true`
 - `laravel.completion.livewireEnable`: Enable livewire completion, default: `true`
 - `laravel.livewire.wireClickAttributes`: List of click related action to be added to `wire:xxxx`, default: `["click", "click.prefetch"]`
