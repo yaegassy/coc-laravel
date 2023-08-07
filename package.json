@@ -42,7 +42,6 @@
   "devDependencies": {
     "@types/node": "^18.17.1",
     "@types/node-fetch": "^2.6.2",
-    "@types/rimraf": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "^6.2.0",
     "@typescript-eslint/parser": "^6.2.0",
     "coc.nvim": "^0.0.83-next.17",
@@ -54,7 +53,7 @@
     "https-proxy-agent": "^5.0.1",
     "node-fetch": "^2.6.7",
     "prettier": "^2.8.8",
-    "rimraf": "^3.0.2",
+    "rimraf": "^5.0.1",
     "typescript": "~5.0.4",
     "vitest": "^0.33.0"
   },
