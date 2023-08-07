@@ -2,6 +2,7 @@ import { expect, test } from 'vitest';
 
 import * as phpCommon from '../common/php';
 import * as phpParser from '../parsers/php/parser';
+
 import * as testUtils from './testUtils';
 
 test('Get defineValue from defineName in php code', async () => {
@@ -51,5 +52,47 @@ if (!function_exists('mb_decode_mimeheader')) {
   const names = phpCommon.getFunctionFromPHPCode(code);
 
   const expected = ['mb_convert_encoding', 'mb_decode_mimeheader'];
+  expect(names).toMatchObject(expected);
+});
+
+test('Get function with namespace from php code', async () => {
+  // \ -> \\
+  const code = testUtils.stripInitialNewline(`
+namespace Laravel\\Prompts;
+
+use Closure;
+use Illuminate\\Support\\Collection;
+
+/**
+ * Prompt the user for text input.
+ */
+function text(string $label, string $placeholder = '', string $default = '', bool|string $required = false, Closure $validate = null): string
+{
+    return (new TextPrompt($label, $placeholder, $default, $required, $validate))->prompt();
+}
+
+/**
+ * Prompt the user for input, hiding the value.
+ */
+function password(string $label, string $placeholder = '', bool|string $required = false, Closure $validate = null): string
+{
+    return (new PasswordPrompt($label, $placeholder, $required, $validate))->prompt();
+}
+`);
+  const namespaces = phpCommon.getNamespaceFromPHPCode(code);
+  const functionNames = phpCommon.getFunctionFromPHPCode(code);
+
+  const names: string[] = [];
+
+  for (const f of functionNames) {
+    if (namespaces.length > 0) {
+      names.push(namespaces[0] + '\\' + f);
+    } else {
+      names.push(f);
+    }
+  }
+
+  const expected = ['Laravel\\Prompts\\text', 'Laravel\\Prompts\\password'];
+
   expect(names).toMatchObject(expected);
 });

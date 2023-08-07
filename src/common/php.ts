@@ -3,11 +3,12 @@ import {
   Boolean as BooleanNode,
   Call,
   Cast,
+  Function as FunctionNode,
   Identifier,
   Name,
+  Namespace as NamespaceNode,
   Number as NumberNode,
   String as StringNode,
-  Function as FunctionNode,
 } from 'php-parser';
 
 import * as phpParser from '../parsers/php/parser';
@@ -105,4 +106,19 @@ export function getFunctionFromPHPCode(code: string) {
   }, ast);
 
   return functionNames;
+}
+
+export function getNamespaceFromPHPCode(code: string) {
+  const namespaces: string[] = [];
+
+  const ast = phpParser.getAst(code);
+  if (!ast) return [];
+
+  phpParser.walk((node) => {
+    if (node.kind !== 'namespace') return;
+    const namespaceNode = node as NamespaceNode;
+    namespaces.push(namespaceNode.name);
+  }, ast);
+
+  return namespaces;
 }

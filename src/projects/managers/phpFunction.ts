@@ -116,14 +116,24 @@ export class PHPFunctionProjectManager {
 
       // Some of the PATHs read do not exist or cause errors
       try {
+        const namespaces = phpCommon.getNamespaceFromPHPCode(targetPHPCode);
+
         const autoloadedFunctions = phpCommon.getFunctionFromPHPCode(targetPHPCode);
         if (autoloadedFunctions.length === 0) continue;
         for (const c of autoloadedFunctions) {
-          phpFunctions.push({
-            name: c,
-            path: relativeFilePath,
-            isStubs: false,
-          });
+          if (namespaces.length > 0) {
+            phpFunctions.push({
+              name: namespaces[0] + '\\' + c,
+              path: relativeFilePath,
+              isStubs: false,
+            });
+          } else {
+            phpFunctions.push({
+              name: c,
+              path: relativeFilePath,
+              isStubs: false,
+            });
+          }
         }
       } catch (e: any) {
         this.outputChannel.appendLine(`[PHPFunction:parse_autoload_file_error] ${JSON.stringify(e)}`);

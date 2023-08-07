@@ -1,5 +1,6 @@
 import {
   CancellationToken,
+  CompletionContext,
   CompletionItem,
   CompletionItemKind,
   InsertTextFormat,
@@ -38,7 +39,8 @@ type ReflectorParameterType = {
 export async function doCompletion(
   document: LinesTextDocument,
   position: Position,
-  phpFunctionProjectManager: PHPFunctionProjectManagerType
+  phpFunctionProjectManager: PHPFunctionProjectManagerType,
+  context?: CompletionContext
 ) {
   if (document.languageId !== 'blade') return [];
 
@@ -54,13 +56,13 @@ export async function doCompletion(
   let wordWithExtraChars: string | undefined = undefined;
   const wordWithExtraCharsRange = doc.getWordRangeAtPosition(
     Position.create(position.line, position.character - 1),
-    '_$'
+    '_$\\'
   );
   if (wordWithExtraCharsRange) {
     wordWithExtraChars = document.getText(wordWithExtraCharsRange);
   }
 
-  const phpFunctionItems = getPHPFunctionItems(phpFunctionProjectManager, position, wordWithExtraChars);
+  const phpFunctionItems = getPHPFunctionItems(phpFunctionProjectManager, position, wordWithExtraChars, context);
   if (phpFunctionItems) {
     items.push(...phpFunctionItems);
   }
@@ -71,20 +73,33 @@ export async function doCompletion(
 function getPHPFunctionItems(
   phpFunctionProjectManager: PHPFunctionProjectManagerType,
   position: Position,
-  wordWithExtraChars: string | undefined
+  wordWithExtraChars?: string,
+  context?: CompletionContext
 ) {
   const items: CompletionItem[] = [];
 
   const phpFunctions = Array.from(phpFunctionProjectManager.list());
 
   for (const phpFunction of phpFunctions) {
-    // MEMO: No uppercase beginning function is needed in this context
-    // e.g. PS_UNRESERVE_PREFIX___halt_compiler()
-    if (
-      phpFunction[0].slice(0, 1).match(/[A-Za-z]/) &&
-      phpFunction[0].slice(0, 1) === phpFunction[0].slice(0, 1).toUpperCase()
-    )
-      continue;
+    let label = phpFunction[0];
+    if (wordWithExtraChars?.includes('\\') && context?.triggerKind === 2) {
+      // filtering
+      if (!label.startsWith(wordWithExtraChars)) continue;
+    }
+
+    if (wordWithExtraChars?.endsWith('\\') && context?.triggerKind === 2) {
+      label = label.replace(wordWithExtraChars, '');
+    }
+
+    if (wordWithExtraChars?.includes('\\') && context?.triggerKind === 1) {
+      const splitWord = wordWithExtraChars.split('\\');
+      splitWord.pop();
+      const parentBackslashedWord = splitWord.join('\\');
+      // filtering
+      if (!label.startsWith(parentBackslashedWord)) continue;
+
+      label = label.replace(parentBackslashedWord + '\\', '');
+    }
 
     const adjustStartCharacter = wordWithExtraChars
       ? position.character - wordWithExtraChars.length
@@ -105,7 +120,7 @@ function getPHPFunctionItems(
     };
 
     items.push({
-      label: phpFunction[0],
+      label: label,
       kind: CompletionItemKind.Function,
       insertTextFormat: InsertTextFormat.Snippet,
       textEdit: edit,

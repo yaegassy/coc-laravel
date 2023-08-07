@@ -76,6 +76,7 @@ export async function register(
       DOCUMENT_SELECTOR,
       new LaravelCompletionProvider(context, projectManager, viewPath, outputChannel),
       [
+        '\\', //  php related
         '$', // livewire property completion, php related
         '@', // directive,
         '<', // component,
@@ -122,7 +123,7 @@ class LaravelCompletionProvider implements CompletionItemProvider {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _token: CancellationToken,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _context?: CompletionContext | undefined
+    context?: CompletionContext
   ) {
     const items: CompletionItem[] | CompletionList = [];
 
@@ -253,7 +254,8 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       const phpFunctionCompletionItems = await phpFunctionCompletionHandler.doCompletion(
         document,
         position,
-        this.projectManager.phpFunctionProjectManager
+        this.projectManager.phpFunctionProjectManager,
+        context
       );
       if (phpFunctionCompletionItems) {
         items.push(...phpFunctionCompletionItems);
