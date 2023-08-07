@@ -23,7 +23,7 @@ export async function register(context: ExtensionContext, outputChannel: OutputC
   const translationProjectManager = new TranslationProjectManager(workspace.root, outputChannel);
   await translationProjectManager.initialize();
 
-  const phpFunctionProjectManager = new PHPFunctionProjectManager(workspace.root, outputChannel);
+  const phpFunctionProjectManager = new PHPFunctionProjectManager(context, workspace.root, outputChannel);
   await phpFunctionProjectManager.initialize();
 
   const phpConstantProjectManager = new PHPConstantProjectManager(context, workspace.root, outputChannel);

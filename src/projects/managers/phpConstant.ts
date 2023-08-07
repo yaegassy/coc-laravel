@@ -3,10 +3,9 @@ import { ExtensionContext, OutputChannel, workspace } from 'coc.nvim';
 import fs from 'fs';
 import path from 'path';
 
-import { getAbusoluteFilesAutoloadFilesPHPFromCode } from '../../common/composer';
+import * as composerCommon from '../../common/composer';
 import * as phpCommon from '../../common/php';
-import { getArtisanPath } from '../../common/shared';
-import { getContextListFromStubMapPHPCode, isAllowStubFile } from '../../common/stubs';
+import * as stubsCommon from '../../common/stubs';
 import { elapsed } from '../../common/utils';
 import { STUBS_VENDOR_NAME } from '../../constant';
 import { PHPConstantType } from '../types';
@@ -57,10 +56,6 @@ export class PHPConstantProjectManager {
   async initialize() {
     this.outputChannel.appendLine('[PHPConstant] Initializing...');
 
-    // Checking artisan to determine if it is a laravel project
-    const artisanPath = getArtisanPath();
-    if (!artisanPath) return;
-
     const phpConstants: PHPConstantType[] = [];
 
     //
@@ -82,10 +77,10 @@ export class PHPConstantProjectManager {
 
     const stubsMapPHPCode = await fs.promises.readFile(stubsMapFilePath, { encoding: 'utf8' });
 
-    const builtinConstantContextList = getContextListFromStubMapPHPCode(stubsMapPHPCode, 'CONSTANTS');
+    const builtinConstantContextList = stubsCommon.getContextListFromStubMapPHPCode(stubsMapPHPCode, 'CONSTANTS');
     if (!builtinConstantContextList) return;
 
-    const builtinConstants = builtinConstantContextList.filter((c) => isAllowStubFile(c.path, useStubs));
+    const builtinConstants = builtinConstantContextList.filter((c) => stubsCommon.isAllowStubFile(c.path, useStubs));
 
     for (const c of builtinConstants) {
       phpConstants.push({
@@ -110,7 +105,7 @@ export class PHPConstantProjectManager {
 
     const autoloadFilesPHPCode = await fs.promises.readFile(autoloadFilesPHPPath, { encoding: 'utf8' });
 
-    const abusoluteAutoloadedFiles = getAbusoluteFilesAutoloadFilesPHPFromCode(
+    const abusoluteAutoloadedFiles = composerCommon.getAbusoluteFilesAutoloadFilesPHPFromCode(
       autoloadFilesPHPCode,
       this.workspaceRoot
     );

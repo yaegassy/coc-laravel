@@ -13,11 +13,11 @@ define('DUMMY', 1);
   const ast = phpParser.getAst(code);
   if (!ast) return;
 
-  const defineValue = phpCommon.getConstantOfDefineValueFromDefineNameInPHPCode(code, 'DUMMY');
-  expect(defineValue).toBe(1);
+  const value = phpCommon.getConstantOfDefineValueFromDefineNameInPHPCode(code, 'DUMMY');
+  expect(value).toBe(1);
 });
 
-test('Get defineValue from defineName in php code', async () => {
+test('Get constant of defineName in php code', async () => {
   // Ref: symfony/polyfill-mbstring/bootstrap.php
   const code = testUtils.stripInitialNewline(`
 if (!defined('MB_CASE_UPPER')) {
@@ -31,8 +31,25 @@ if (!defined('MB_CASE_TITLE')) {
 }
 `);
 
-  const defineNames = phpCommon.getConstantOfDefineNameFromPHPCode(code);
+  const names = phpCommon.getConstantOfDefineNameFromPHPCode(code);
 
   const expected = ['MB_CASE_UPPER', 'MB_CASE_LOWER', 'MB_CASE_TITLE'];
-  expect(defineNames).toMatchObject(expected);
+  expect(names).toMatchObject(expected);
+});
+
+test('Get function from php code', async () => {
+  // Ref: symfony/polyfill-mbstring/bootstrap.php
+  const code = testUtils.stripInitialNewline(`
+if (!function_exists('mb_convert_encoding')) {
+    function mb_convert_encoding($string, $to_encoding, $from_encoding = null) { return p\Mbstring::mb_convert_encoding($string, $to_encoding, $from_encoding); }
+}
+if (!function_exists('mb_decode_mimeheader')) {
+    function mb_decode_mimeheader($string) { return p\Mbstring::mb_decode_mimeheader($string); }
+}
+`);
+
+  const names = phpCommon.getFunctionFromPHPCode(code);
+
+  const expected = ['mb_convert_encoding', 'mb_decode_mimeheader'];
+  expect(names).toMatchObject(expected);
 });
