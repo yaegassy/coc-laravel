@@ -41,7 +41,6 @@ import * as translationCompletionHandler from './handlers/translationHandler';
 import * as validationCompletionHandler from './handlers/validationHandler';
 import * as viewCompletionHandler from './handlers/viewHandler';
 
-import path from 'path';
 import { getArtisanPath, getViewPath } from '../common/shared';
 import { CompletionItemDataType } from './types';
 
@@ -294,16 +293,7 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       workspace.getConfiguration('laravel').get('completion.directiveEnable') &&
       !this.isCocBladeCompletionEnableDirective
     ) {
-      const directiveJsonFilePaths = [
-        path.join(this.extensionContext.extensionPath, 'resources', 'jsonData', 'blade-directive.json'),
-        path.join(this.extensionContext.extensionPath, 'resources', 'jsonData', 'livewire-directive.json'),
-      ];
-
-      const bladeDirectiveCompletionItems = await bladeDirectiveCompletionHandler.doCompletion(
-        document,
-        position,
-        directiveJsonFilePaths
-      );
+      const bladeDirectiveCompletionItems = await bladeDirectiveCompletionHandler.doCompletion(document, position);
       if (bladeDirectiveCompletionItems) {
         items.push(...bladeDirectiveCompletionItems);
       }
@@ -368,11 +358,7 @@ class LaravelCompletionProvider implements CompletionItemProvider {
     if (!item.data) return item;
     const itemData = item.data as CompletionItemDataType;
 
-    if (itemData.source === 'laravel-blade-directive') {
-      const docDataDir = path.join(this.extensionContext.extensionPath, 'resources', 'markdownData', 'blade');
-      const resolveItem = await bladeDirectiveCompletionHandler.doResolveCompletionItem(item, _token, docDataDir);
-      return resolveItem;
-    } else if (itemData.source === 'laravel-php-constant') {
+    if (itemData.source === 'laravel-php-constant') {
       const resolveItem = await phpConstantCompletionHandler.doResolveCompletionItem(
         item,
         _token,
