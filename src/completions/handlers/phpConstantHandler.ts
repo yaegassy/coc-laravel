@@ -8,6 +8,7 @@ import {
   Position,
   TextEdit,
   workspace,
+  MarkupContent,
 } from 'coc.nvim';
 
 import fs from 'fs';
@@ -102,13 +103,7 @@ export async function doResolveCompletionItem(
 
   const resoveItem = item.data as CompletionItemDataType;
   if (resoveItem.source !== 'laravel-php-constant') return item;
-
-  //
-  // documentation
-  //
-
   if (!resoveItem.filePath) return item;
-  item.documentation = resoveItem.filePath;
 
   //
   // detail
@@ -134,6 +129,25 @@ export async function doResolveCompletionItem(
   if (defineValue) {
     item.detail = String(defineValue);
   }
+
+  //
+  // documentation
+  //
+
+  let documentationValue = '';
+  if (defineValue) {
+    documentationValue = '```php\n<?php\n';
+    documentationValue += `define(${item.label}, ${String(defineValue)});`;
+    documentationValue += '\n```\n\n';
+  }
+  documentationValue += resoveItem.filePath;
+
+  const documentation: MarkupContent = {
+    kind: 'markdown',
+    value: documentationValue,
+  };
+
+  item.documentation = documentation;
 
   return item;
 }
