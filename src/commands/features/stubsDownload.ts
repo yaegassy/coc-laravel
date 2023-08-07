@@ -6,7 +6,7 @@ import fs from 'fs';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import fetch from 'node-fetch';
 import path from 'path';
-import rimraf from 'rimraf';
+import { rimrafSync } from 'rimraf';
 import stream from 'stream';
 import util from 'util';
 
@@ -93,7 +93,7 @@ async function doExtract(context: ExtensionContext) {
   const extractedFilenames: string[] = [];
   const targetPath = path.join(context.storagePath, `${STUBS_VENDOR_NAME}`);
 
-  rimraf.sync(targetPath);
+  rimrafSync(targetPath);
 
   if (fs.existsSync(zipPath)) {
     await extract(zipPath, {
@@ -112,6 +112,6 @@ async function doExtract(context: ExtensionContext) {
     fs.writeFileSync(versionTxtFilePath, `tag: ${DOWNLOAD_STUBS_VERSION}`);
 
     fs.renameSync(extractedBasePath, targetPath);
-    rimraf.sync(zipPath);
+    rimrafSync(zipPath);
   }
 }
