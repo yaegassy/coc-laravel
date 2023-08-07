@@ -13,9 +13,8 @@ export type RangeOffset = {
 
 export type CompletionItemDataType = {
   source: CompletionItemSource;
-  filePath?: string; // phpConstant
-  isStubs?: boolean; // phpConstant
-  snippetsText?: string; // blade-directive
+  filePath?: string; // phpConstant, phpFunction
+  isStubs?: boolean; // phpConstant, phpFunction
 };
 
-type CompletionItemSource = 'laravel-blade-directive' | 'laravel-php-constant';
+type CompletionItemSource = 'laravel-php-constant' | 'laravel-php-function';

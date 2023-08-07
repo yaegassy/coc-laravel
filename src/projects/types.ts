@@ -51,7 +51,7 @@ export type PHPConstantType = {
 export type PHPFunctionType = {
   name: string;
   path: string;
-  arguments?: ArgumentParameterType[];
+  isStubs: boolean;
 };
 
 export type CallViewFunctionType = {

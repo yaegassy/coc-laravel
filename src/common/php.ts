@@ -3,9 +3,11 @@ import {
   Boolean as BooleanNode,
   Call,
   Cast,
+  Identifier,
   Name,
   Number as NumberNode,
   String as StringNode,
+  Function as FunctionNode,
 } from 'php-parser';
 
 import * as phpParser from '../parsers/php/parser';
@@ -85,4 +87,22 @@ export function getConstantOfDefineValueFromDefineNameInPHPCode(code: string, de
 
   if (defineValues.length === 0) return;
   return defineValues[0];
+}
+
+export function getFunctionFromPHPCode(code: string) {
+  const functionNames: string[] = [];
+
+  const ast = phpParser.getAst(code);
+  if (!ast) return [];
+
+  phpParser.walk((node) => {
+    if (node.kind !== 'function') return;
+
+    const functionNode = node as FunctionNode;
+    if (typeof functionNode.name !== 'object') return;
+    const identifierNode = functionNode.name as Identifier;
+    functionNames.push(identifierNode.name);
+  }, ast);
+
+  return functionNames;
 }

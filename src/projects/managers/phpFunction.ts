@@ -1,29 +1,33 @@
-import { OutputChannel } from 'coc.nvim';
+import { ExtensionContext, OutputChannel, workspace } from 'coc.nvim';
 
 import fs from 'fs';
 import path from 'path';
 
-import { getArtisanPath } from '../../common/shared';
-import { elapsed } from '../../common/utils';
-import { BUILTIN_FUNCTIONS_JSON_PATH } from '../../constant';
-import * as phpFunctionProjectService from '../services/phpFunction';
-import { PHPFunctionType } from '../types';
 import * as composerCommon from '../../common/composer';
+import * as phpCommon from '../../common/php';
+import * as stubsCommon from '../../common/stubs';
+import { elapsed } from '../../common/utils';
+import { STUBS_VENDOR_NAME } from '../../constant';
+import { PHPFunctionType } from '../types';
 
 export class PHPFunctionProjectManager {
   phpFunctionMapStore: Map<string, PHPFunctionType>;
+
+  context: ExtensionContext;
   workspaceRoot: string;
   outputChannel: OutputChannel;
+
   initializedAt: [number, number];
   initialized: boolean;
 
   private isReady: boolean = false;
   private readyCallbacks: (() => void)[] = [];
 
-  constructor(workspaceRoot: string, outputChannel: OutputChannel) {
+  constructor(context: ExtensionContext, workspaceRoot: string, outputChannel: OutputChannel) {
     this.initializedAt = process.hrtime();
     this.initialized = false;
 
+    this.context = context;
     this.workspaceRoot = workspaceRoot;
     this.outputChannel = outputChannel;
 
@@ -52,50 +56,74 @@ export class PHPFunctionProjectManager {
   async initialize() {
     this.outputChannel.appendLine('[PHPFunction] Initializing...');
 
-    // Checking artisan to determine if it is a laravel project
-    const artisanPath = getArtisanPath();
-    if (!artisanPath) return;
-
     const phpFunctions: PHPFunctionType[] = [];
 
     //
-    // builtinFunctions
+    // builtin
     //
 
-    const builtinFunctionsJSONStr = await fs.promises.readFile(BUILTIN_FUNCTIONS_JSON_PATH, { encoding: 'utf8' });
-    const builtinFunctionsJSON = JSON.parse(builtinFunctionsJSONStr) as PHPFunctionType[];
-    if (builtinFunctionsJSON) {
-      phpFunctions.push(...builtinFunctionsJSON);
+    const useStubs = workspace.getConfiguration('laravel').get<string[]>('stubs.useStubs', []);
+
+    const stubsMapFilePath = path.resolve(
+      path.join(this.context.storagePath, STUBS_VENDOR_NAME, 'PhpStormStubsMap.php')
+    );
+
+    let existsStubsMapFilePath = false;
+    try {
+      await fs.promises.stat(stubsMapFilePath);
+      existsStubsMapFilePath = true;
+    } catch {}
+    if (!existsStubsMapFilePath) return;
+
+    const stubsMapPHPCode = await fs.promises.readFile(stubsMapFilePath, { encoding: 'utf8' });
+
+    const builtinFunctionContextList = stubsCommon.getContextListFromStubMapPHPCode(stubsMapPHPCode, 'FUNCTIONS');
+    if (!builtinFunctionContextList) return;
+
+    const builtinFunctions = builtinFunctionContextList.filter((c) => stubsCommon.isAllowStubFile(c.path, useStubs));
+
+    for (const f of builtinFunctions) {
+      phpFunctions.push({
+        name: f.name,
+        path: f.path,
+        isStubs: true,
+      });
     }
 
     //
     // autoloadedFunctions
     //
 
-    const autoloadFunctionFilePath = path.join(this.workspaceRoot, 'vendor', 'composer', 'autoload_files.php');
+    const autoloadFilesPHPPath = path.join(this.workspaceRoot, 'vendor', 'composer', 'autoload_files.php');
 
-    let fileExists = false;
+    let existsAutoloadFilesPHP = false;
     try {
-      await fs.promises.stat(autoloadFunctionFilePath);
-      fileExists = true;
+      await fs.promises.stat(autoloadFilesPHPPath);
+      existsAutoloadFilesPHP = true;
     } catch {}
-    if (!fileExists) return;
+    if (!existsAutoloadFilesPHP) return;
 
-    const autoloadFunctionFilePHPCode = await fs.promises.readFile(autoloadFunctionFilePath, { encoding: 'utf8' });
-    const abusoluteAutoloadedFunctionsFiles = composerCommon.getAbusoluteFilesAutoloadFilesPHPFromCode(
-      autoloadFunctionFilePHPCode,
+    const autoloadFilesPHPCode = await fs.promises.readFile(autoloadFilesPHPPath, { encoding: 'utf8' });
+
+    const abusoluteAutoloadedFiles = composerCommon.getAbusoluteFilesAutoloadFilesPHPFromCode(
+      autoloadFilesPHPCode,
       this.workspaceRoot
     );
 
-    for (const autoloadedFunctionFile of abusoluteAutoloadedFunctionsFiles) {
-      const relativeFilePath = autoloadedFunctionFile.replace(this.workspaceRoot, '').replace(/^\//, '');
-      const targetPHPCode = await fs.promises.readFile(autoloadedFunctionFile, { encoding: 'utf8' });
+    for (const abusoluteFilePath of abusoluteAutoloadedFiles) {
+      const relativeFilePath = abusoluteFilePath.replace(this.workspaceRoot, '').replace(/^\//, '');
+      const targetPHPCode = await fs.promises.readFile(abusoluteFilePath, { encoding: 'utf8' });
 
       // Some of the PATHs read do not exist or cause errors
       try {
-        const autoloadedFunctions = phpFunctionProjectService.getPHPFunctions(targetPHPCode, relativeFilePath);
-        if (autoloadedFunctions) {
-          phpFunctions.push(...autoloadedFunctions);
+        const autoloadedFunctions = phpCommon.getFunctionFromPHPCode(targetPHPCode);
+        if (autoloadedFunctions.length === 0) continue;
+        for (const c of autoloadedFunctions) {
+          phpFunctions.push({
+            name: c,
+            path: relativeFilePath,
+            isStubs: false,
+          });
         }
       } catch (e: any) {
         this.outputChannel.appendLine(`[PHPFunction:parse_autoload_file_error] ${JSON.stringify(e)}`);

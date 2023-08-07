@@ -26,7 +26,7 @@
     "access": "public"
   },
   "scripts": {
-    "stubs": "rimraf stubs && git clone git@github.com:JetBrains/phpstorm-stubs.git --depth 1 stubs && vite-node scripts/builtinFunctions.ts",
+    "stubs": "rimraf stubs && git clone git@github.com:JetBrains/phpstorm-stubs.git --depth 1 stubs",
     "laravel": "rimraf laravel-project && composer create-project laravel/laravel:10.* laravel-project && cp -R resources/laravel/laravel-project.env laravel-project/.env && touch laravel-project/database/database.sqlite && cd laravel-project && ./artisan key:generate && ./artisan migrate",
     "lint": "eslint src --ext ts",
     "clean": "rimraf lib",
@@ -494,7 +494,6 @@
     "minimatch": "^9.0.3",
     "php-parser": "3.1.5",
     "stillat-blade-parser": "1.2.0",
-    "vscode-html-languageservice": "^5.0.6",
-    "web-tree-sitter": "0.20.8"
+    "vscode-html-languageservice": "^5.0.6"
   }
 }
