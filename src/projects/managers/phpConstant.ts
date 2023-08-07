@@ -3,6 +3,8 @@ import { ExtensionContext, OutputChannel, workspace } from 'coc.nvim';
 import fs from 'fs';
 import path from 'path';
 
+import { getAbusoluteFilesAutoloadFilesPHPFromCode } from '../../common/composer';
+import * as phpCommon from '../../common/php';
 import { getArtisanPath } from '../../common/shared';
 import { getContextListFromStubMapPHPCode, isAllowStubFile } from '../../common/stubs';
 import { elapsed } from '../../common/utils';
@@ -59,7 +61,6 @@ export class PHPConstantProjectManager {
     const artisanPath = getArtisanPath();
     if (!artisanPath) return;
 
-    //const phpFunctions: PHPFunctionType[] = [];
     const phpConstants: PHPConstantType[] = [];
 
     //
@@ -95,10 +96,45 @@ export class PHPConstantProjectManager {
     }
 
     //
-    // TODO: autoloaded
+    // autoloaded
     //
 
-    // ...
+    const autoloadFilesPHPPath = path.join(this.workspaceRoot, 'vendor', 'composer', 'autoload_files.php');
+
+    let existsAutoloadFilesPHP = false;
+    try {
+      await fs.promises.stat(autoloadFilesPHPPath);
+      existsAutoloadFilesPHP = true;
+    } catch {}
+    if (!existsAutoloadFilesPHP) return;
+
+    const autoloadFilesPHPCode = await fs.promises.readFile(autoloadFilesPHPPath, { encoding: 'utf8' });
+
+    const abusoluteAutoloadedFiles = getAbusoluteFilesAutoloadFilesPHPFromCode(
+      autoloadFilesPHPCode,
+      this.workspaceRoot
+    );
+
+    for (const abusoluteFilePath of abusoluteAutoloadedFiles) {
+      const relativeFilePath = abusoluteFilePath.replace(this.workspaceRoot, '').replace(/^\//, '');
+      const targetPHPCode = await fs.promises.readFile(abusoluteFilePath, { encoding: 'utf8' });
+
+      // Some of the PATHs read do not exist or cause errors
+      try {
+        const autoloadedConstants = phpCommon.getConstantOfDefineNameFromPHPCode(targetPHPCode);
+        if (autoloadedConstants.length === 0) continue;
+
+        for (const c of autoloadedConstants) {
+          phpConstants.push({
+            name: c,
+            path: relativeFilePath,
+            isStubs: false,
+          });
+        }
+      } catch (e: any) {
+        this.outputChannel.appendLine(`[PHPConstant:parse_autoload_file_error] ${JSON.stringify(e)}`);
+      }
+    }
 
     //
     // Set MapStore

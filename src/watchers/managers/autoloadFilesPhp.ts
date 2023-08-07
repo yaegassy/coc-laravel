@@ -47,6 +47,7 @@ class AutoloadFilesPhpWatcherManager {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.watcher.onDidCreate(async (_e) => {
       await this.projectManager.phpFunctionProjectManager.restart();
+      await this.projectManager.phpConstantProjectManager.restart();
     });
   }
 
@@ -54,6 +55,7 @@ class AutoloadFilesPhpWatcherManager {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.watcher.onDidChange(async (_e) => {
       await this.projectManager.phpFunctionProjectManager.restart();
+      await this.projectManager.phpConstantProjectManager.restart();
     });
   }
 
@@ -61,6 +63,7 @@ class AutoloadFilesPhpWatcherManager {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.watcher.onDidDelete(async (_e) => {
       await this.projectManager.phpFunctionProjectManager.restart();
+      await this.projectManager.phpConstantProjectManager.restart();
     });
   }
 }

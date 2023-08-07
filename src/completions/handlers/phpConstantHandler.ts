@@ -13,7 +13,7 @@ import {
 import fs from 'fs';
 import path from 'path';
 
-import * as stubsCommon from '../../common/stubs';
+import * as phpCommon from '../../common/php';
 import { type PHPConstantProjectManagerType } from '../../projects/types';
 import * as phpConstantCompletionService from '../services/phpConstantService';
 
@@ -114,24 +114,25 @@ export async function doResolveCompletionItem(
   // detail
   //
 
+  let phpFilePath = '';
   if (resoveItem.isStubs) {
-    const phpFilePathInStubs = path.resolve(
-      path.join(extensionContext.storagePath, STUBS_VENDOR_NAME, resoveItem.filePath)
-    );
+    phpFilePath = path.resolve(path.join(extensionContext.storagePath, STUBS_VENDOR_NAME, resoveItem.filePath));
+  } else {
+    phpFilePath = path.resolve(path.join(workspace.root, resoveItem.filePath));
+  }
 
-    let existsPhpFilePath = false;
-    try {
-      await fs.promises.stat(phpFilePathInStubs);
-      existsPhpFilePath = true;
-    } catch {}
-    if (!existsPhpFilePath) return item;
+  let existsPhpFilePath = false;
+  try {
+    await fs.promises.stat(phpFilePath);
+    existsPhpFilePath = true;
+  } catch {}
+  if (!existsPhpFilePath) return item;
 
-    const phpCodeInStubs = await fs.promises.readFile(phpFilePathInStubs, { encoding: 'utf8' });
-    const defineValue = stubsCommon.getDefineValueFromDefineNameInPHPCode(phpCodeInStubs, item.label);
+  const phpCode = await fs.promises.readFile(phpFilePath, { encoding: 'utf8' });
+  const defineValue = phpCommon.getConstantOfDefineValueFromDefineNameInPHPCode(phpCode, item.label);
 
-    if (defineValue) {
-      item.detail = String(defineValue);
-    }
+  if (defineValue) {
+    item.detail = String(defineValue);
   }
 
   return item;

@@ -8,6 +8,7 @@ import { elapsed } from '../../common/utils';
 import { BUILTIN_FUNCTIONS_JSON_PATH } from '../../constant';
 import * as phpFunctionProjectService from '../services/phpFunction';
 import { PHPFunctionType } from '../types';
+import * as composerCommon from '../../common/composer';
 
 export class PHPFunctionProjectManager {
   phpFunctionMapStore: Map<string, PHPFunctionType>;
@@ -81,7 +82,7 @@ export class PHPFunctionProjectManager {
     if (!fileExists) return;
 
     const autoloadFunctionFilePHPCode = await fs.promises.readFile(autoloadFunctionFilePath, { encoding: 'utf8' });
-    const abusoluteAutoloadedFunctionsFiles = phpFunctionProjectService.getAbusoluteAutoloadFunctionFilesFromCode(
+    const abusoluteAutoloadedFunctionsFiles = composerCommon.getAbusoluteFilesAutoloadFilesPHPFromCode(
       autoloadFunctionFilePHPCode,
       this.workspaceRoot
     );

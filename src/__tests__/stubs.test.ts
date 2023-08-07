@@ -3,13 +3,7 @@ import { expect, test } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-import {
-  getContextListFromStubMapPHPCode,
-  getDefineValueFromDefineNameInPHPCode,
-  isAllowStubFile,
-} from '../common/stubs';
-import * as phpParser from '../parsers/php/parser';
-import * as testUtils from './testUtils';
+import { getContextListFromStubMapPHPCode, isAllowStubFile } from '../common/stubs';
 
 const STUBS_PATH = path.resolve(path.join(__dirname, '../../stubs'));
 const USE_STUBS = ['Core', 'date', 'standard'];
@@ -29,17 +23,4 @@ test('Get list of constatns from StubsMmap file', async () => {
     name: 'ABDAY_1',
     path: 'standard/standard_defines.php',
   });
-});
-
-test('Get defineValue from defineName in php code', async () => {
-  const code = testUtils.stripInitialNewline(`
-<?php
-define('DUMMY', 1);
-`);
-
-  const ast = phpParser.getAst(code);
-  if (!ast) return;
-
-  const defineValue = getDefineValueFromDefineNameInPHPCode(code, 'DUMMY');
-  expect(defineValue).toBe(1);
 });

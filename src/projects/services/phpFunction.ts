@@ -1,16 +1,12 @@
-import path from 'path';
-
 import {
   Array as ArrayNode,
   Bin,
   Boolean as BooleanNode,
-  Entry,
   Function as FunctionNode,
   Identifier,
   Name as NameNode,
   Number as NumberNode,
   Parameter as ParameterNode,
-  Return,
   StaticLookup,
   String as StringNode,
   TypeReference,
@@ -21,36 +17,6 @@ import {
 import * as phpParser from '../../parsers/php/parser';
 
 import { ArgumentParameterType, PHPFunctionType } from '../types';
-
-export function getAbusoluteAutoloadFunctionFilesFromCode(code: string, rootDir: string) {
-  const files: string[] = [];
-
-  const ast = phpParser.getAst(code);
-  if (!ast) return [];
-
-  phpParser.walk((node) => {
-    if (node.kind !== 'return') return;
-    const returnNode = node as Return;
-    if (!returnNode.expr) return;
-    if (returnNode.expr.kind !== 'array') return;
-    const arrayNode = returnNode.expr as ArrayNode;
-    if (arrayNode.items.length === 0) return;
-    for (const item of arrayNode.items) {
-      if (item.kind !== 'entry') continue;
-      const entryNode = item as Entry;
-      if (entryNode.value.kind !== 'bin') continue;
-      const binNode = entryNode.value as Bin;
-      if (binNode.right.kind !== 'string') continue;
-      const stringNode = binNode.right as StringNode;
-      files.push(stringNode.value);
-    }
-  }, ast);
-
-  if (files.length === 0) return [];
-  const abusoluteFiles = files.map((f) => path.join(rootDir, 'vendor', f.replace(/^\//, '')));
-
-  return abusoluteFiles;
-}
 
 export function getPHPFunctions(code: string, filePath: string) {
   const phpFunctions: PHPFunctionType[] = [];
