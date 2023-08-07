@@ -10,7 +10,7 @@ import rimraf from 'rimraf';
 import stream from 'stream';
 import util from 'util';
 
-import { STUBS_UPSTREAM_NAME, STUBS_VERSION } from '../../constant';
+import { STUBS_VENDOR_NAME, STUBS_VERSION } from '../../constant';
 
 const DOWNLOAD_STUBS_VERSION = getDownloadStubsVersion();
 
@@ -47,7 +47,7 @@ function handleDownloadStubs(context: ExtensionContext) {
 
 async function doDownload(context: ExtensionContext): Promise<void> {
   const statusItem = window.createStatusBarItem(0, { progress: true });
-  statusItem.text = `Downloading ${STUBS_UPSTREAM_NAME}`;
+  statusItem.text = `Downloading ${STUBS_VENDOR_NAME}`;
   statusItem.show();
 
   const downloadUrl = `https://github.com/JetBrains/phpstorm-stubs/archive/refs/tags/${DOWNLOAD_STUBS_VERSION}.zip`;
@@ -64,12 +64,12 @@ async function doDownload(context: ExtensionContext): Promise<void> {
   resp.body.on('data', (chunk: Buffer) => {
     cur += chunk.length;
     const p = ((cur / len) * 100).toFixed(2);
-    statusItem.text = `${p}% Downloading ${STUBS_UPSTREAM_NAME}`;
+    statusItem.text = `${p}% Downloading ${STUBS_VENDOR_NAME}`;
   });
 
-  const _path = path.join(context.storagePath, `${STUBS_UPSTREAM_NAME}.zip`);
+  const _path = path.join(context.storagePath, `${STUBS_VENDOR_NAME}.zip`);
   const randomHex = randomBytes(5).toString('hex');
-  const tempFile = path.join(context.storagePath, `${STUBS_UPSTREAM_NAME}-${randomHex}.zip`);
+  const tempFile = path.join(context.storagePath, `${STUBS_VENDOR_NAME}-${randomHex}.zip`);
 
   const destFileStream = fs.createWriteStream(tempFile, { mode: 0o755 });
   await pipeline(resp.body, destFileStream);
@@ -88,10 +88,10 @@ async function doDownload(context: ExtensionContext): Promise<void> {
 }
 
 async function doExtract(context: ExtensionContext) {
-  const zipPath = path.join(context.storagePath, `${STUBS_UPSTREAM_NAME}.zip`);
+  const zipPath = path.join(context.storagePath, `${STUBS_VENDOR_NAME}.zip`);
   const extractPath = path.join(context.storagePath);
   const extractedFilenames: string[] = [];
-  const targetPath = path.join(context.storagePath, `${STUBS_UPSTREAM_NAME}`);
+  const targetPath = path.join(context.storagePath, `${STUBS_VENDOR_NAME}`);
 
   rimraf.sync(targetPath);
 
