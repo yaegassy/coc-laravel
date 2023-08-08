@@ -112,10 +112,17 @@ export class PHPConstantProjectManager {
 
     for (const abusoluteFilePath of abusoluteAutoloadedFiles) {
       const relativeFilePath = abusoluteFilePath.replace(this.workspaceRoot, '').replace(/^\//, '');
-      const targetPHPCode = await fs.promises.readFile(abusoluteFilePath, { encoding: 'utf8' });
+      let existsRelativeFilePath = false;
+      try {
+        await fs.promises.stat(relativeFilePath);
+        existsRelativeFilePath = true;
+      } catch {}
+      if (!existsRelativeFilePath) continue;
 
       // Some of the PATHs read do not exist or cause errors
       try {
+        const targetPHPCode = await fs.promises.readFile(abusoluteFilePath, { encoding: 'utf8' });
+
         const autoloadedConstants = phpCommon.getConstantOfDefineNameFromPHPCode(targetPHPCode);
         if (autoloadedConstants.length === 0) continue;
 
