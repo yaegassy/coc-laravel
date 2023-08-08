@@ -17,11 +17,16 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
   let wordWithExtraChars: string | undefined = undefined;
   const wordWithExtraCharsRange = doc.getWordRangeAtPosition(
     Position.create(position.line, position.character - 1),
-    '_'
+    '_:\\$'
   );
   if (wordWithExtraCharsRange) {
     wordWithExtraChars = document.getText(wordWithExtraCharsRange);
   }
+
+  // We do not provide completion candidates if a specific string is included
+  // to avoid reacting with other completion triggers
+  if (wordWithExtraChars?.includes('\\') || wordWithExtraChars?.includes(':') || wordWithExtraChars?.includes('$'))
+    return [];
 
   const phpFunctionItems = getKeywordCompletionItems(position, wordWithExtraChars);
   if (phpFunctionItems) {
