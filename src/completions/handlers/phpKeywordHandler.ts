@@ -23,8 +23,7 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
     wordWithExtraChars = document.getText(wordWithExtraCharsRange);
   }
 
-  // We do not provide completion candidates if a specific string is included
-  // to avoid reacting with other completion triggers
+  // add filtering string to prevent response to other triggers
   if (wordWithExtraChars?.includes('\\') || wordWithExtraChars?.includes(':') || wordWithExtraChars?.includes('$'))
     return [];
 

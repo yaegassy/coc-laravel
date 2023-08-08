@@ -40,11 +40,15 @@ export async function doCompletion(
   let wordWithExtraChars: string | undefined = undefined;
   const wordWithExtraCharsRange = doc.getWordRangeAtPosition(
     Position.create(position.line, position.character - 1),
-    '_$'
+    '_:\\$'
   );
   if (wordWithExtraCharsRange) {
     wordWithExtraChars = document.getText(wordWithExtraCharsRange);
   }
+
+  // add filtering string to prevent response to other triggers
+  if (wordWithExtraChars?.includes('\\') || wordWithExtraChars?.includes(':') || wordWithExtraChars?.includes('$'))
+    return [];
 
   const phpConstantItems = getPHPConstantItems(phpConstantProjectManager, position, wordWithExtraChars);
   if (phpConstantItems) {
