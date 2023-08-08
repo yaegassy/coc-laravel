@@ -68,7 +68,7 @@ This coc-extension will provide various completion features and more features fo
   - `laravel.view.findAllReferences` command | [DEMO](https://github.com/yaegassy/coc-laravel/issues/3#issuecomment-1645929779)
     - [Blade -> PHP] Show references to PHP files that use the current blade
       file. Referenced directories are `routes`, `app/Http/Controllers`,
-      `app/View/Components` and `app/Http/Livewire`.
+      `app/View/Components`, `app/Http/Livewire` and `app/Livewire`.
   - View reference | [DEMO](https://github.com/yaegassy/coc-laravel/issues/3#issuecomment-1645932674)
     - [PHP -> Blade] Reference to a PHP file that uses the same template in the view function.
 - Hovers
