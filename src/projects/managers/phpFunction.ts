@@ -94,24 +94,24 @@ export class PHPFunctionProjectManager {
     // autoloadedFunctions
     //
 
-    const autoloadFilesPHPPath = path.join(this.workspaceRoot, 'vendor', 'composer', 'autoload_files.php');
+    const composerAutoloadFilesPHPPath = path.join(this.workspaceRoot, 'vendor', 'composer', 'autoload_files.php');
 
-    let existsAutoloadFilesPHP = false;
+    let existsComposerAutoloadFilesPHPPath = false;
     try {
-      await fs.promises.stat(autoloadFilesPHPPath);
-      existsAutoloadFilesPHP = true;
+      await fs.promises.stat(composerAutoloadFilesPHPPath);
+      existsComposerAutoloadFilesPHPPath = true;
     } catch {}
-    if (!existsAutoloadFilesPHP) return;
+    if (!existsComposerAutoloadFilesPHPPath) return;
 
-    const autoloadFilesPHPCode = await fs.promises.readFile(autoloadFilesPHPPath, { encoding: 'utf8' });
+    const composerAutoloadFilesPHPCode = await fs.promises.readFile(composerAutoloadFilesPHPPath, { encoding: 'utf8' });
 
-    const abusoluteAutoloadedFiles = composerCommon.getAbusoluteFilesAutoloadFilesPHPFromCode(
-      autoloadFilesPHPCode,
+    const abusoluteFileResources = composerCommon.getAbusoluteFileResourcesAtVendorComposerTargetFileOfphpCode(
+      composerAutoloadFilesPHPCode,
       this.workspaceRoot
     );
 
-    for (const abusoluteFilePath of abusoluteAutoloadedFiles) {
-      const relativeFilePath = abusoluteFilePath.replace(this.workspaceRoot, '').replace(/^\//, '');
+    for (const r of abusoluteFileResources) {
+      const relativeFilePath = r.path.replace(this.workspaceRoot, '').replace(/^\//, '');
       let existsRelativeFilePath = false;
       try {
         await fs.promises.stat(relativeFilePath);
@@ -121,7 +121,7 @@ export class PHPFunctionProjectManager {
 
       // Some of the PATHs read do not exist or cause errors
       try {
-        const targetPHPCode = await fs.promises.readFile(abusoluteFilePath, { encoding: 'utf8' });
+        const targetPHPCode = await fs.promises.readFile(r.path, { encoding: 'utf8' });
 
         const namespaces = phpCommon.getNamespaceFromPHPCode(targetPHPCode);
 

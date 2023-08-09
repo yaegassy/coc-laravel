@@ -33,6 +33,7 @@ import * as livewireEventCompletionHandler from './handlers/livewireEventHandler
 import * as livewirePropertyHandler from './handlers/livewirePropertyHandler';
 import * as livewireTagCompletionHandler from './handlers/livewireTagHandler';
 import * as middlewareCompletionHandler from './handlers/middlewareHandler';
+import * as phpClassCompletionHandler from './handlers/phpClassHandler';
 import * as phpConstantCompletionHandler from './handlers/phpConstantHandler';
 import * as phpFunctionCompletionHandler from './handlers/phpFunctionHandler';
 import * as phpKeywordCompletionHandler from './handlers/phpKeywordHandler';
@@ -54,11 +55,6 @@ export async function register(
 
   const { document } = await workspace.getCurrentState();
   if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
-
-  await projectManager.bladeProjectManager.onReady(() => {});
-  await projectManager.phpFunctionProjectManager.onReady(() => {});
-  await projectManager.translationProjectManager.onReady(() => {});
-  await projectManager.livewireProjectManager.onReady(() => {});
 
   outputChannel.appendLine('Start registration for completion feature');
 
@@ -262,6 +258,20 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       }
     }
 
+    // php class (class, interface, trait, enum)
+    // TODO: trait?: prefix contain `use |`
+    if (workspace.getConfiguration('laravel').get('completion.phpClassEnable')) {
+      const phpClassCompletionItems = await phpClassCompletionHandler.doCompletion(
+        document,
+        position,
+        this.projectManager.phpClassProjectManager,
+        context
+      );
+      if (phpClassCompletionItems) {
+        items.push(...phpClassCompletionItems);
+      }
+    }
+
     // php keyword
     if (workspace.getConfiguration('laravel').get('completion.phpKeywordEnable')) {
       const phpKeywordCompletionItems = await phpKeywordCompletionHandler.doCompletion(document, position);
@@ -369,6 +379,9 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       return resolveItem;
     } else if (itemData.source === 'laravel-php-function') {
       const resolveItem = await phpFunctionCompletionHandler.doResolveCompletionItem(item, _token);
+      return resolveItem;
+    } else if (itemData.source === 'laravel-php-class') {
+      const resolveItem = await phpClassCompletionHandler.doResolveCompletionItem(item, _token, this.extensionContext);
       return resolveItem;
     }
 

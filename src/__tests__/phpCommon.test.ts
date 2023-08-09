@@ -1,7 +1,9 @@
-import { expect, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 import * as phpCommon from '../common/php';
 import * as phpParser from '../parsers/php/parser';
+
+import { PHPClassItemKindEnum } from '../projects/types';
 
 import * as testUtils from './testUtils';
 
@@ -95,4 +97,121 @@ function password(string $label, string $placeholder = '', bool|string $required
   const expected = ['Laravel\\Prompts\\text', 'Laravel\\Prompts\\password'];
 
   expect(names).toMatchObject(expected);
+});
+
+test('Get class item kind from php code by name', async () => {
+  const code = testUtils.stripInitialNewline(`
+<?php
+class DummyClass {}
+interface DummyInterface {}
+trait DummyTrait {}
+enum DummyEnum {}
+`);
+
+  const kind1 = phpCommon.getClassItemKindFromPHPCodeByName(code, 'DummyClass');
+  const kind2 = phpCommon.getClassItemKindFromPHPCodeByName(code, 'DummyInterface');
+  const kind3 = phpCommon.getClassItemKindFromPHPCodeByName(code, 'DummyTrait');
+  const kind4 = phpCommon.getClassItemKindFromPHPCodeByName(code, 'DummyEnum');
+
+  expect(kind1).toBe(PHPClassItemKindEnum.Class);
+  expect(kind2).toBe(PHPClassItemKindEnum.Interface);
+  expect(kind3).toBe(PHPClassItemKindEnum.Trait);
+  expect(kind4).toBe(PHPClassItemKindEnum.Enum);
+});
+
+describe('Get definition string of class related item', () => {
+  test('Class | Get definition string of class related item', async () => {
+    const code = testUtils.stripInitialNewline(`
+<?php
+class Request extends SymfonyRequest implements Arrayable, ArrayAccess
+{
+  // ...snip
+}
+`);
+
+    const itemName = 'Request';
+    const itemKindName = phpCommon.getClassItemKindName(PHPClassItemKindEnum.Class);
+    const offset = phpCommon.getClassItemStartOffsetFromPhpCode(code, itemName, itemKindName)!;
+    const definitionString = phpCommon.getDefinitionStringByStartOffsetFromPhpCode(code, offset);
+
+    expect(definitionString).toBe('class Request extends SymfonyRequest implements Arrayable, ArrayAccess');
+  });
+
+  test('Interface | Get definition string of class related item', async () => {
+    const code = testUtils.stripInitialNewline(`
+<?php
+interface ValidatorInterface
+{
+  // ...snip
+}
+`);
+
+    const itemName = 'ValidatorInterface';
+    const itemKindName = phpCommon.getClassItemKindName(PHPClassItemKindEnum.Interface);
+    const offset = phpCommon.getClassItemStartOffsetFromPhpCode(code, itemName, itemKindName)!;
+    const definitionString = phpCommon.getDefinitionStringByStartOffsetFromPhpCode(code, offset);
+
+    expect(definitionString).toBe('interface ValidatorInterface');
+  });
+
+  test('Trait | Get definition string of class related item', async () => {
+    const code = testUtils.stripInitialNewline(`
+<?php
+trait Boundaries
+{
+  // ...snip
+}
+`);
+
+    const itemName = 'Boundaries';
+    const itemKindName = phpCommon.getClassItemKindName(PHPClassItemKindEnum.Trait);
+    const offset = phpCommon.getClassItemStartOffsetFromPhpCode(code, itemName, itemKindName)!;
+    const definitionString = phpCommon.getDefinitionStringByStartOffsetFromPhpCode(code, offset);
+
+    expect(definitionString).toBe('trait Boundaries');
+  });
+
+  test('Enum | Get definition string of class related item', async () => {
+    const code = testUtils.stripInitialNewline(`
+<?php
+enum Level: int
+{
+  // ...snip
+}
+`);
+
+    const itemName = 'Level';
+    const itemKindName = phpCommon.getClassItemKindName(PHPClassItemKindEnum.Enum);
+    const offset = phpCommon.getClassItemStartOffsetFromPhpCode(code, itemName, itemKindName)!;
+    const definitionString = phpCommon.getDefinitionStringByStartOffsetFromPhpCode(code, offset);
+
+    expect(definitionString).toBe('enum Level: int');
+  });
+});
+
+test('Get documantation of class related item', async () => {
+  const code = testUtils.stripInitialNewline(`
+<?php
+/**
+ * @method array validate(array $rules, ...$params)
+ * @method array validateWithBag(string $errorBag, array $rules, ...$params)
+ * @method bool hasValidSignature(bool $absolute = true)
+ */
+class Request extends SymfonyRequest implements Arrayable, ArrayAccess
+{
+  // ...snip
+}
+`);
+
+  const classItemName = 'Request';
+  const classItemKindName = phpCommon.getClassItemKindName(PHPClassItemKindEnum.Class);
+  const documantaion = phpCommon.getClassItemDocumantationFromPhpCode(code, classItemName, classItemKindName);
+
+  const expected = `/**
+ * @method array validate(array $rules, ...$params)
+ * @method array validateWithBag(string $errorBag, array $rules, ...$params)
+ * @method bool hasValidSignature(bool $absolute = true)
+ */`;
+
+  expect(documantaion).toBe(expected);
 });

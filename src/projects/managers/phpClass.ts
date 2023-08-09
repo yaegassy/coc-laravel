@@ -8,10 +8,10 @@ import * as phpCommon from '../../common/php';
 import * as stubsCommon from '../../common/stubs';
 import { elapsed } from '../../common/utils';
 import { STUBS_VENDOR_NAME } from '../../constant';
-import { PHPConstantType } from '../types';
+import { PHPClassType } from '../types';
 
-export class PHPConstantProjectManager {
-  phpConstantMapStore: Map<string, PHPConstantType>;
+export class PHPClassProjectManager {
+  phpClassMapStore: Map<string, PHPClassType>;
 
   context: ExtensionContext;
   workspaceRoot: string;
@@ -31,15 +31,15 @@ export class PHPConstantProjectManager {
     this.workspaceRoot = workspaceRoot;
     this.outputChannel = outputChannel;
 
-    this.phpConstantMapStore = new Map();
+    this.phpClassMapStore = new Map();
   }
 
   private setReady() {
     this.isReady = true;
     this.initialized = true;
 
-    this.outputChannel.appendLine(`[PHPConstant] Initialized in ${elapsed(this.initializedAt).toFixed()} ms`);
-    this.outputChannel.appendLine(`[PHPConstant] Store count is ${this.phpConstantMapStore.size}`);
+    this.outputChannel.appendLine(`[PHPClass] Initialized in ${elapsed(this.initializedAt).toFixed()} ms`);
+    this.outputChannel.appendLine(`[PHPClass] Store count is ${this.phpClassMapStore.size}`);
 
     this.readyCallbacks.forEach((callback) => callback());
     this.readyCallbacks = [];
@@ -54,9 +54,9 @@ export class PHPConstantProjectManager {
   }
 
   async initialize() {
-    this.outputChannel.appendLine('[PHPConstant] Initializing...');
+    this.outputChannel.appendLine('[PHPClass] Initializing...');
 
-    const phpConstants: PHPConstantType[] = [];
+    const phpClasses: PHPClassType[] = [];
 
     //
     // builtin
@@ -77,36 +77,57 @@ export class PHPConstantProjectManager {
 
     const stubsMapPHPCode = await fs.promises.readFile(stubsMapFilePath, { encoding: 'utf8' });
 
-    const builtinConstantContextList = stubsCommon.getContextListFromStubMapPHPCode(stubsMapPHPCode, 'CONSTANTS');
-    if (!builtinConstantContextList) return;
+    const builtinClassContextList = stubsCommon.getContextListFromStubMapPHPCode(stubsMapPHPCode, 'CLASSES');
+    if (!builtinClassContextList) return;
 
-    const builtinConstants = builtinConstantContextList.filter((c) => stubsCommon.isAllowStubFile(c.path, useStubs));
+    const builtinClasses = builtinClassContextList.filter((c) => stubsCommon.isAllowStubFile(c.path, useStubs));
 
-    for (const c of builtinConstants) {
-      phpConstants.push({
-        name: c.name,
-        path: c.path,
+    for (const f of builtinClasses) {
+      const stubPath = path.join(this.context.storagePath, STUBS_VENDOR_NAME, f.path);
+      let existsStubPath = false;
+      try {
+        await fs.promises.stat(stubPath);
+        existsStubPath = true;
+      } catch {}
+      if (!existsStubPath) continue;
+
+      const stubPathOfPHPCode = await fs.promises.readFile(stubPath, { encoding: 'utf8' });
+
+      const classItemKind = phpCommon.getClassItemKindFromPHPCodeByName(stubPathOfPHPCode, f.name);
+      if (!classItemKind) continue;
+
+      phpClasses.push({
+        name: f.name,
+        path: f.path,
+        kind: classItemKind,
         isStubs: true,
       });
     }
 
     //
-    // autoloaded
+    // autoload
     //
 
-    const composerAutoloadFilesPHPPath = path.join(this.workspaceRoot, 'vendor', 'composer', 'autoload_files.php');
+    const composerAutoloadClassMapPHPPath = path.join(
+      this.workspaceRoot,
+      'vendor',
+      'composer',
+      'autoload_classmap.php'
+    );
 
-    let existsComposerAutoloadFilesPHPPath = false;
+    let existsComposerAutoloadClassMapPHPPath = false;
     try {
-      await fs.promises.stat(composerAutoloadFilesPHPPath);
-      existsComposerAutoloadFilesPHPPath = true;
+      await fs.promises.stat(composerAutoloadClassMapPHPPath);
+      existsComposerAutoloadClassMapPHPPath = true;
     } catch {}
-    if (!existsComposerAutoloadFilesPHPPath) return;
+    if (!existsComposerAutoloadClassMapPHPPath) return;
 
-    const composerAutoloadFilesPHPCode = await fs.promises.readFile(composerAutoloadFilesPHPPath, { encoding: 'utf8' });
+    const composerAutoloadClassMapPHPCode = await fs.promises.readFile(composerAutoloadClassMapPHPPath, {
+      encoding: 'utf8',
+    });
 
     const abusoluteFileResources = composerCommon.getAbusoluteFileResourcesAtVendorComposerTargetFileOfphpCode(
-      composerAutoloadFilesPHPCode,
+      composerAutoloadClassMapPHPCode,
       this.workspaceRoot
     );
 
@@ -123,18 +144,19 @@ export class PHPConstantProjectManager {
       try {
         const targetPHPCode = await fs.promises.readFile(r.path, { encoding: 'utf8' });
 
-        const autoloadedConstants = phpCommon.getConstantOfDefineNameFromPHPCode(targetPHPCode);
-        if (autoloadedConstants.length === 0) continue;
+        const namespaces = phpCommon.getNamespaceFromPHPCode(targetPHPCode);
+        const shotName = r.name.replace(namespaces[0], '').replace(/^\\/, '');
+        const classItemKind = phpCommon.getClassItemKindFromPHPCodeByName(targetPHPCode, shotName);
+        if (!classItemKind) continue;
 
-        for (const c of autoloadedConstants) {
-          phpConstants.push({
-            name: c,
-            path: relativeFilePath,
-            isStubs: false,
-          });
-        }
+        phpClasses.push({
+          name: r.name,
+          path: relativeFilePath,
+          kind: classItemKind,
+          isStubs: false,
+        });
       } catch (e: any) {
-        this.outputChannel.appendLine(`[PHPConstant:parse_autoload_file_error] ${JSON.stringify(e)}`);
+        this.outputChannel.appendLine(`[PHPClass:parse_autoload_file_error] ${JSON.stringify(e)}`);
       }
     }
 
@@ -142,8 +164,8 @@ export class PHPConstantProjectManager {
     // Set MapStore
     //
 
-    for (const phpConstant of phpConstants) {
-      this.phpConstantMapStore.set(phpConstant.name, phpConstant);
+    for (const phpClass of phpClasses) {
+      this.phpClassMapStore.set(phpClass.name, phpClass);
     }
 
     // FIN
@@ -155,7 +177,7 @@ export class PHPConstantProjectManager {
   }
 
   async restart() {
-    this.phpConstantMapStore.clear();
+    this.phpClassMapStore.clear();
 
     this.isReady = false;
     this.initialized = false;
@@ -165,6 +187,6 @@ export class PHPConstantProjectManager {
   }
 
   list() {
-    return this.phpConstantMapStore.entries();
+    return this.phpClassMapStore.entries();
   }
 }

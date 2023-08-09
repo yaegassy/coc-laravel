@@ -25,9 +25,6 @@ export async function register(
   const { document } = await workspace.getCurrentState();
   if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
 
-  await projectManager.bladeProjectManager.onReady(() => {});
-  await projectManager.viewReferenceProjectManager.onReady(() => {});
-
   outputChannel.appendLine('Start registration for reference feature');
 
   context.subscriptions.push(

@@ -62,6 +62,24 @@ export function getAst(code: string) {
   }
 }
 
+export function getAstByEvalCode(code: string) {
+  try {
+    const parserEngine = getParserEngine();
+    return parserEngine.parseEval(stripPHPTag(code));
+  } catch (e) {
+    return undefined;
+  }
+}
+
+export function getAstByParseCode(code: string) {
+  try {
+    const parserEngine = getParserEngine();
+    return parserEngine.parseCode(code, '');
+  } catch (e) {
+    return undefined;
+  }
+}
+
 export function stripPHPTag(code: string) {
   return code.replace('<?php', '').replace('?>', '').replace('<?=', '');
 }

@@ -31,6 +31,10 @@ export async function register(context: ExtensionContext, projectManagers: Proje
       const translationProjectContent =
         '### Translation\n\n' + '```json\n' + JSON.stringify(translationProjectList, null, 2) + '\n```\n\n';
 
+      const phpClassProjectList = Array.from(projectManagers.phpClassProjectManager.list());
+      const phpClassProjectContent =
+        '### PHP Class\n\n' + '```json\n' + JSON.stringify(phpClassProjectList, null, 2) + '\n```\n\n';
+
       const phpFunctionProjectList = Array.from(projectManagers.phpFunctionProjectManager.list());
       const phpFunctionProjectContent =
         '### PHP Function\n\n' + '```json\n' + JSON.stringify(phpFunctionProjectList, null, 2) + '\n```\n\n';
@@ -45,6 +49,7 @@ export async function register(context: ExtensionContext, projectManagers: Proje
         componentProjectContent +
         livewireProjectContent +
         translationProjectContent +
+        phpClassProjectContent +
         phpFunctionProjectContent +
         phpConstantProjectContent;
 

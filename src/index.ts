@@ -23,12 +23,12 @@ export async function activate(context: ExtensionContext): Promise<void> {
   }
 
   const outputChannel = window.createOutputChannel('laravel');
+  showOutputCommandFeature.register(context, outputChannel);
   if (!getArtisanPath()) {
     outputChannel.appendLine('coc-laravel extension was not activated because it is not a laravel project');
     return;
   }
 
-  showOutputCommandFeature.register(context, outputChannel);
   outputChannel.appendLine('Project initialization...');
   if (workspace.getConfiguration('laravel').get<boolean>('project.startupMessageEnable')) {
     window.showInformationMessage('[coc-laravel] Project initialization...');

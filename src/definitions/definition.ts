@@ -29,9 +29,6 @@ export async function register(
   const { document } = await workspace.getCurrentState();
   if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
 
-  await projectManager.bladeProjectManager.onReady(() => {});
-  await projectManager.livewireProjectManager.onReady(() => {});
-
   outputChannel.appendLine(`Start registration for definition feature`);
 
   context.subscriptions.push(

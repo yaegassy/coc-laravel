@@ -23,8 +23,6 @@ export async function register(
   const { document } = await workspace.getCurrentState();
   if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
 
-  await projectManager.bladeProjectManager.onReady(() => {});
-
   outputChannel.appendLine('Start registration for diagnostic feature');
 
   const diagManager = new LaravelDiagnosticManager(projectManager, outputChannel);

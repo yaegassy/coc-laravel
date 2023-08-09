@@ -138,9 +138,9 @@ export async function doResolveCompletionItem(
 ) {
   if (!item.data) return item;
 
-  const resoveItem = item.data as CompletionItemDataType;
-  if (resoveItem.source !== 'laravel-php-function') return item;
-  if (!resoveItem.filePath) return item;
+  const itemData = item.data as CompletionItemDataType;
+  if (itemData.source !== 'laravel-php-function') return item;
+  if (!itemData.filePath) return item;
 
   const artisanPath = getArtisanPath();
   if (!artisanPath) return item;
@@ -177,7 +177,7 @@ echo json_encode(['returnType' => \\$returnType, 'parameters' => \\$parameters],
 `);
 
   let documentationValue = '';
-  documentationValue += `${resoveItem.filePath}\n`;
+  documentationValue += `${itemData.filePath}\n`;
 
   // Temporary assignment to item.documantaion in case tinker fails
   item.documentation = documentationValue;
@@ -236,7 +236,7 @@ echo json_encode(['returnType' => \\$returnType, 'parameters' => \\$parameters],
     item.detail = detail;
   }
 
-  documentationValue += resoveItem.filePath;
+  documentationValue += itemData.filePath;
 
   const documentation: MarkupContent = {
     kind: 'markdown',

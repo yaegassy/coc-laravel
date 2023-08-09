@@ -3,6 +3,7 @@ import {
   Boolean as BooleanNode,
   Call,
   Cast,
+  Declaration as DeclarationNode,
   Function as FunctionNode,
   Identifier,
   Name,
@@ -12,6 +13,7 @@ import {
 } from 'php-parser';
 
 import * as phpParser from '../parsers/php/parser';
+import { PHPClassItemKindEnum } from '../projects/types';
 
 export function getConstantOfDefineNameFromPHPCode(code: string) {
   const defineNames: string[] = [];
@@ -90,6 +92,40 @@ export function getConstantOfDefineValueFromDefineNameInPHPCode(code: string, de
   return defineValues[0];
 }
 
+export function getClassItemKindFromPHPCodeByName(code: string, name: string) {
+  const kinds: PHPClassItemKindEnum[] = [];
+
+  const ast = phpParser.getAstByParseCode(code);
+  if (!ast) return undefined;
+
+  phpParser.walk((node, parent) => {
+    if (!parent) return;
+    if (node.kind !== 'identifier') return;
+    const identifierNode = node as Identifier;
+
+    if (parent.kind === 'class') {
+      if (identifierNode.name === name) {
+        kinds.push(PHPClassItemKindEnum.Class);
+      }
+    } else if (parent.kind === 'interface') {
+      if (identifierNode.name === name) {
+        kinds.push(PHPClassItemKindEnum.Interface);
+      }
+    } else if (parent.kind === 'trait') {
+      if (identifierNode.name === name) {
+        kinds.push(PHPClassItemKindEnum.Trait);
+      }
+    } else if (parent.kind === 'enum') {
+      if (identifierNode.name === name) {
+        kinds.push(PHPClassItemKindEnum.Enum);
+      }
+    }
+  }, ast);
+
+  if (kinds.length === 0) return;
+  return kinds[0];
+}
+
 export function getFunctionFromPHPCode(code: string) {
   const functionNames: string[] = [];
 
@@ -121,4 +157,73 @@ export function getNamespaceFromPHPCode(code: string) {
   }, ast);
 
   return namespaces;
+}
+
+export function getDefinitionStringByStartOffsetFromPhpCode(code: string, startOffset: number) {
+  const defStrings: string[] = [];
+
+  for (let i = startOffset; i < code.length; i++) {
+    if (code[i] === '{') break;
+    defStrings.push(code[i]);
+  }
+
+  // Trim to remove trailing newline codes
+  return defStrings.join('').trim();
+}
+
+export function getClassItemStartOffsetFromPhpCode(code: string, className: string, classItemKindName: string) {
+  const offsets: number[] = [];
+
+  const ast = phpParser.getAstByParseCode(code);
+  if (!ast) return undefined;
+
+  phpParser.walk((node) => {
+    if (node.kind !== classItemKindName) return;
+    const declarationNode = node as DeclarationNode;
+    if (!declarationNode.loc) return;
+    if (typeof declarationNode.name !== 'object') return;
+    const identifierNode = declarationNode.name as Identifier;
+    if (identifierNode.name !== className) return;
+    offsets.push(declarationNode.loc.start.offset);
+  }, ast);
+
+  return offsets[0];
+}
+
+export function getClassItemKindName(classItemKind: PHPClassItemKindEnum) {
+  switch (classItemKind) {
+    case PHPClassItemKindEnum.Class:
+      return 'class';
+    case PHPClassItemKindEnum.Interface:
+      return 'interface';
+    case PHPClassItemKindEnum.Trait:
+      return 'trait';
+    case PHPClassItemKindEnum.Enum:
+      return 'enum';
+    default:
+      return 'class';
+  }
+}
+
+export function getClassItemDocumantationFromPhpCode(code: string, className: string, classItemKindName: string) {
+  const documantations: string[] = [];
+
+  const ast = phpParser.getAstByParseCode(code);
+  if (!ast) return undefined;
+
+  phpParser.walk((node) => {
+    if (node.kind !== classItemKindName) return;
+    const declarationNode = node as DeclarationNode;
+    if (!declarationNode.loc) return;
+    const identifierNode = declarationNode.name as Identifier;
+    if (identifierNode.name !== className) return;
+    if (!declarationNode.leadingComments) return;
+    if (declarationNode.leadingComments.length === 0) return;
+    for (const c of declarationNode.leadingComments) {
+      documantations.push(c.value);
+    }
+  }, ast);
+
+  if (documantations.length === 0) return undefined;
+  return documantations.join('');
 }
