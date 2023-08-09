@@ -39,9 +39,9 @@ This coc-extension will provide various completion features and more features fo
   - PHP completion in PHP-related region of Blade file
     - **[NOTE]**: To use this feature, please execute the `laravel.stubs.download` command.
     - PHP Function completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1643359916)
-    - PHP Class completion
-    - PHP Constant completion
-    - PHP Keyword completion
+    - PHP Class completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1671277304)
+    - PHP Constant completion | [DESCRIPTION](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1671281861)
+    - PHP Keyword completion | [DESCRIPTION](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1671284071)
   - Directive completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1657000532)
   - Config completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635266998)
   - Env completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1635267885)
