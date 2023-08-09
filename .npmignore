@@ -12,5 +12,7 @@ yarn-error.log
 .eslintrc.js
 .prettierrc
 _ref
+_config.yml
 stubs
 laravel-project
+resources/laravel/laravel-project.env
