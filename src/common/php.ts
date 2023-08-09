@@ -171,6 +171,25 @@ export function getDefinitionStringByStartOffsetFromPhpCode(code: string, startO
   return defStrings.join('').trim();
 }
 
+export function getFunctionItemStartOffsetFromPhpCode(code: string, name: string) {
+  const offsets: number[] = [];
+
+  const ast = phpParser.getAstByParseCode(code);
+  if (!ast) return undefined;
+
+  phpParser.walk((node) => {
+    if (node.kind !== 'function') return;
+    const functionNode = node as FunctionNode;
+    if (!functionNode.loc) return;
+    if (typeof functionNode.name !== 'object') return;
+    const identifierNode = functionNode.name as Identifier;
+    if (identifierNode.name !== name) return;
+    offsets.push(functionNode.loc.start.offset);
+  }, ast);
+
+  return offsets[0];
+}
+
 export function getClassItemStartOffsetFromPhpCode(code: string, className: string, classItemKindName: string) {
   const offsets: number[] = [];
 
@@ -203,6 +222,30 @@ export function getClassItemKindName(classItemKind: PHPClassItemKindEnum) {
     default:
       return 'class';
   }
+}
+
+export function getFunctionItemDocumantationFromPhpCode(code: string, name: string) {
+  const documantations: string[] = [];
+
+  const ast = phpParser.getAstByParseCode(code);
+  if (!ast) return undefined;
+
+  phpParser.walk((node) => {
+    if (node.kind !== 'function') return;
+    const functionNode = node as FunctionNode;
+    if (!functionNode.loc) return;
+    if (typeof functionNode.name !== 'object') return;
+    const identifierNode = functionNode.name as Identifier;
+    if (identifierNode.name !== name) return;
+    if (!functionNode.leadingComments) return;
+    if (functionNode.leadingComments.length === 0) return;
+    for (const c of functionNode.leadingComments) {
+      documantations.push(c.value);
+    }
+  }, ast);
+
+  if (documantations.length === 0) return undefined;
+  return documantations.join('');
 }
 
 export function getClassItemDocumantationFromPhpCode(code: string, className: string, classItemKindName: string) {

@@ -378,7 +378,11 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       );
       return resolveItem;
     } else if (itemData.source === 'laravel-php-function') {
-      const resolveItem = await phpFunctionCompletionHandler.doResolveCompletionItem(item, _token);
+      const resolveItem = await phpFunctionCompletionHandler.doResolveCompletionItem(
+        item,
+        _token,
+        this.extensionContext
+      );
       return resolveItem;
     } else if (itemData.source === 'laravel-php-class') {
       const resolveItem = await phpClassCompletionHandler.doResolveCompletionItem(item, _token, this.extensionContext);

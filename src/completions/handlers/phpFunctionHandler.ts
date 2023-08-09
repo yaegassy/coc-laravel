@@ -3,6 +3,7 @@ import {
   CompletionContext,
   CompletionItem,
   CompletionItemKind,
+  ExtensionContext,
   InsertTextFormat,
   LinesTextDocument,
   MarkupContent,
@@ -12,29 +13,15 @@ import {
   workspace,
 } from 'coc.nvim';
 
-import { getArtisanPath, runTinkerReflection } from '../../common/shared';
-import { stripInitialNewline } from '../../common/utils';
+import fs from 'fs';
+import path from 'path';
+
+import * as phpCommon from '../../common/php';
+import { getArtisanPath } from '../../common/shared';
+import { STUBS_VENDOR_NAME } from '../../constant';
 import { type PHPFunctionProjectManagerType } from '../../projects/types';
 import * as phpFunctionCompletionService from '../services/phpFunctionService';
 import { CompletionItemDataType } from '../types';
-
-type ReflectorFunctionType = {
-  returnType: string[] | null;
-  parameters: ReflectorParameterType[];
-};
-
-type ReflectorParameterType = {
-  name: string;
-  position: number;
-  allowsNull: boolean;
-  canBePassedByValue: boolean;
-  defaultValue: string | null;
-  isOptional: boolean;
-  isPassedByReference: boolean;
-  isVariadic: boolean;
-  type: string | null;
-  __toString: string;
-};
 
 export async function doCompletion(
   document: LinesTextDocument,
@@ -134,7 +121,8 @@ function getPHPFunctionItems(
 export async function doResolveCompletionItem(
   item: CompletionItem,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _token: CancellationToken
+  _token: CancellationToken,
+  extentionContext: ExtensionContext
 ) {
   if (!item.data) return item;
 
@@ -142,101 +130,44 @@ export async function doResolveCompletionItem(
   if (itemData.source !== 'laravel-php-function') return item;
   if (!itemData.filePath) return item;
 
+  const itemDataFilePath = itemData.filePath;
+
   const artisanPath = getArtisanPath();
   if (!artisanPath) return item;
 
-  const reflectionCode = stripInitialNewline(`
-\\$reflector = new ReflectionFunction('${item.label}');
-\\$hasReturnType = \\$reflector->hasReturnType();
-\\$returnType = [];
-if (\\$hasReturnType) {
-    \\$reflectionType = \\$reflector->getReturnType();
-    if (\\$reflectionType instanceof ReflectionNamedType) {
-        \\$returnType = [\\$reflectionType->getName()];
-    } elseif (\\$reflectionType instanceof ReflectionUnionType) {
-        \\$returnType = array_map(function (ReflectionNamedType \\$type) {
-            return \\$type->getName();
-        }, \\$reflectionType->getTypes());
-    }
-}
-\\$parameters = array_map(function (ReflectionParameter \\$param) {
-    return [
-        'name' => \\$param->getName(),
-        'position' => \\$param->getPosition(),
-        'allowsNull' => \\$param->allowsNull(),
-        'canBePassedByValue' => \\$param->canBePassedByValue(),
-        'defaultValue' => \\$param->isDefaultValueAvailable() ? \\$param->getDefaultValue() : null,
-        'isOptional' => \\$param->isOptional(),
-        'isPassedByReference' => \\$param->isPassedByReference(),
-        'isVariadic' => \\$param->isVariadic(),
-        'type' => \\$param->hasType() ? (string) \\$param->getType() : null,
-        '__toString' => \\$param->__toString(),
-    ];
-}, \\$reflector->getParameters());
-echo json_encode(['returnType' => \\$returnType, 'parameters' => \\$parameters], JSON_PRETTY_PRINT);
-`);
+  const absoluteItemDataFilePath = itemData.isStubs
+    ? path.join(extentionContext.storagePath, STUBS_VENDOR_NAME, itemDataFilePath)
+    : path.join(workspace.root, itemDataFilePath);
+
+  let existsAbsoluteItemDataFilePath = false;
+  try {
+    await fs.promises.stat(absoluteItemDataFilePath);
+    existsAbsoluteItemDataFilePath = true;
+  } catch {}
+  if (!existsAbsoluteItemDataFilePath) return item;
+
+  const targetPHPCode = await fs.promises.readFile(absoluteItemDataFilePath, { encoding: 'utf8' });
+
+  const itemShortName = item.label.includes('\\') ? item.label.split('\\').pop() : item.label;
+  if (!itemShortName) return item;
+
+  const itemStartOffset = phpCommon.getFunctionItemStartOffsetFromPhpCode(targetPHPCode, itemShortName);
+  if (!itemStartOffset) return item;
+
+  const defineString = phpCommon.getDefinitionStringByStartOffsetFromPhpCode(targetPHPCode, itemStartOffset);
+
+  const itemDocumentation = phpCommon.getFunctionItemDocumantationFromPhpCode(targetPHPCode, itemShortName);
 
   let documentationValue = '';
-  documentationValue += `${itemData.filePath}\n`;
+  documentationValue += '```php\n<?php\n';
+  documentationValue += `${defineString} { }\n`;
+  documentationValue += '```\n\n';
 
-  // Temporary assignment to item.documantaion in case tinker fails
-  item.documentation = documentationValue;
-  // Reset documentationValue
-  documentationValue = '';
-
-  const resJsonStr = await runTinkerReflection(reflectionCode, artisanPath);
-  if (!resJsonStr) return item;
-
-  const reflectorFunction = JSON.parse(resJsonStr) as ReflectorFunctionType;
-
-  // documentation & detail
-  if (reflectorFunction) {
-    let detail = '';
-
-    detail += `${item.label}(`;
-
-    if (reflectorFunction.parameters.length > 0) {
-      for (const [i, v] of reflectorFunction.parameters.entries()) {
-        if (i !== 0) {
-          detail += `, `;
-        }
-
-        if (v.type) {
-          detail += `${v.type} `;
-        }
-
-        detail += '$' + v.name;
-
-        if (v.defaultValue) {
-          detail += ` = ${v.defaultValue}`;
-        }
-      }
-    }
-
-    detail += `)`;
-
-    // returnType
-    if (reflectorFunction.returnType && reflectorFunction.returnType.length > 0) {
-      detail += `: `;
-      for (const [i, v] of reflectorFunction.returnType.entries()) {
-        if (i !== 0) {
-          detail += `|`;
-        }
-        detail += v;
-      }
-    }
-
-    // parameters
-    if (reflectorFunction.parameters.length > 0) {
-      for (const p of reflectorFunction.parameters) {
-        documentationValue += `${p.__toString}\n`;
-      }
-    }
-
-    item.detail = detail;
+  if (itemDocumentation) {
+    documentationValue += '```php\n<?php\n';
+    documentationValue += `${itemDocumentation}\n`;
+    documentationValue += '```\n';
   }
-
-  documentationValue += itemData.filePath;
 
   const documentation: MarkupContent = {
     kind: 'markdown',

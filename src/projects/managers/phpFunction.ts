@@ -115,7 +115,6 @@ export class PHPFunctionProjectManager {
 
     for (const r of abusoluteFileResources) {
       const relativeFilePath = r.path.replace(this.workspaceRoot, '').replace(/^\//, '');
-      console.log(relativeFilePath);
       if (projectCommon.isExcludeVendor(relativeFilePath, excludeVendors)) continue;
 
       let existsRelativeFilePath = false;
