@@ -124,6 +124,7 @@ For more information, check this coc.nvim's wiki.
 ## Configuration options
 
 - `laravel.enable`: Enable coc-laravel extension, default: `true`
+- `laravel.project.startupMessageEnable`: Enable project startup messages, default: `true`
 - `laravel.environment.phpPath`: Path to PHP, you can use a custom version of PHP. If there is no setting, `php` of the execution environment will be used, default: `""`
 - `laravel.stubs.customVersion`: Specify the version of stubs to download with the `laravel.stubs.download` command. If not set, the `stubsVersion` defined in `package.json` will be used, default: `""`
 - `laravel.stubs.useStubs`: List of stubs to be used, default: `["Core", "date", "standard"]`
