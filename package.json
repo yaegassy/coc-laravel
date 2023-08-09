@@ -85,6 +85,11 @@
           "default": true,
           "description": "Enable coc-laravel extension."
         },
+        "laravel.project.startupMessageEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable project startup messages."
+        },
         "laravel.environment.phpPath": {
           "type": "string",
           "default": "",
