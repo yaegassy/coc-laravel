@@ -265,15 +265,20 @@
           "default": true,
           "description": "Enable php function completion."
         },
-        "laravel.completion.phpKeywordEnable": {
+        "laravel.completion.phpClassEnable": {
           "type": "boolean",
           "default": true,
-          "description": "Enable php keyword completion."
+          "description": "Enable php class completion."
         },
         "laravel.completion.phpConstantEnable": {
           "type": "boolean",
           "default": true,
           "description": "Enable php constant completion."
+        },
+        "laravel.completion.phpKeywordEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable php keyword completion."
         },
         "laravel.completion.methodParameterEnable": {
           "type": "boolean",

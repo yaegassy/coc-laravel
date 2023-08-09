@@ -105,19 +105,19 @@ export async function doResolveCompletionItem(
 ) {
   if (!item.data) return item;
 
-  const resoveItem = item.data as CompletionItemDataType;
-  if (resoveItem.source !== 'laravel-php-constant') return item;
-  if (!resoveItem.filePath) return item;
+  const itemData = item.data as CompletionItemDataType;
+  if (itemData.source !== 'laravel-php-constant') return item;
+  if (!itemData.filePath) return item;
 
   //
   // detail
   //
 
   let phpFilePath = '';
-  if (resoveItem.isStubs) {
-    phpFilePath = path.resolve(path.join(extensionContext.storagePath, STUBS_VENDOR_NAME, resoveItem.filePath));
+  if (itemData.isStubs) {
+    phpFilePath = path.resolve(path.join(extensionContext.storagePath, STUBS_VENDOR_NAME, itemData.filePath));
   } else {
-    phpFilePath = path.resolve(path.join(workspace.root, resoveItem.filePath));
+    phpFilePath = path.resolve(path.join(workspace.root, itemData.filePath));
   }
 
   let existsPhpFilePath = false;
@@ -144,7 +144,7 @@ export async function doResolveCompletionItem(
     documentationValue += `define(${item.label}, ${String(defineValue)});`;
     documentationValue += '\n```\n\n';
   }
-  documentationValue += resoveItem.filePath;
+  documentationValue += itemData.filePath;
 
   const documentation: MarkupContent = {
     kind: 'markdown',

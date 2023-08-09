@@ -3,6 +3,7 @@ import { ExtensionContext, OutputChannel, workspace } from 'coc.nvim';
 import { SUPPORTED_LANGUAGE } from '../constant';
 import { BladeProjectsManager } from './managers/blade';
 import { LivewireProjectManager } from './managers/livewire';
+import { PHPClassProjectManager } from './managers/phpClass';
 import { PHPConstantProjectManager } from './managers/phpConstant';
 import { PHPFunctionProjectManager } from './managers/phpFunction';
 import { TranslationProjectManager } from './managers/translation';
@@ -23,6 +24,9 @@ export async function register(context: ExtensionContext, outputChannel: OutputC
   const translationProjectManager = new TranslationProjectManager(workspace.root, outputChannel);
   await translationProjectManager.initialize();
 
+  const phpClassProjectManager = new PHPClassProjectManager(context, workspace.root, outputChannel);
+  await phpClassProjectManager.initialize();
+
   const phpFunctionProjectManager = new PHPFunctionProjectManager(context, workspace.root, outputChannel);
   await phpFunctionProjectManager.initialize();
 
@@ -38,6 +42,7 @@ export async function register(context: ExtensionContext, outputChannel: OutputC
     translationProjectManager,
     phpFunctionProjectManager,
     phpConstantProjectManager,
+    phpClassProjectManager,
     livewireProjectManager,
   };
 

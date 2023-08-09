@@ -1,8 +1,8 @@
 import { ExtensionContext, OutputChannel } from 'coc.nvim';
 
 import { type ProjectManagerType } from '../projects/types';
-import * as autoloadFilesPhpWatcherManager from './managers/autoloadFilesPhp';
 import * as phpFileExtensionWatcherManager from './managers/phpFileExtension';
+import * as vendorComposerWatcherManager from './managers/vendorComposer';
 
 export async function register(
   context: ExtensionContext,
@@ -12,5 +12,5 @@ export async function register(
   outputChannel.appendLine('Start registration for watcher feature');
 
   await phpFileExtensionWatcherManager.register(context, projectManager);
-  await autoloadFilesPhpWatcherManager.register(context, projectManager);
+  await vendorComposerWatcherManager.register(context, projectManager);
 }

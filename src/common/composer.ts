@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { Array as ArrayNode, Bin, Entry, Return, String as StringNode } from 'php-parser';
+import { Array as ArrayNode, Bin, Entry, Return, String as StringNode, Variable } from 'php-parser';
 
 import * as phpParser from '../parsers/php/parser';
 import { ComposerJsonContentType, PhpNamespaceType } from './types';
@@ -76,10 +76,10 @@ export function getFileNamespace(namespaces: PhpNamespaceType[], relativeFilePat
   }
 }
 
-export function getAbusoluteFilesAutoloadFilesPHPFromCode(code: string, rootDir: string) {
-  const files: string[] = [];
+export function getAbusoluteFileResourcesAtVendorComposerTargetFileOfphpCode(code: string, rootDir: string) {
+  const resourceFiles: { key: string; value: string; dirVariable: string }[] = [];
 
-  const ast = phpParser.getAst(code);
+  const ast = phpParser.getAstByParseCode(code);
   if (!ast) return [];
 
   phpParser.walk((node) => {
@@ -92,16 +92,45 @@ export function getAbusoluteFilesAutoloadFilesPHPFromCode(code: string, rootDir:
     for (const item of arrayNode.items) {
       if (item.kind !== 'entry') continue;
       const entryNode = item as Entry;
+      if (!entryNode.key) continue;
+      if (entryNode.key.kind !== 'string') continue;
+      // ===
+      const keyStringNode = entryNode.key as StringNode;
+      const key = keyStringNode.value;
+
       if (entryNode.value.kind !== 'bin') continue;
       const binNode = entryNode.value as Bin;
+      if (binNode.left.kind !== 'variable') continue;
+      const variableNode = binNode.left as Variable;
+      if (typeof variableNode.name !== 'string') return;
+      // ===
+      const dirVariable = variableNode.name;
       if (binNode.right.kind !== 'string') continue;
       const stringNode = binNode.right as StringNode;
-      files.push(stringNode.value);
+      // ===
+      const value = stringNode.value;
+
+      resourceFiles.push({
+        key,
+        value,
+        dirVariable,
+      });
     }
   }, ast);
 
-  if (files.length === 0) return [];
-  const abusoluteFiles = files.map((f) => path.join(rootDir, 'vendor', f.replace(/^\//, '')));
+  if (resourceFiles.length === 0) return [];
 
-  return abusoluteFiles;
+  const abusoluteFileResources = resourceFiles.map((f) => {
+    const absolutePath =
+      f.dirVariable === 'vendorDir'
+        ? path.join(rootDir, 'vendor', f.value.replace(/^\//, ''))
+        : path.join(rootDir, f.value.replace(/^\//, ''));
+
+    return {
+      name: f.key,
+      path: absolutePath,
+    };
+  });
+
+  return abusoluteFileResources;
 }

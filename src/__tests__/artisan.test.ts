@@ -1,4 +1,4 @@
-import { expect, test, describe } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 import * as testUtils from './testUtils';
 
@@ -191,5 +191,29 @@ echo json_encode(
 
     expect(reflectorMethods[0]).toMatchObject(expected0);
     expect(reflectorMethods[21]).toMatchObject(expected21);
+  });
+});
+
+describe('Test example of getting a class using the REFRELCTION API with artisan tinker', () => {
+  test('Class | Simple', async () => {
+    // \\$ -> $
+    const code = testUtils.stripInitialNewline(`
+\\$reflector = new ReflectionClass('DateTime'); 
+echo json_encode(\\$reflector->getMethods(), JSON_PRETTY_PRINT);
+  `);
+
+    const rootDir = testUtils.TEST_LV_PROJECT_PATH;
+    const artisanPath = testUtils.getArtisanPath(rootDir)!;
+
+    const resJsonStr = await testUtils.runTinker(code, artisanPath);
+    if (!resJsonStr) return;
+    const reflectorMethods = JSON.parse(resJsonStr) as ReflectorMethodsType[];
+
+    const expected = {
+      name: '__construct',
+      class: 'DateTime',
+    };
+
+    expect(reflectorMethods[0]).toMatchObject(expected);
   });
 });

@@ -20,8 +20,6 @@ export async function register(
   projectManager: ProjectManagerType,
   outputChannel: OutputChannel
 ) {
-  await projectManager.bladeProjectManager.onReady(() => {});
-
   outputChannel.appendLine('Start registration for hover feature');
 
   context.subscriptions.push(
