@@ -5,6 +5,7 @@ import path from 'path';
 
 import * as composerCommon from '../../common/composer';
 import * as phpCommon from '../../common/php';
+import * as projectCommon from '../../common/project';
 import * as stubsCommon from '../../common/stubs';
 import { elapsed } from '../../common/utils';
 import { STUBS_VENDOR_NAME } from '../../constant';
@@ -110,8 +111,12 @@ export class PHPConstantProjectManager {
       this.workspaceRoot
     );
 
+    const excludeVendors = workspace.getConfiguration('laravel').get<string[]>('project.excludeVendors', []);
+
     for (const r of abusoluteFileResources) {
       const relativeFilePath = r.path.replace(this.workspaceRoot, '').replace(/^\//, '');
+      if (projectCommon.isExcludeVendor(relativeFilePath, excludeVendors)) continue;
+
       let existsRelativeFilePath = false;
       try {
         await fs.promises.stat(relativeFilePath);

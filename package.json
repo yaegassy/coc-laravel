@@ -85,6 +85,11 @@
           "default": true,
           "description": "Enable coc-laravel extension."
         },
+        "laravel.project.excludeVendors": {
+          "type": "array",
+          "default": [],
+          "description": "List of target vendor directories to exclude during project analysis, e.g. [\"fakerphp\", \"phpunit\"]"
+        },
         "laravel.project.startupMessageEnable": {
           "type": "boolean",
           "default": true,
