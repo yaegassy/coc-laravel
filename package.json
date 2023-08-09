@@ -1,6 +1,6 @@
 {
   "name": "@yaegassy/coc-laravel",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "stubsVersion": "v2023.2",
   "description": "Laravel extension for coc.nvim",
   "author": "yaegassy <yosstools@gmail.com>",
