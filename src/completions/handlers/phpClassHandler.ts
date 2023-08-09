@@ -146,34 +146,26 @@ export async function doResolveCompletionItem(
 
   const targetPHPCode = await fs.promises.readFile(absoluteItemDataFilePath, { encoding: 'utf8' });
 
-  const classItemShortName = item.label.includes('\\') ? item.label.split('\\').pop() : item.label;
-  if (!classItemShortName) return item;
+  const itemShortName = item.label.includes('\\') ? item.label.split('\\').pop() : item.label;
+  if (!itemShortName) return item;
 
-  const classItemKindName = phpCommon.getClassItemKindName(itemData.kind);
+  const itemKindName = phpCommon.getClassItemKindName(itemData.kind);
 
-  const classItemStartOffset = phpCommon.getClassItemStartOffsetFromPhpCode(
-    targetPHPCode,
-    classItemShortName,
-    classItemKindName
-  );
-  if (!classItemStartOffset) return item;
+  const itemStartOffset = phpCommon.getClassItemStartOffsetFromPhpCode(targetPHPCode, itemShortName, itemKindName);
+  if (!itemStartOffset) return item;
 
-  const defineString = phpCommon.getDefinitionStringByStartOffsetFromPhpCode(targetPHPCode, classItemStartOffset);
+  const defineString = phpCommon.getDefinitionStringByStartOffsetFromPhpCode(targetPHPCode, itemStartOffset);
 
-  const classItemDocumentation = phpCommon.getClassItemDocumantationFromPhpCode(
-    targetPHPCode,
-    classItemShortName,
-    classItemKindName
-  );
+  const itemDocumentation = phpCommon.getClassItemDocumantationFromPhpCode(targetPHPCode, itemShortName, itemKindName);
 
   let documentationValue = '';
   documentationValue += '```php\n<?php\n';
   documentationValue += `${defineString} { }\n`;
   documentationValue += '```\n\n';
 
-  if (classItemDocumentation) {
+  if (itemDocumentation) {
     documentationValue += '```php\n<?php\n';
-    documentationValue += `${classItemDocumentation}\n`;
+    documentationValue += `${itemDocumentation}\n`;
     documentationValue += '```\n';
   }
 
