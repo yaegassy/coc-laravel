@@ -13,6 +13,8 @@ import {
   workspace,
 } from 'coc.nvim';
 
+import { getArtisanPath, getViewPath } from '../common/shared';
+import { config } from '../config';
 import { DOCUMENT_SELECTOR, SUPPORTED_LANGUAGE } from '../constant';
 import { type ProjectManagerType } from '../projects/types';
 import * as bladeComponentCompletionHandler from './handlers/bladeComponentHandler';
@@ -41,8 +43,6 @@ import * as routeCompletionHandler from './handlers/routeHandler';
 import * as translationCompletionHandler from './handlers/translationHandler';
 import * as validationCompletionHandler from './handlers/validationHandler';
 import * as viewCompletionHandler from './handlers/viewHandler';
-
-import { getArtisanPath, getViewPath } from '../common/shared';
 import { CompletionItemDataType } from './types';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -246,7 +246,7 @@ class LaravelCompletionProvider implements CompletionItemProvider {
     }
 
     // php function
-    if (workspace.getConfiguration('laravel').get('completion.phpFunctionEnable')) {
+    if (config.completion.phpFunctionEnable) {
       const phpFunctionCompletionItems = await phpFunctionCompletionHandler.doCompletion(
         document,
         position,
@@ -260,7 +260,7 @@ class LaravelCompletionProvider implements CompletionItemProvider {
 
     // php class (class, interface, trait, enum)
     // TODO: trait?: prefix contain `use |`
-    if (workspace.getConfiguration('laravel').get('completion.phpClassEnable')) {
+    if (config.completion.phpClassEnable) {
       const phpClassCompletionItems = await phpClassCompletionHandler.doCompletion(
         document,
         position,
@@ -272,16 +272,8 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       }
     }
 
-    // php keyword
-    if (workspace.getConfiguration('laravel').get('completion.phpKeywordEnable')) {
-      const phpKeywordCompletionItems = await phpKeywordCompletionHandler.doCompletion(document, position);
-      if (phpKeywordCompletionItems) {
-        items.push(...phpKeywordCompletionItems);
-      }
-    }
-
     // php constant
-    if (workspace.getConfiguration('laravel').get('completion.phpConstantEnable')) {
+    if (config.completion.phpConstantEnable) {
       const phpConstantCompletionItems = await phpConstantCompletionHandler.doCompletion(
         document,
         position,
@@ -289,6 +281,14 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       );
       if (phpConstantCompletionItems) {
         items.push(...phpConstantCompletionItems);
+      }
+    }
+
+    // php keyword
+    if (workspace.getConfiguration('laravel').get('completion.phpKeywordEnable')) {
+      const phpKeywordCompletionItems = await phpKeywordCompletionHandler.doCompletion(document, position);
+      if (phpKeywordCompletionItems) {
+        items.push(...phpKeywordCompletionItems);
       }
     }
 

@@ -1,5 +1,6 @@
 import { ExtensionContext, OutputChannel, workspace } from 'coc.nvim';
 
+import { config } from '../config';
 import { SUPPORTED_LANGUAGE } from '../constant';
 import { BladeProjectsManager } from './managers/blade';
 import { LivewireProjectManager } from './managers/livewire';
@@ -25,13 +26,13 @@ export async function register(context: ExtensionContext, outputChannel: OutputC
   await translationProjectManager.initialize();
 
   const phpClassProjectManager = new PHPClassProjectManager(context, workspace.root, outputChannel);
-  await phpClassProjectManager.initialize();
+  if (config.completion.phpClassEnable) await phpClassProjectManager.initialize();
 
   const phpFunctionProjectManager = new PHPFunctionProjectManager(context, workspace.root, outputChannel);
-  await phpFunctionProjectManager.initialize();
+  if (config.completion.phpFunctionEnable) await phpFunctionProjectManager.initialize();
 
   const phpConstantProjectManager = new PHPConstantProjectManager(context, workspace.root, outputChannel);
-  await phpConstantProjectManager.initialize();
+  if (config.completion.phpConstantEnable) await phpConstantProjectManager.initialize();
 
   const livewireProjectManager = new LivewireProjectManager(workspace.root, outputChannel);
   await livewireProjectManager.initialize();
