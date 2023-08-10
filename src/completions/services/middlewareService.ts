@@ -30,7 +30,7 @@ export function canCompletionFromContext(ast: Node, editorOffset: number) {
       if (m.name !== 'middleware') continue;
       if (m.arguments.length > 0) {
         if (m.arguments[0].startOffset && m.arguments[0].endOffset) {
-          if (m.arguments[0].startOffset <= adjustedOffset && m.arguments[0].endOffset >= adjustedOffset) {
+          if (m.arguments[0].startOffset <= editorOffset && m.arguments[0].endOffset >= editorOffset) {
             flags.push(true);
           }
         }
