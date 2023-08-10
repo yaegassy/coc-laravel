@@ -4,7 +4,6 @@ import fs from 'fs';
 
 import * as codeActionFeature from './codeActions/codeAction';
 import * as commandFeature from './commands/command';
-import * as showOutputCommandFeature from './commands/features/showOutput';
 import { getArtisanPath } from './common/shared';
 import * as completionFeature from './completions/completion';
 import * as definitionFeature from './definitions/definition';
@@ -23,7 +22,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
   }
 
   const outputChannel = window.createOutputChannel('laravel');
-  showOutputCommandFeature.register(context, outputChannel);
   if (!getArtisanPath()) {
     outputChannel.appendLine('coc-laravel extension was not activated because it is not a laravel project');
     return;
@@ -35,14 +33,14 @@ export async function activate(context: ExtensionContext): Promise<void> {
   }
 
   async function initialize(projectManager: ProjectManagerType) {
-    commandFeature.register(context, projectManager, outputChannel);
-    completionFeature.register(context, projectManager, outputChannel);
-    definitionFeature.register(context, projectManager, outputChannel);
-    referenceFeature.register(context, projectManager, outputChannel);
-    hoverFeature.register(context, projectManager, outputChannel);
-    diagnosticFeature.register(context, projectManager, outputChannel);
-    codeActionFeature.register(context, outputChannel);
-    watcherFeature.register(context, projectManager, outputChannel);
+    await commandFeature.register(context, projectManager, outputChannel);
+    await completionFeature.register(context, projectManager, outputChannel);
+    await definitionFeature.register(context, projectManager, outputChannel);
+    await referenceFeature.register(context, projectManager, outputChannel);
+    await hoverFeature.register(context, projectManager, outputChannel);
+    await diagnosticFeature.register(context, projectManager, outputChannel);
+    await codeActionFeature.register(context, outputChannel);
+    await watcherFeature.register(context, projectManager, outputChannel);
   }
 
   projectManagerFeature.register(context, outputChannel).then(async (projectManager) => {
