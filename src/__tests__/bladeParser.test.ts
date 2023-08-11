@@ -4,13 +4,53 @@ import { BladeDocument } from 'stillat-blade-parser/out/document/bladeDocument';
 import { BladeComponentNode, BladeEchoNode, DirectiveNode } from 'stillat-blade-parser/out/nodes/nodes';
 import { Position as ParserPosition, Range as ParserRange } from 'stillat-blade-parser/out/nodes/position';
 
-import fs from 'fs';
-import path from 'path';
-
-const FIXTURES_DIR = path.join(__dirname, 'fixtures');
+import * as testUtils from './testUtils';
 
 test('Check the count of {{ ... }} nodes', () => {
-  const code = fs.readFileSync(path.join(FIXTURES_DIR, 'blade', 'basic.blade.php'), { encoding: 'utf8' });
+  const code = testUtils.stripInitialNewline(`
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <title>{{ config('app.name', 'Laravel') }}</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-sans antialiased">
+        <div class="min-h-screen bg-gray-100">
+            @include('layouts.navigation')
+
+            <!-- Page Heading -->
+            @if (isset($header))
+                <header class="bg-white shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endif
+
+            <!-- Page Content -->
+            <main>
+                {{ $slot }}
+
+
+                @php
+                  $isActive = false;
+                  $hasError = true;
+                @endphp
+            </main>
+        </div>
+    </body>
+</html>
+`);
 
   const assertionNodes: BladeEchoNode[] = [];
 
@@ -25,7 +65,50 @@ test('Check the count of {{ ... }} nodes', () => {
 });
 
 test('Check the positions of the parameters of the target directive', () => {
-  const code = fs.readFileSync(path.join(FIXTURES_DIR, 'blade', 'basic.blade.php'), { encoding: 'utf8' });
+  const code = testUtils.stripInitialNewline(`
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <title>{{ config('app.name', 'Laravel') }}</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-sans antialiased">
+        <div class="min-h-screen bg-gray-100">
+            @include('layouts.navigation')
+
+            <!-- Page Heading -->
+            @if (isset($header))
+                <header class="bg-white shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endif
+
+            <!-- Page Content -->
+            <main>
+                {{ $slot }}
+
+
+                @php
+                  $isActive = false;
+                  $hasError = true;
+                @endphp
+            </main>
+        </div>
+    </body>
+</html>
+`);
 
   const assertionData: ParserRange[] = [];
 
@@ -56,7 +139,50 @@ test('Check the positions of the parameters of the target directive', () => {
 });
 
 test('Check the contents of the if directive parameter', () => {
-  const code = fs.readFileSync(path.join(FIXTURES_DIR, 'blade', 'basic.blade.php'), { encoding: 'utf8' });
+  const code = testUtils.stripInitialNewline(`
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <title>{{ config('app.name', 'Laravel') }}</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-sans antialiased">
+        <div class="min-h-screen bg-gray-100">
+            @include('layouts.navigation')
+
+            <!-- Page Heading -->
+            @if (isset($header))
+                <header class="bg-white shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endif
+
+            <!-- Page Content -->
+            <main>
+                {{ $slot }}
+
+
+                @php
+                  $isActive = false;
+                  $hasError = true;
+                @endphp
+            </main>
+        </div>
+    </body>
+</html>
+`);
 
   const assertionData: string[] = [];
 
@@ -75,7 +201,50 @@ test('Check the contents of the if directive parameter', () => {
 });
 
 test('Get the location of the endphp directive based on the php directive.', () => {
-  const code = fs.readFileSync(path.join(FIXTURES_DIR, 'blade', 'basic.blade.php'), { encoding: 'utf8' });
+  const code = testUtils.stripInitialNewline(`
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <title>{{ config('app.name', 'Laravel') }}</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-sans antialiased">
+        <div class="min-h-screen bg-gray-100">
+            @include('layouts.navigation')
+
+            <!-- Page Heading -->
+            @if (isset($header))
+                <header class="bg-white shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endif
+
+            <!-- Page Content -->
+            <main>
+                {{ $slot }}
+
+
+                @php
+                  $isActive = false;
+                  $hasError = true;
+                @endphp
+            </main>
+        </div>
+    </body>
+</html>
+`);
 
   const assertionData: ParserPosition[] = [];
 
@@ -100,9 +269,72 @@ test('Get the location of the endphp directive based on the php directive.', () 
 });
 
 test('Various parsing examples of blade component', () => {
-  const code = fs.readFileSync(path.join(FIXTURES_DIR, 'blade', 'component-contain.blade.php'), {
-    encoding: 'utf8',
-  });
+  const code = testUtils.stripInitialNewline(`
+<section>
+    <header>
+        <h2 class="text-lg font-medium text-gray-900">
+            {{ __('Profile Information') }}
+        </h2>
+
+        <p class="mt-1 text-sm text-gray-600">
+            {{ __("Update your account's profile information and email address.") }}
+        </p>
+    </header>
+
+    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
+        @csrf
+    </form>
+
+    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+        @csrf
+        @method('patch')
+
+        <div>
+            <x-input-label for="name" :value="__('Name')" />
+            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
+            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+        </div>
+
+        <div>
+            <x-input-label for="email" :value="__('Email')" />
+            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
+            <x-input-error class="mt-2" :messages="$errors->get('email')" />
+
+            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
+                <div>
+                    <p class="text-sm mt-2 text-gray-800">
+                        {{ __('Your email address is unverified.') }}
+
+                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            {{ __('Click here to re-send the verification email.') }}
+                        </button>
+                    </p>
+
+                    @if (session('status') === 'verification-link-sent')
+                        <p class="mt-2 font-medium text-sm text-green-600">
+                            {{ __('A new verification link has been sent to your email address.') }}
+                        </p>
+                    @endif
+                </div>
+            @endif
+        </div>
+
+        <div class="flex items-center gap-4">
+            <x-primary-button>{{ __('Save') }}</x-primary-button>
+
+            @if (session('status') === 'profile-updated')
+                <p
+                    x-data="{ show: true }"
+                    x-show="show"
+                    x-transition
+                    x-init="setTimeout(() => show = false, 2000)"
+                    class="text-sm text-gray-600"
+                >{{ __('Saved.') }}</p>
+            @endif
+        </div>
+    </form>
+</section>
+`);
 
   const assertionComponentNames: string[] = [];
   const assertionHasParmeterses: boolean[] = [];
@@ -145,5 +377,3 @@ test('Various parsing examples of blade component', () => {
     offset: 611,
   });
 });
-
-// TODO: And more...

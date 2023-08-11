@@ -40,3 +40,27 @@ export type ArgumentParameterType = {
   variadic: boolean;
   typehint?: string;
 };
+
+export type ScopeResolutionItemType = {
+  class: {
+    name: string;
+    startOffset: number;
+    endOffset: number;
+  };
+  member: {
+    name: string;
+    startOffset: number;
+    endOffset: number;
+  };
+};
+
+export type ScopeResolutionMemberDataType = {
+  classConstants: string[];
+  staticMethods: string[];
+};
+
+export type BladeWithPhpScopeResolutionItemsType = {
+  start: number;
+  end: number;
+  scopeResolutionItems: ScopeResolutionItemType[];
+};

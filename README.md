@@ -40,6 +40,7 @@ This coc-extension will provide various completion features and more features fo
     - **[NOTE]**: To use this feature, please execute the `laravel.stubs.download` command.
     - PHP Function completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1643359916)
     - PHP Class completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1671277304)
+    - PHP Scope Resolution completion (`Dummy::|`)
     - PHP Constant completion | [DESCRIPTION](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1671281861)
     - PHP Keyword completion | [DESCRIPTION](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1671284071)
   - Directive completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1657000532)
@@ -125,9 +126,9 @@ For more information, check this coc.nvim's wiki.
 ## Configuration options
 
 - `laravel.enable`: Enable coc-laravel extension, default: `true`
+- `laravel.environment.phpPath`: Path to PHP, you can use a custom version of PHP. If there is no setting, `php` of the execution environment will be used, default: `""`
 - `laravel.project.excludeVendors`: List of target vendor directories to exclude during project analysis, e.g. `["fakerphp", "phpunit"]`, default: `[]`
 - `laravel.project.startupMessageEnable`: Enable project startup messages, default: `true`
-- `laravel.environment.phpPath`: Path to PHP, you can use a custom version of PHP. If there is no setting, `php` of the execution environment will be used, default: `""`
 - `laravel.stubs.customVersion`: Specify the version of stubs to download with the `laravel.stubs.download` command. If not set, the `stubsVersion` defined in `package.json` will be used, default: `""`
 - `laravel.stubs.useStubs`: List of stubs to be used, default: `["Core", "date", "standard"]`
 - `laravel.completion.enable`: Enable all completion feature, default: `true`

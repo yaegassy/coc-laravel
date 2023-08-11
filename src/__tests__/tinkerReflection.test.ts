@@ -16,17 +16,16 @@ type ReflectorMethodsType = {
 
 describe('Test example of getting a function using the REFRELCTION API with artisan tinker', () => {
   test('Functions | Simple', async () => {
-    let code = '';
-
-    const rootDir = testUtils.TEST_LV_PROJECT_PATH;
-    const artisanPath = testUtils.getArtisanPath(rootDir)!;
-
-    code = testUtils.stripInitialNewline(`
+    // $ -> \\$
+    const code = testUtils.stripInitialNewline(`
 \\$reflector = new ReflectionFunction('abort_if');
 echo json_encode(\\$reflector->getParameters(), JSON_PRETTY_PRINT);
 `);
 
-    const resJsonStr = await testUtils.runTinker(code, artisanPath);
+    const rootDir = testUtils.TEST_LV_PROJECT_PATH;
+    const artisanPath = testUtils.getArtisanPath(rootDir)!;
+
+    const resJsonStr = await testUtils.runTinkerReflection(code, artisanPath);
     if (!resJsonStr) return;
     const reflectorFunctionParameters = JSON.parse(resJsonStr) as ReflectorParameterType[];
 
@@ -36,12 +35,8 @@ echo json_encode(\\$reflector->getParameters(), JSON_PRETTY_PRINT);
   });
 
   test('Functions | Detail', async () => {
-    let code = '';
-
-    const rootDir = testUtils.TEST_LV_PROJECT_PATH;
-    const artisanPath = testUtils.getArtisanPath(rootDir)!;
-
-    code = testUtils.stripInitialNewline(`
+    // $ -> \\$
+    const code = testUtils.stripInitialNewline(`
 \\$reflector = new ReflectionFunction('abort_if');
 echo json_encode(
     array_map(function (ReflectionParameter \\$param) {
@@ -55,7 +50,10 @@ echo json_encode(
 );
 `);
 
-    const resJsonStr = await testUtils.runTinker(code, artisanPath);
+    const rootDir = testUtils.TEST_LV_PROJECT_PATH;
+    const artisanPath = testUtils.getArtisanPath(rootDir)!;
+
+    const resJsonStr = await testUtils.runTinkerReflection(code, artisanPath);
     if (!resJsonStr) return;
     const reflectorFunctionParameters = JSON.parse(resJsonStr) as ReflectorParameterType[];
 
@@ -92,7 +90,7 @@ echo json_encode(
 
 describe('Test example of getting a methods using the REFRELCTION API with artisan tinker', () => {
   test('Methods | Simple', async () => {
-    // \\$ -> $
+    // $ -> \\$
     const code = testUtils.stripInitialNewline(`
 \\$reflector = new ReflectionClass('DateTime'); 
 echo json_encode(\\$reflector->getMethods(), JSON_PRETTY_PRINT);
@@ -101,7 +99,7 @@ echo json_encode(\\$reflector->getMethods(), JSON_PRETTY_PRINT);
     const rootDir = testUtils.TEST_LV_PROJECT_PATH;
     const artisanPath = testUtils.getArtisanPath(rootDir)!;
 
-    const resJsonStr = await testUtils.runTinker(code, artisanPath);
+    const resJsonStr = await testUtils.runTinkerReflection(code, artisanPath);
     if (!resJsonStr) return;
     const reflectorMethods = JSON.parse(resJsonStr) as ReflectorMethodsType[];
 
@@ -114,7 +112,7 @@ echo json_encode(\\$reflector->getMethods(), JSON_PRETTY_PRINT);
   });
 
   test('Methods | Detail', async () => {
-    // \\$ -> $
+    // $ -> \\$
     const code = testUtils.stripInitialNewline(`
 \\$reflector = new ReflectionClass('DateTime'); 
 echo json_encode(
@@ -143,7 +141,7 @@ echo json_encode(
     const rootDir = testUtils.TEST_LV_PROJECT_PATH;
     const artisanPath = testUtils.getArtisanPath(rootDir)!;
 
-    const resJsonStr = await testUtils.runTinker(code, artisanPath);
+    const resJsonStr = await testUtils.runTinkerReflection(code, artisanPath);
     if (!resJsonStr) return;
     const reflectorMethods = JSON.parse(resJsonStr) as ReflectorMethodsType[];
 
@@ -196,7 +194,7 @@ echo json_encode(
 
 describe('Test example of getting a class using the REFRELCTION API with artisan tinker', () => {
   test('Class | Simple', async () => {
-    // \\$ -> $
+    // $ -> \\$
     const code = testUtils.stripInitialNewline(`
 \\$reflector = new ReflectionClass('DateTime'); 
 echo json_encode(\\$reflector->getMethods(), JSON_PRETTY_PRINT);
@@ -205,7 +203,7 @@ echo json_encode(\\$reflector->getMethods(), JSON_PRETTY_PRINT);
     const rootDir = testUtils.TEST_LV_PROJECT_PATH;
     const artisanPath = testUtils.getArtisanPath(rootDir)!;
 
-    const resJsonStr = await testUtils.runTinker(code, artisanPath);
+    const resJsonStr = await testUtils.runTinkerReflection(code, artisanPath);
     if (!resJsonStr) return;
     const reflectorMethods = JSON.parse(resJsonStr) as ReflectorMethodsType[];
 
@@ -215,5 +213,137 @@ echo json_encode(\\$reflector->getMethods(), JSON_PRETTY_PRINT);
     };
 
     expect(reflectorMethods[0]).toMatchObject(expected);
+  });
+});
+
+describe('Scope resolution', () => {
+  test('Scope resolution | 1', async () => {
+    // $ -> \\$
+    const code = testUtils.stripInitialNewline(`
+\\$reflector = new ReflectionClass('DateTime');
+\\$classConstants = array_keys(\\$reflector->getConstants());
+\\$staticMethods = array_values(
+    array_filter(
+        array_map(fn(ReflectionMethod \\$m) => \\$m->isStatic() ? \\$m->getName() : null, \\$reflector->getMethods()),
+        fn(\\$v) => !is_null(\\$v)
+    )
+);
+echo json_encode(['classConstants' => \\$classConstants, 'staticMethods' => \\$staticMethods], JSON_PRETTY_PRINT);
+  `);
+
+    const rootDir = testUtils.TEST_LV_PROJECT_PATH;
+    const artisanPath = testUtils.getArtisanPath(rootDir)!;
+
+    const resJsonStr = await testUtils.runTinkerReflection(code, artisanPath)!;
+    if (!resJsonStr) return;
+
+    const memberItems = JSON.parse(resJsonStr);
+
+    const expected = {
+      classConstants: [
+        'ATOM',
+        'COOKIE',
+        'ISO8601',
+        'ISO8601_EXPANDED',
+        'RFC822',
+        'RFC850',
+        'RFC1036',
+        'RFC1123',
+        'RFC7231',
+        'RFC2822',
+        'RFC3339',
+        'RFC3339_EXTENDED',
+        'RSS',
+        'W3C',
+      ],
+      staticMethods: ['__set_state', 'createFromImmutable', 'createFromInterface', 'createFromFormat', 'getLastErrors'],
+    };
+
+    expect(memberItems).toMatchObject(expected);
+  });
+
+  test('Scope resolution | 2', async () => {
+    let code = '';
+
+    const rootDir = testUtils.TEST_LV_PROJECT_PATH;
+    const artisanPath = testUtils.getArtisanPath(rootDir)!;
+
+    // $ -> \\$
+    code = testUtils.stripInitialNewline(`
+\\$reflector = new ReflectionClass('DateTime');
+echo json_encode(\\$reflector->getConstant('ATOM'));
+  `);
+
+    const resJsonStr1 = await testUtils.runTinkerReflection(code, artisanPath)!;
+    if (!resJsonStr1) return;
+    const classConstantValue1 = JSON.parse(resJsonStr1) as string | false;
+    if (!classConstantValue1) return;
+    const expected1 = 'Y-m-d\\TH:i:sP';
+
+    // $ -> \\$
+    code = testUtils.stripInitialNewline(`
+\\$reflector = new ReflectionClass('DateTime');
+echo json_encode(\\$reflector->getConstant('DUMMY'));
+  `);
+
+    const resJsonStr2 = await testUtils.runTinkerReflection(code, artisanPath)!;
+    if (!resJsonStr2) return;
+    const classConstantValue2 = JSON.parse(resJsonStr2) as string | false;
+    const expected2 = false;
+
+    expect(classConstantValue1).toBe(expected1);
+    expect(classConstantValue2).toBe(expected2);
+  });
+
+  test('Scope resolution | 3', async () => {
+    let code = '';
+
+    const rootDir = testUtils.TEST_LV_PROJECT_PATH;
+    const artisanPath = testUtils.getArtisanPath(rootDir)!;
+
+    //
+    // Testing of standard case
+    //
+
+    // $ -> \\$
+    code = testUtils.stripInitialNewline(`
+\\$reflector = new ReflectionClass('DateTime');
+\\$staticMethod = \\$reflector->getMethod('createFromImmutable');
+echo json_encode(\\$staticMethod->__toString());
+  `);
+
+    const resJsonStr1 = await testUtils.runTinkerReflection(code, artisanPath)!;
+    if (!resJsonStr1) return;
+    const staticMethodData1 = JSON.parse(resJsonStr1) as string;
+    if (!staticMethodData1) return;
+    const expected1 = `Method [ <internal:date> static public method createFromImmutable ] {
+
+  - Parameters [1] {
+    Parameter #0 [ <required> DateTimeImmutable $object ]
+  }
+  - Tentative return [ static ]
+}
+`;
+
+    //
+    // Testing for non-existent methods
+    //
+
+    // $ -> \\$
+    code = testUtils.stripInitialNewline(`
+\\$reflector = new ReflectionClass('DateTime');
+\\$staticMethod = \\$reflector->getMethod('dummy'); # Non-existent method name
+echo json_encode(\\$staticMethod->__toString());
+  `);
+
+    // If the method does not exist, a ReflectionException is raised; in the
+    // runtinker, the ReflectionException string is detected and set to
+    // undefined
+    const resJsonStr2 = await testUtils.runTinkerReflection(code, artisanPath)!;
+    const staticMethodData2 = resJsonStr2; // dummy, undefined;
+    const expected2 = undefined;
+
+    expect(staticMethodData1).toBe(expected1);
+    expect(staticMethodData2).toBe(expected2);
   });
 });
