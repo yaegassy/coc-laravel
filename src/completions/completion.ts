@@ -39,6 +39,7 @@ import * as phpClassCompletionHandler from './handlers/phpClassHandler';
 import * as phpConstantCompletionHandler from './handlers/phpConstantHandler';
 import * as phpFunctionCompletionHandler from './handlers/phpFunctionHandler';
 import * as phpKeywordCompletionHandler from './handlers/phpKeywordHandler';
+import * as phpScopeResolutionCompletionHandler from './handlers/phpScopeResolutionHandler';
 import * as routeCompletionHandler from './handlers/routeHandler';
 import * as translationCompletionHandler from './handlers/translationHandler';
 import * as validationCompletionHandler from './handlers/validationHandler';
@@ -70,7 +71,7 @@ export async function register(
       'Laravel',
       'Laravel',
       DOCUMENT_SELECTOR,
-      new LaravelCompletionProvider(context, projectManager, viewPath, outputChannel),
+      new LaravelCompletionProvider(context, projectManager, viewPath, artisanPath, outputChannel),
       [
         '\\', //  php related
         '$', // livewire property completion, php related
@@ -89,6 +90,7 @@ export async function register(
 class LaravelCompletionProvider implements CompletionItemProvider {
   extensionContext: ExtensionContext;
   projectManager: ProjectManagerType;
+  artisanPath: string;
   viewPath: string;
   outputChannel: OutputChannel;
 
@@ -98,11 +100,13 @@ class LaravelCompletionProvider implements CompletionItemProvider {
     context: ExtensionContext,
     projectManager: ProjectManagerType,
     viewPath: string,
+    artisanPath: string,
     outputChannel: OutputChannel
   ) {
     this.extensionContext = context;
     this.projectManager = projectManager;
     this.viewPath = viewPath;
+    this.artisanPath = artisanPath;
     this.outputChannel = outputChannel;
 
     this.isCocBladeCompletionEnableDirective = false;
@@ -122,6 +126,8 @@ class LaravelCompletionProvider implements CompletionItemProvider {
     context?: CompletionContext
   ) {
     const items: CompletionItem[] | CompletionList = [];
+
+    const isIncompletes: boolean[] = [];
 
     // config
     if (workspace.getConfiguration('laravel').get('completion.configEnable')) {
@@ -272,6 +278,19 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       }
     }
 
+    // php scope resolution (Xxxx::)
+    if (workspace.getConfiguration('laravel').get('completion.phpScopeResolutionEnable')) {
+      const phpScopeResolutionCompletionItems = await phpScopeResolutionCompletionHandler.doCompletion(
+        document,
+        position,
+        this.projectManager.phpClassProjectManager,
+        this.artisanPath
+      );
+      if (phpScopeResolutionCompletionItems) {
+        items.push(...phpScopeResolutionCompletionItems);
+      }
+    }
+
     // php constant
     if (config.completion.phpConstantEnable) {
       const phpConstantCompletionItems = await phpConstantCompletionHandler.doCompletion(
@@ -362,6 +381,9 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       }
     }
 
+    if (isIncompletes.includes(true)) {
+      return CompletionList.create(items, true);
+    }
     return items;
   }
 
@@ -386,6 +408,13 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       return resolveItem;
     } else if (itemData.source === 'laravel-php-class') {
       const resolveItem = await phpClassCompletionHandler.doResolveCompletionItem(item, _token, this.extensionContext);
+      return resolveItem;
+    } else if (itemData.source === 'laravel-php-scope-resolution') {
+      const resolveItem = await phpScopeResolutionCompletionHandler.doResolveCompletionItem(
+        item,
+        _token,
+        this.artisanPath
+      );
       return resolveItem;
     }
 

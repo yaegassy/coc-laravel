@@ -8,6 +8,12 @@ export type BladeWithPhpNodesRange = {
   phpNodes: Node[];
 };
 
+export type BladeWithPhpNodesKindRangeOffsets = {
+  start: number;
+  end: number;
+  kindRangeOffsets: RangeOffset[];
+};
+
 export type RangeOffset = {
   start: number;
   end: number;
@@ -15,9 +21,14 @@ export type RangeOffset = {
 
 export type CompletionItemDataType = {
   source: CompletionItemSource;
-  filePath?: string; // phpConstant, phpFunction
-  kind?: PHPClassItemKindEnum; // phpClass
-  isStubs?: boolean; // phpConstant, phpFunction
+  filePath?: string; // phpConstant, phpFunction, phpClass, phpScopeResolution
+  kind?: PHPClassItemKindEnum; // phpClass, phpScopeResolution
+  isStubs?: boolean; // phpConstant, phpFunction, phpClass, phpScopeResolution
+  className?: string; // phpScopeResolution
 };
 
-type CompletionItemSource = 'laravel-php-constant' | 'laravel-php-function' | 'laravel-php-class';
+type CompletionItemSource =
+  | 'laravel-php-constant'
+  | 'laravel-php-function'
+  | 'laravel-php-class'
+  | 'laravel-php-scope-resolution';

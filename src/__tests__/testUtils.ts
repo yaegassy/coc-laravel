@@ -36,15 +36,36 @@ export async function runTinker(code: string, artisanPath: string) {
 
   const r = new Promise<string | undefined>((resolve, reject) => {
     cp.exec(`"${phpPath}" "${artisanPath}" tinker --execute="${code}"`, (err, stdout, stderr) => {
-      if (err) {
-        console.log(err);
-        reject(undefined);
-      }
+      if (err) reject(undefined);
 
       if (stdout.length > 0) {
         resolve(stdout);
       } else {
         reject(stderr);
+      }
+    });
+  }).catch(() => {
+    return undefined;
+  });
+  return r;
+}
+
+export async function runTinkerReflection(code: string, artisanPath: string) {
+  const phpPath = getPhpPath();
+
+  const r = new Promise<string | undefined>((resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    cp.exec(`"${phpPath}" "${artisanPath}" tinker --execute="${code}"`, (err, stdout, _stderr) => {
+      if (err) {
+        reject(undefined);
+      }
+
+      if (stdout.length > 0) {
+        if (stdout.includes('ReflectionException')) {
+          reject(undefined);
+        } else {
+          resolve(stdout);
+        }
       }
     });
   }).catch(() => {

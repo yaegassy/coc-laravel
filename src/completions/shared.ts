@@ -3,7 +3,7 @@ import { BladeComponentNode, BladeEchoNode, DirectiveNode, InlinePhpNode } from 
 
 import * as bladeParser from '../parsers/blade/parser';
 import * as phpParser from '../parsers/php/parser';
-import { BladeWithPhpNodesRange, RangeOffset } from './types';
+import { BladeWithPhpNodesKindRangeOffsets, BladeWithPhpNodesRange, RangeOffset } from './types';
 
 //
 // Can php function comletion related
@@ -1129,4 +1129,182 @@ function getRangeOffsetsFromPHPParserByStaticClassAndMethodName(
   }, ast);
 
   return rangeOffsets;
+}
+
+//
+// Expelimental
+//
+
+export function isEditorOffsetInBladeEchoRegionOfPhpNodeKindWithExtraChars(
+  code: string,
+  editorOffset: number,
+  phpNodeKind: string,
+  wordWithExtraChars?: string
+) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return false;
+
+  const contextRanges: BladeWithPhpNodesKindRangeOffsets[] = [];
+
+  for (const node of bladeDoc.getAllNodes()) {
+    if (node instanceof BladeEchoNode) {
+      if (!node.offset) continue;
+
+      // blade echo
+      let phpCode = 'echo ' + node.content;
+
+      // `Foo::|` returns ast but cannot get the expected offset due to syntax errors.
+      // Therefore, if the input string ends in a colon, the process proceeds
+      // with the addition of a dummy string.
+      //
+      // Subtract the number of dummy characters from the offset later.
+      let existsEndsWithColon = false;
+      const addDummyCode = 'DUMMY';
+      if (wordWithExtraChars && wordWithExtraChars.endsWith(':')) {
+        phpCode = phpCode + addDummyCode;
+        existsEndsWithColon = true;
+      }
+
+      let phpAst = phpParser.getAst(phpCode);
+      if (!phpAst) {
+        phpCode = phpCode + ' ; ';
+      }
+      phpAst = phpParser.getAst(phpCode);
+      if (!phpAst) continue;
+
+      const kindRangeOffsets: RangeOffset[] = [];
+      phpParser.walk((node) => {
+        if (node.kind === phpNodeKind) {
+          if (!node.loc) return;
+          kindRangeOffsets.push({
+            start: existsEndsWithColon ? node.loc.start.offset - addDummyCode.length : node.loc.start.offset,
+            end: existsEndsWithColon ? node.loc.end.offset - addDummyCode.length : node.loc.end.offset,
+          });
+        }
+      }, phpAst);
+
+      const contextRange: BladeWithPhpNodesKindRangeOffsets = {
+        start: existsEndsWithColon ? node.offset.start - addDummyCode.length : node.offset.start,
+        end: existsEndsWithColon ? node.offset.end - addDummyCode.length : node.offset.end,
+        kindRangeOffsets,
+      };
+
+      contextRanges.push(contextRange);
+    }
+  }
+
+  // `{{` character count is 2
+  // `{{` converted to `echo `, so the number of 5 characters including spaces.
+  // 5 - 2 = 3
+  const adjustOffset = 3;
+
+  for (const contextRange of contextRanges) {
+    if (contextRange.start <= editorOffset && contextRange.end >= editorOffset) {
+      for (const k of contextRange.kindRangeOffsets) {
+        if (
+          k.start - adjustOffset + contextRange.start <= editorOffset &&
+          k.end - adjustOffset + contextRange.end >= editorOffset
+        ) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+export function isEditorOffsetInInlinePHPRegionOfPhpNodeKindWithExtraChars(
+  code: string,
+  editorOffset: number,
+  phpNodeKind: string,
+  wordWithExtraChars?: string
+) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return false;
+
+  const contextRanges: BladeWithPhpNodesKindRangeOffsets[] = [];
+
+  //let adjustOffset = 0;
+
+  if (wordWithExtraChars && !wordWithExtraChars.endsWith('::') && wordWithExtraChars.endsWith(':')) {
+    return false;
+  }
+
+  for (const node of bladeDoc.getAllNodes()) {
+    if (node instanceof InlinePhpNode) {
+      if (!node.startPosition) continue;
+      if (!node.endPosition) continue;
+
+      let phpCode = node.sourceContent;
+
+      //if (phpCode.startsWith('<?php')) {
+      //  // Number of `<?php ` characters is 6 including spaces.
+      //  adjustOffset = 6;
+      //} else if (phpCode.startsWith('<?=')) {
+      //  // In this context, we first replace the content itself
+      //  phpCode = node.sourceContent.replace('<?=', '<?php echo');
+      //  // Number of `<?php` characters is 5.
+      //  // Number of ` echo ` characters is 6 including spaces.
+      //  // 5 - 6 = -1
+      //  adjustOffset = -1;
+      //}
+
+      // `Foo::|` returns ast but cannot get the expected offset due to syntax errors.
+      // Therefore, if the input string ends in a colon, the process proceeds
+      // with the addition of a dummy string.
+      //
+      // Subtract the number of dummy characters from the offset later.
+      let existsEndsWithColon = false;
+      const addDummyCode = '';
+      if (wordWithExtraChars && wordWithExtraChars.endsWith('::')) {
+        phpCode = phpCode + addDummyCode;
+        existsEndsWithColon = true;
+      }
+
+      //let phpAst = phpParser.getAstByParseCode(phpCode);
+      // if (!phpAst) {
+      //   phpCode = phpCode + ' ; ';
+      // }
+
+      // OK 最後の文字が :: で staticlookup の中で。name が空なら
+      //
+
+      const phpAst = phpParser.getAstByParseCode(phpCode);
+      if (!phpAst) continue;
+
+      console.log(`=A=: ${phpCode}`);
+
+      const kindRangeOffsets: RangeOffset[] = [];
+      phpParser.walk((node) => {
+        if (node.kind === phpNodeKind) {
+          if (!node.loc) return;
+          kindRangeOffsets.push({
+            start: existsEndsWithColon ? node.loc.start.offset - addDummyCode.length : node.loc.start.offset,
+            end: existsEndsWithColon ? node.loc.end.offset - addDummyCode.length : node.loc.end.offset,
+          });
+        }
+      }, phpAst);
+
+      const contextRange: BladeWithPhpNodesKindRangeOffsets = {
+        start: node.startPosition.offset,
+        end: existsEndsWithColon ? node.endPosition.offset - addDummyCode.length : node.endPosition.offset,
+        kindRangeOffsets,
+      };
+
+      contextRanges.push(contextRange);
+    }
+  }
+
+  for (const contextRange of contextRanges) {
+    if (contextRange.start <= editorOffset && contextRange.end >= editorOffset) {
+      for (const c of contextRange.kindRangeOffsets) {
+        if (c.start + contextRange.start <= editorOffset && c.end + contextRange.end >= editorOffset) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
 }

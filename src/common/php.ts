@@ -3,15 +3,19 @@ import {
   Boolean as BooleanNode,
   Call,
   Cast,
+  ClassConstant,
+  Class as ClassNode,
   Declaration as DeclarationNode,
   Function as FunctionNode,
   Identifier,
   Name,
   Namespace as NamespaceNode,
   Number as NumberNode,
+  StaticLookup,
   String as StringNode,
 } from 'php-parser';
 
+import { ScopeResolutionItemType } from '../common/types';
 import * as phpParser from '../parsers/php/parser';
 import { PHPClassItemKindEnum } from '../projects/types';
 
@@ -171,6 +175,17 @@ export function getDefinitionStringByStartOffsetFromPhpCode(code: string, startO
   return defStrings.join('').trim();
 }
 
+export function getStringByRangeOffsetFromPhpCode(code: string, start: number, end: number) {
+  const defStrings: string[] = [];
+
+  for (let i = start; i < end; i++) {
+    defStrings.push(code[i]);
+  }
+
+  // Trim to remove trailing newline codes
+  return defStrings.join('').trim();
+}
+
 export function getFunctionItemStartOffsetFromPhpCode(code: string, name: string) {
   const offsets: number[] = [];
 
@@ -269,4 +284,100 @@ export function getClassItemDocumantationFromPhpCode(code: string, className: st
 
   if (documantations.length === 0) return undefined;
   return documantations.join('');
+}
+
+export function getScopeResolutionItemFromPhpCode(code: string) {
+  const ast = phpParser.getAstByParseCode(code);
+  if (!ast) return [];
+
+  const items: ScopeResolutionItemType[] = [];
+
+  phpParser.walk((node, parent) => {
+    if (!parent) return;
+    // exists echo case?
+    //if (parent.kind !== 'expressionstatement') return;
+    if (node.kind !== 'staticlookup') return;
+    const staticlookupNode = node as StaticLookup;
+    if (staticlookupNode.what.kind !== 'name') return;
+    if (!staticlookupNode.what.loc) return;
+    // ===
+    const classStartOffset = staticlookupNode.what.loc.start.offset;
+    const classEndOffset = staticlookupNode.what.loc.end.offset;
+
+    const whatNameNode = staticlookupNode.what as Name;
+    // ===
+    const className = whatNameNode.name;
+
+    if (staticlookupNode.offset.kind !== 'identifier') return;
+    if (!staticlookupNode.offset.loc) return;
+    // ===
+    const memberStartOffset = staticlookupNode.offset.loc.start.offset;
+    const memberEndOffset = staticlookupNode.offset.loc.end.offset;
+
+    const identiferNode = staticlookupNode.offset as Identifier;
+    // ===
+    const memberName = identiferNode.name;
+
+    items.push({
+      class: {
+        name: className,
+        startOffset: classStartOffset,
+        endOffset: classEndOffset,
+      },
+      member: {
+        name: memberName,
+        startOffset: memberStartOffset,
+        endOffset: memberEndOffset,
+      },
+    });
+  }, ast);
+
+  return items;
+}
+
+/**
+ * This function is not currently used. However, it is left as it may be used
+ * somewhere else.
+ */
+export function getClassConstantRangeOffsetFromPhpCode(code: string, className: string, constantName: string) {
+  const rangeOffsets: { start: number; end: number }[] = [];
+
+  const ast = phpParser.getAstByParseCode(code);
+  if (!ast) return undefined;
+
+  phpParser.walk((node) => {
+    if (node.kind !== 'class') return;
+    const classNode = node as ClassNode;
+    if (typeof classNode.name !== 'object') return;
+    const identiferNode = classNode.name as Identifier;
+    // ===
+    if (identiferNode.name !== className) return;
+
+    if (classNode.body.length === 0) return;
+    const declarationNodes = classNode.body as DeclarationNode[];
+    for (const d of declarationNodes) {
+      if (d.kind !== 'classconstant') continue;
+      const classConstantNode = d as unknown as ClassConstant;
+      if (classConstantNode.constants.length === 0) continue;
+      let existsTargetConstantName = false;
+      for (const c of classConstantNode.constants) {
+        if (typeof c.name !== 'object') continue;
+        const identiferNode = c.name as Identifier;
+        if (identiferNode.name === constantName) {
+          // ===
+          existsTargetConstantName = true;
+          break;
+        }
+      }
+      if (!existsTargetConstantName) continue;
+      if (!classConstantNode.loc) continue;
+      rangeOffsets.push({
+        start: classConstantNode.loc.start.offset,
+        end: classConstantNode.loc.end.offset,
+      });
+    }
+  }, ast);
+
+  if (rangeOffsets.length === 0) return undefined;
+  return rangeOffsets[0];
 }

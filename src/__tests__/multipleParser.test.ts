@@ -1,16 +1,12 @@
 import { expect, test } from 'vitest';
 
-import fs from 'fs';
-import path from 'path';
-
 import * as bladeRouteCompletionService from '../completions/services/bladeRouteService';
-
-const FIXTURES_DIR = path.join(__dirname, 'fixtures');
+import * as testUtils from './testUtils';
 
 test('Check route-static-method-in-blade-echo.blade', () => {
-  const code = fs.readFileSync(path.join(FIXTURES_DIR, 'blade', 'route-static-method-in-blade-echo.blade.php'), {
-    encoding: 'utf8',
-  });
+  const code = testUtils.stripInitialNewline(`
+{{ Route::has('register') }}
+`);
 
   expect(bladeRouteCompletionService.canCompletionFromContext(code, 13)).toBe(false);
   expect(bladeRouteCompletionService.canCompletionFromContext(code, 14)).toBe(true);
@@ -19,9 +15,11 @@ test('Check route-static-method-in-blade-echo.blade', () => {
 });
 
 test('Check route-static-method-in-php-directive.blade', () => {
-  const code = fs.readFileSync(path.join(FIXTURES_DIR, 'blade', 'route-static-method-in-php-directive.blade.php'), {
-    encoding: 'utf8',
-  });
+  const code = testUtils.stripInitialNewline(`
+@php
+  Route::has('register');
+@endphp
+`);
 
   expect(bladeRouteCompletionService.canCompletionFromContext(code, 17)).toBe(false);
   expect(bladeRouteCompletionService.canCompletionFromContext(code, 18)).toBe(true);
@@ -30,12 +28,10 @@ test('Check route-static-method-in-php-directive.blade', () => {
 });
 
 test('Check route-static-method-in-directive-with-parameters', () => {
-  const code = fs.readFileSync(
-    path.join(FIXTURES_DIR, 'blade', 'route-static-method-in-directive-with-parameters.blade.php'),
-    {
-      encoding: 'utf8',
-    }
-  );
+  const code = testUtils.stripInitialNewline(`
+@if (Route::has('register'))
+@endif
+`);
 
   expect(bladeRouteCompletionService.canCompletionFromContext(code, 15)).toBe(false);
   expect(bladeRouteCompletionService.canCompletionFromContext(code, 16)).toBe(true);
@@ -44,9 +40,11 @@ test('Check route-static-method-in-directive-with-parameters', () => {
 });
 
 test('Check route-static-method-in-component', () => {
-  const code = fs.readFileSync(path.join(FIXTURES_DIR, 'blade', 'route-static-method-in-component.blade.php'), {
-    encoding: 'utf8',
-  });
+  const code = testUtils.stripInitialNewline(`
+<x-app-layout>
+  <x-sample :message="Route::has('register')" />
+</x-app-layout>
+`);
 
   expect(bladeRouteCompletionService.canCompletionFromContext(code, 46)).toBe(false);
   expect(bladeRouteCompletionService.canCompletionFromContext(code, 47)).toBe(true);

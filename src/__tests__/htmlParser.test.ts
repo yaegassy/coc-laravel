@@ -1,16 +1,18 @@
 import { expect, test } from 'vitest';
 
-import * as htmlParser from '../parsers/html/parser';
-
-import fs from 'fs';
-import path from 'path';
-
-const FIXTURES_DIR = path.join(__dirname, 'fixtures');
-
 import * as htmlLanguageService from 'vscode-html-languageservice';
+import * as htmlParser from '../parsers/html/parser';
+import * as testUtils from './testUtils';
 
 test('Html parser example test', () => {
-  const code = fs.readFileSync(path.join(FIXTURES_DIR, 'html', 'example.html'), { encoding: 'utf8' });
+  const code = testUtils.stripInitialNewline(`
+<div>
+  <main>
+    <p>Example</p>
+  </main>
+</div>
+`);
+
   const parsedDoc = htmlParser.parse(code);
 
   expect(parsedDoc.findNodeAt(9).tag).toBe('main');

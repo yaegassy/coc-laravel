@@ -1,1 +1,0 @@
-{{ Route::has('register') }}

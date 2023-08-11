@@ -2,9 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import * as phpCommon from '../common/php';
 import * as phpParser from '../parsers/php/parser';
-
 import { PHPClassItemKindEnum } from '../projects/types';
-
 import * as testUtils from './testUtils';
 
 test('Get defineValue from defineName in php code', async () => {
@@ -214,4 +212,60 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
  */`;
 
   expect(documantaion).toBe(expected);
+});
+
+describe('Check scope resolution items', () => {
+  test('Even if the member name has not been entered yet, it can be successfully retrieved as items.', async () => {
+    const code = testUtils.stripInitialNewline(`
+<?php
+Dummy\\Foo\\Bar::
+`);
+
+    const ast = phpParser.getAstByParseCode(code);
+    if (!ast) return;
+
+    const items = phpCommon.getScopeResolutionItemFromPhpCode(code);
+
+    const expected = [
+      {
+        class: {
+          name: 'Dummy\\Foo\\Bar',
+          startOffset: 6,
+          endOffset: 19,
+        },
+        member: {
+          name: '',
+          startOffset: 22,
+          endOffset: 22,
+        },
+      },
+    ];
+
+    // If there is no string, start has the same value as end.
+    // If there is a string, start will also be at the appropriate offset.
+
+    expect(items).toMatchObject(expected);
+  });
+});
+
+test('Get class constant range offset from php code', async () => {
+  const code = testUtils.stripInitialNewline(`
+<?php
+class DateTime implements DateTimeInterface
+{
+    public const RFC822 = 'D, d M y H:i:s O';
+
+    public const RFC850 = 'l, d-M-y H:i:s T';
+
+    // ...snip
+}
+`);
+
+  const ast = phpParser.getAstByParseCode(code);
+  if (!ast) return;
+
+  const itemRangeOffset = phpCommon.getClassConstantRangeOffsetFromPhpCode(code, 'DateTime', 'RFC822');
+
+  const expected = { start: 69, end: 96 };
+  expect(itemRangeOffset).toMatchObject(expected);
 });
