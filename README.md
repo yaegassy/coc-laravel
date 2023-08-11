@@ -40,7 +40,7 @@ This coc-extension will provide various completion features and more features fo
     - **[NOTE]**: To use this feature, please execute the `laravel.stubs.download` command.
     - PHP Function completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1643359916)
     - PHP Class completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1671277304)
-    - PHP Scope Resolution completion (`Dummy::|`)
+    - PHP Scope Resolution completion (e.g. `DateTime::|`) | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1674415047)
     - PHP Constant completion | [DESCRIPTION](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1671281861)
     - PHP Keyword completion | [DESCRIPTION](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1671284071)
   - Directive completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1657000532)
