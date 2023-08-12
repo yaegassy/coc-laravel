@@ -23,7 +23,7 @@ export function canCompletionFromContext(code: string, editorOffset: number) {
   flags.push(isEditorOffsetInBladeEchoRegionOfPhpNodeKind(code, editorOffset, 'useitem'));
   flags.push(isEditorOffsetInPHPDirectiveRegionOfPhpNodeKind(code, editorOffset, 'useitem'));
   flags.push(isEditorOffsetInInlinePHPRegionOfPhpNodeKind(code, editorOffset, 'useitem'));
-  flags.push(isEditorOffsetInDirectiveWithParametersRegionOfPhpNodeKind(code, editorOffset, 'name'));
+  flags.push(isEditorOffsetInDirectiveWithParametersRegionOfPhpNodeKind(code, editorOffset, 'useitem'));
   flags.push(isEditorOffsetInPropsValueRegionOfPhpNodeKind(code, editorOffset, 'useitem'));
 
   if (flags.includes(true)) {
