@@ -286,7 +286,7 @@ export function getClassItemDocumantationFromPhpCode(code: string, className: st
   return documantations.join('');
 }
 
-export function getScopeResolutionItemFromPhpCode(code: string) {
+export function getScopeResolutionItemsFromPhpCode(code: string) {
   const ast = phpParser.getAstByParseCode(code);
   if (!ast) return [];
 
@@ -294,7 +294,6 @@ export function getScopeResolutionItemFromPhpCode(code: string) {
 
   phpParser.walk((node, parent) => {
     if (!parent) return;
-    // exists echo case?
     //if (parent.kind !== 'expressionstatement') return;
     if (node.kind !== 'staticlookup') return;
     const staticlookupNode = node as StaticLookup;
@@ -308,15 +307,23 @@ export function getScopeResolutionItemFromPhpCode(code: string) {
     // ===
     const className = whatNameNode.name;
 
-    if (staticlookupNode.offset.kind !== 'identifier') return;
-    if (!staticlookupNode.offset.loc) return;
-    // ===
-    const memberStartOffset = staticlookupNode.offset.loc.start.offset;
-    const memberEndOffset = staticlookupNode.offset.loc.end.offset;
+    let memberName: string | undefined = undefined;
+    let memberStartOffset: number | undefined = undefined;
+    let memberEndOffset: number | undefined = undefined;
+    // In the case of `DateTime::dummy`, `dummy` information is entered.
+    if (staticlookupNode.offset.kind === 'identifier') {
+      const offsetIdentiferNode = staticlookupNode.offset as Identifier;
+      if (!offsetIdentiferNode.loc) return;
 
-    const identiferNode = staticlookupNode.offset as Identifier;
-    // ===
-    const memberName = identiferNode.name;
+      memberName = offsetIdentiferNode.name;
+      memberStartOffset = offsetIdentiferNode.loc.start.offset;
+      memberEndOffset = offsetIdentiferNode.loc.end.offset;
+    } else {
+      // In the case of `DateTime::|`.
+      memberName = '';
+      memberStartOffset = classEndOffset + '::'.length;
+      memberEndOffset = classEndOffset + '::'.length;
+    }
 
     items.push({
       class: {

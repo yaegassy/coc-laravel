@@ -224,7 +224,7 @@ Dummy\\Foo\\Bar::
     const ast = phpParser.getAstByParseCode(code);
     if (!ast) return;
 
-    const items = phpCommon.getScopeResolutionItemFromPhpCode(code);
+    const items = phpCommon.getScopeResolutionItemsFromPhpCode(code);
 
     const expected = [
       {
