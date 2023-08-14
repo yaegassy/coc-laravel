@@ -347,3 +347,29 @@ echo json_encode(\\$staticMethod->__toString());
     expect(staticMethodData2).toBe(expected2);
   });
 });
+
+describe('PHP variable related', () => {
+  test('Get information about an object from a variable', async () => {
+    const rootDir = testUtils.TEST_LV_PROJECT_PATH;
+    const artisanPath = testUtils.getArtisanPath(rootDir)!;
+
+    // $ -> \\$
+    const code = testUtils.stripInitialNewline(`
+\\$date = \\"2023/08/14\\";
+\\$now = new DateTime(\\$date);
+
+try {
+    if (isset(\\$now)) {
+        \\$reflector = new ReflectionObject(\\$now);
+        echo json_encode(\\$reflector->name);
+    }
+} catch (\\Throwable \\$th) {}
+`);
+
+    const resJsonStr = await testUtils.runTinkerReflection(code, artisanPath)!;
+    if (!resJsonStr) return;
+    const detectVariableType = JSON.parse(resJsonStr) as string;
+
+    expect(detectVariableType).toBe('DateTime');
+  });
+});

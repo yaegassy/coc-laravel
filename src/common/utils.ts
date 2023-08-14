@@ -9,3 +9,7 @@ export function elapsed(start: [number, number]) {
 export function stripInitialNewline(text: string) {
   return text.replace(/^\n/, '');
 }
+
+export function quoteForTerminalExecution(text: string) {
+  return text.replace(/\$/g, '\\$').replace(/"/g, '\\"').replace(/\\/g, '\\');
+}

@@ -282,6 +282,11 @@
           "default": true,
           "description": "Enable php scope resolution completion."
         },
+        "laravel.completion.phpVariableEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable php variable completion."
+        },
         "laravel.completion.phpConstantEnable": {
           "type": "boolean",
           "default": true,

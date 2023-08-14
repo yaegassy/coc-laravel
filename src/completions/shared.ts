@@ -1273,8 +1273,6 @@ export function isEditorOffsetInInlinePHPRegionOfPhpNodeKindWithExtraChars(
       const phpAst = phpParser.getAstByParseCode(phpCode);
       if (!phpAst) continue;
 
-      console.log(`=A=: ${phpCode}`);
-
       const kindRangeOffsets: RangeOffset[] = [];
       phpParser.walk((node) => {
         if (node.kind === phpNodeKind) {

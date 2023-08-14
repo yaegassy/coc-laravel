@@ -10,5 +10,9 @@ export const config = {
     phpFunctionEnable: _config.get<boolean>('completion.phpFunctionEnable', true),
     phpClassEnable: _config.get<boolean>('completion.phpClassEnable', true),
     phpConstantEnable: _config.get<boolean>('completion.phpConstantEnable', true),
+    get phpVariableEnable() {
+      const defaultValue = true;
+      return _config.get<boolean>('completion.phpVariableEnable', defaultValue);
+    },
   },
 };
