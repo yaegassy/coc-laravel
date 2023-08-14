@@ -42,7 +42,7 @@ export function getVariableItemsWithBladeRangeOffsetsFromBladeDoc(
       }
     }
 
-    if (!bladeStartOffset) continue;
+    if (bladeStartOffset == null) continue;
     if (!bladeEndOffset) continue;
     if (!phpCode) continue;
 
@@ -123,7 +123,7 @@ export function getVariableItemsFromEditorOffset(phpVariableItems: PhpVariableIt
 
   for (const v of phpVariableItems) {
     if (!v.bladeNodeType) continue;
-    if (!v.bladeNodeStart) continue;
+    if (v.bladeNodeStart == null) continue;
 
     const adjustOffset = getAdjustOffsetAtBladeNodeTypeString(v.bladeNodeType);
     if (adjustOffset == null) continue;
