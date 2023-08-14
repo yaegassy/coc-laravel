@@ -36,7 +36,7 @@ export function isEditorOffsetInBladeEchoRegionOfPhpScopeResolutionItem(code: st
       // blade echo
       const phpCode = '<?php echo' + node.content;
 
-      const items = phpCommon.getScopeResolutionItemFromPhpCode(phpCode);
+      const items = phpCommon.getScopeResolutionItemsFromPhpCode(phpCode);
 
       const contextRange: BladeWithPhpScopeResolutionItemsType = {
         start: node.offset.start,
@@ -54,11 +54,13 @@ export function isEditorOffsetInBladeEchoRegionOfPhpScopeResolutionItem(code: st
   for (const contextRange of contextRanges) {
     if (contextRange.start <= editorOffset && contextRange.end >= editorOffset) {
       for (const i of contextRange.scopeResolutionItems) {
-        if (i.member.name === '' || i.member.name === '?>') {
+        // In the case of `DateTime::|`
+        if (i.member.startOffset > i.member.endOffset) {
           if (i.member.endOffset + contextRange.start - adjustOffset === editorOffset) {
             return true;
           }
         } else {
+          // In the case of `DateTime::x...`
           if (
             i.member.startOffset + contextRange.start - adjustOffset <= editorOffset &&
             i.member.endOffset + contextRange.start - adjustOffset + 1 >= editorOffset
@@ -93,7 +95,7 @@ export function isEditorOffsetInPHPDirectiveRegionOfOfPhpScopeResolutionItem(cod
         const phpCode = '<?php' + node.documentContent;
         adjustOffset = 2;
 
-        const items = phpCommon.getScopeResolutionItemFromPhpCode(phpCode);
+        const items = phpCommon.getScopeResolutionItemsFromPhpCode(phpCode);
 
         const contextRange: BladeWithPhpScopeResolutionItemsType = {
           start: node.offset.start,
@@ -107,7 +109,7 @@ export function isEditorOffsetInPHPDirectiveRegionOfOfPhpScopeResolutionItem(cod
 
         adjustOffset = 1;
 
-        const items = phpCommon.getScopeResolutionItemFromPhpCode(phpCode);
+        const items = phpCommon.getScopeResolutionItemsFromPhpCode(phpCode);
 
         const contextRange: BladeWithPhpScopeResolutionItemsType = {
           start: node.offset.start,
@@ -123,11 +125,13 @@ export function isEditorOffsetInPHPDirectiveRegionOfOfPhpScopeResolutionItem(cod
   for (const contextRange of contextRanges) {
     if (contextRange.start <= editorOffset && contextRange.end >= editorOffset) {
       for (const i of contextRange.scopeResolutionItems) {
-        if (i.member.name === '' || i.member.name === '?>') {
+        // In the case of `DateTime::|`
+        if (i.member.startOffset > i.member.endOffset) {
           if (i.member.endOffset + contextRange.start - adjustOffset === editorOffset) {
             return true;
           }
         } else {
+          // In the case of `DateTime::x...`
           if (
             i.member.startOffset + contextRange.start <= editorOffset &&
             i.member.endOffset + contextRange.start >= editorOffset
@@ -155,7 +159,7 @@ export function isEditorOffsetInInlinePhpResionOfPhpScopeResolutionItem(code: st
 
       const phpCode = node.sourceContent;
 
-      const items = phpCommon.getScopeResolutionItemFromPhpCode(phpCode);
+      const items = phpCommon.getScopeResolutionItemsFromPhpCode(phpCode);
 
       const contextRange: BladeWithPhpScopeResolutionItemsType = {
         start: node.startPosition.offset,
@@ -170,11 +174,13 @@ export function isEditorOffsetInInlinePhpResionOfPhpScopeResolutionItem(code: st
   for (const contextRange of contextRanges) {
     if (contextRange.start <= editorOffset && contextRange.end >= editorOffset) {
       for (const i of contextRange.scopeResolutionItems) {
-        if (i.member.name === '' || i.member.name === '?>') {
+        // In the case of `DateTime::|`
+        if (i.member.startOffset > i.member.endOffset) {
           if (i.member.endOffset + contextRange.start === editorOffset) {
             return true;
           }
         } else {
+          // In the case of `DateTime::x...`
           if (
             i.member.startOffset + contextRange.start <= editorOffset &&
             i.member.endOffset + contextRange.start >= editorOffset
@@ -225,7 +231,7 @@ export function isEditorOffsetInDirectiveWithParametersRegionOfPhpScopeResolutio
 
         const phpCode = '<?php ' + node.directiveParameters.replace(/^\(/, '').replace(/\)$/, '') + ' ?>';
 
-        const items = phpCommon.getScopeResolutionItemFromPhpCode(phpCode);
+        const items = phpCommon.getScopeResolutionItemsFromPhpCode(phpCode);
 
         const contextRange: BladeWithPhpScopeResolutionItemsType = {
           start: node.directiveParametersPosition.start.offset,
@@ -243,11 +249,13 @@ export function isEditorOffsetInDirectiveWithParametersRegionOfPhpScopeResolutio
   for (const contextRange of contextRanges) {
     if (contextRange.start <= editorOffset && contextRange.end >= editorOffset) {
       for (const i of contextRange.scopeResolutionItems) {
-        if (i.member.name === '' || i.member.name === '?>') {
+        // In the case of `DateTime::|`
+        if (i.member.startOffset > i.member.endOffset) {
           if (i.member.endOffset + contextRange.start - adjustOffset === editorOffset) {
             return true;
           }
         } else {
+          // In the case of `DateTime::x...`
           if (
             i.member.startOffset + contextRange.start - adjustOffset + 1 <= editorOffset &&
             i.member.endOffset + contextRange.start - adjustOffset >= editorOffset
@@ -279,7 +287,7 @@ export function isEditorOffsetInPropsValueRegionOfPhpScopeResolutionItem(code: s
         if (!parameter.valuePosition.end?.offset) continue;
 
         const phpCode = '<?php ' + parameter.value + ' ?>';
-        const items = phpCommon.getScopeResolutionItemFromPhpCode(phpCode);
+        const items = phpCommon.getScopeResolutionItemsFromPhpCode(phpCode);
 
         const contextRange: BladeWithPhpScopeResolutionItemsType = {
           start: parameter.valuePosition.start.offset,
@@ -297,11 +305,13 @@ export function isEditorOffsetInPropsValueRegionOfPhpScopeResolutionItem(code: s
   for (const contextRange of contextRanges) {
     if (contextRange.start <= editorOffset && contextRange.end >= editorOffset) {
       for (const i of contextRange.scopeResolutionItems) {
-        if (i.member.name === '' || i.member.name === '?>') {
+        // In the case of `DateTime::|`
+        if (i.member.startOffset > i.member.endOffset) {
           if (i.member.endOffset + contextRange.start - adjustOffset === editorOffset) {
             return true;
           }
         } else {
+          // In the case of `DateTime::x...`
           if (
             i.member.startOffset + contextRange.start - adjustOffset + 1 <= editorOffset &&
             i.member.endOffset + contextRange.start - adjustOffset >= editorOffset

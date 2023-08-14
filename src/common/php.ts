@@ -310,18 +310,24 @@ export function getScopeResolutionItemsFromPhpCode(code: string) {
     let memberName: string | undefined = undefined;
     let memberStartOffset: number | undefined = undefined;
     let memberEndOffset: number | undefined = undefined;
-    // In the case of `DateTime::dummy`, `dummy` information is entered.
     if (staticlookupNode.offset.kind === 'identifier') {
       const offsetIdentiferNode = staticlookupNode.offset as Identifier;
       if (!offsetIdentiferNode.loc) return;
-
-      memberName = offsetIdentiferNode.name;
-      memberStartOffset = offsetIdentiferNode.loc.start.offset;
-      memberEndOffset = offsetIdentiferNode.loc.end.offset;
+      // In the case of `DateTime::|`.
+      if (offsetIdentiferNode.name === '') {
+        memberName = '';
+        memberStartOffset = classEndOffset + '::'.length - 1;
+        memberEndOffset = classEndOffset + '::'.length;
+      } else {
+        // In the case of `DateTime::|`.
+        memberName = offsetIdentiferNode.name;
+        memberStartOffset = offsetIdentiferNode.loc.start.offset;
+        memberEndOffset = offsetIdentiferNode.loc.end.offset;
+      }
     } else {
       // In the case of `DateTime::|`.
       memberName = '';
-      memberStartOffset = classEndOffset + '::'.length;
+      memberStartOffset = classEndOffset + '::'.length - 1;
       memberEndOffset = classEndOffset + '::'.length;
     }
 
