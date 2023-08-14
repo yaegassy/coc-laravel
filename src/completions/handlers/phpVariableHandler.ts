@@ -145,10 +145,13 @@ try {
 } catch (\\Throwable \\$th) {}
 `);
 
-    const resJsonStr = await runTinkerReflection(reflectionCode, artisanPath);
-    if (!resJsonStr) return item;
-
-    const detectVariableType = JSON.parse(resJsonStr) as string;
+    let detectVariableType: string | undefined = undefined;
+    try {
+      const resJsonStr = await runTinkerReflection(reflectionCode, artisanPath);
+      if (resJsonStr) {
+        detectVariableType = JSON.parse(resJsonStr) as string;
+      }
+    } catch (e) {}
     if (!detectVariableType) return item;
 
     item.detail = detectVariableType;
