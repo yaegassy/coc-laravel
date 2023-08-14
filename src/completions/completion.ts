@@ -40,6 +40,7 @@ import * as phpConstantCompletionHandler from './handlers/phpConstantHandler';
 import * as phpFunctionCompletionHandler from './handlers/phpFunctionHandler';
 import * as phpKeywordCompletionHandler from './handlers/phpKeywordHandler';
 import * as phpScopeResolutionCompletionHandler from './handlers/phpScopeResolutionHandler';
+import * as phpVariableCompletionHandler from './handlers/phpVariableHandler';
 import * as routeCompletionHandler from './handlers/routeHandler';
 import * as translationCompletionHandler from './handlers/translationHandler';
 import * as validationCompletionHandler from './handlers/validationHandler';
@@ -291,6 +292,14 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       }
     }
 
+    // php variable
+    if (config.completion.phpVariableEnable) {
+      const phpVariableCompletionItems = await phpVariableCompletionHandler.doCompletion(document, position);
+      if (phpVariableCompletionItems) {
+        items.push(...phpVariableCompletionItems);
+      }
+    }
+
     // php constant
     if (config.completion.phpConstantEnable) {
       const phpConstantCompletionItems = await phpConstantCompletionHandler.doCompletion(
@@ -415,6 +424,9 @@ class LaravelCompletionProvider implements CompletionItemProvider {
         _token,
         this.artisanPath
       );
+      return resolveItem;
+    } else if (itemData.source === 'laravel-php-variable') {
+      const resolveItem = await phpVariableCompletionHandler.doResolveCompletionItem(item, _token, this.artisanPath);
       return resolveItem;
     }
 

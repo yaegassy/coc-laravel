@@ -64,3 +64,15 @@ export type BladeWithPhpScopeResolutionItemsType = {
   end: number;
   scopeResolutionItems: ScopeResolutionItemType[];
 };
+
+export type PhpRelatedBladeNodeType = 'inlinePhp' | 'phpDirective';
+
+export type PhpVariableItemType = {
+  name: string;
+  type: string;
+  start: number;
+  end: number;
+  bladeNodeStart?: number;
+  bladeNodeEnd?: number;
+  bladeNodeType?: PhpRelatedBladeNodeType;
+};

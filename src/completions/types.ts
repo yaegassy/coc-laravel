@@ -25,10 +25,13 @@ export type CompletionItemDataType = {
   kind?: PHPClassItemKindEnum; // phpClass, phpScopeResolution
   isStubs?: boolean; // phpConstant, phpFunction, phpClass, phpScopeResolution
   className?: string; // phpScopeResolution
+  variableType?: string; // phpVariable
+  originalContent?: string; // phpVariable
 };
 
 type CompletionItemSource =
   | 'laravel-php-constant'
   | 'laravel-php-function'
   | 'laravel-php-class'
-  | 'laravel-php-scope-resolution';
+  | 'laravel-php-scope-resolution'
+  | 'laravel-php-variable';
