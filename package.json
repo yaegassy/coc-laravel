@@ -283,6 +283,11 @@
           "default": true,
           "description": "Enable php scope resolution completion."
         },
+        "laravel.completion.phpObjectMemberEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable php object member completion."
+        },
         "laravel.completion.phpVariableEnable": {
           "type": "boolean",
           "default": true,

@@ -39,6 +39,7 @@ import * as phpClassCompletionHandler from './handlers/phpClassHandler';
 import * as phpConstantCompletionHandler from './handlers/phpConstantHandler';
 import * as phpFunctionCompletionHandler from './handlers/phpFunctionHandler';
 import * as phpKeywordCompletionHandler from './handlers/phpKeywordHandler';
+import * as phpObjectMemberCompletionHandler from './handlers/phpObjectMemberHandler';
 import * as phpScopeResolutionCompletionHandler from './handlers/phpScopeResolutionHandler';
 import * as phpVariableCompletionHandler from './handlers/phpVariableHandler';
 import * as routeCompletionHandler from './handlers/routeHandler';
@@ -74,6 +75,7 @@ export async function register(
       DOCUMENT_SELECTOR,
       new LaravelCompletionProvider(context, projectManager, viewPath, artisanPath, outputChannel),
       [
+        '>', //  php object member
         '\\', //  php related
         '$', // livewire property completion, php related
         '@', // directive,
@@ -279,8 +281,8 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       }
     }
 
-    // php scope resolution (Xxxx::)
-    if (workspace.getConfiguration('laravel').get('completion.phpScopeResolutionEnable')) {
+    // php scope resolution (DateTime::|)
+    if (config.completion.phpScopeResolutionEnable) {
       const phpScopeResolutionCompletionItems = await phpScopeResolutionCompletionHandler.doCompletion(
         document,
         position,
@@ -289,6 +291,18 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       );
       if (phpScopeResolutionCompletionItems) {
         items.push(...phpScopeResolutionCompletionItems);
+      }
+    }
+
+    // php object member ($obj->|)
+    if (config.completion.phpObjectMemberEnable) {
+      const phpObjectMemberCompletionItems = await phpObjectMemberCompletionHandler.doCompletion(
+        document,
+        position,
+        this.artisanPath
+      );
+      if (phpObjectMemberCompletionItems) {
+        items.push(...phpObjectMemberCompletionItems);
       }
     }
 
@@ -427,6 +441,13 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       return resolveItem;
     } else if (itemData.source === 'laravel-php-variable') {
       const resolveItem = await phpVariableCompletionHandler.doResolveCompletionItem(item, _token, this.artisanPath);
+      return resolveItem;
+    } else if (itemData.source === 'laravel-php-object-member') {
+      const resolveItem = await phpObjectMemberCompletionHandler.doResolveCompletionItem(
+        item,
+        _token,
+        this.artisanPath
+      );
       return resolveItem;
     }
 

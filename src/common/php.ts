@@ -11,11 +11,13 @@ import {
   Name,
   Namespace as NamespaceNode,
   Number as NumberNode,
+  PropertyLookup,
   StaticLookup,
   String as StringNode,
+  Variable,
 } from 'php-parser';
 
-import { ScopeResolutionItemType } from '../common/types';
+import { PhpObjectItemType, ScopeResolutionItemType } from '../common/types';
 import * as phpParser from '../parsers/php/parser';
 import { PHPClassItemKindEnum } from '../projects/types';
 
@@ -336,6 +338,69 @@ export function getScopeResolutionItemsFromPhpCode(code: string) {
         name: className,
         startOffset: classStartOffset,
         endOffset: classEndOffset,
+      },
+      member: {
+        name: memberName,
+        startOffset: memberStartOffset,
+        endOffset: memberEndOffset,
+      },
+    });
+  }, ast);
+
+  return items;
+}
+
+export function getObjectItemsFromPhpCode(code: string) {
+  const ast = phpParser.getAstByParseCode(code);
+  if (!ast) return [];
+
+  const items: PhpObjectItemType[] = [];
+
+  phpParser.walk((node, parent) => {
+    if (!parent) return;
+    //if (parent.kind !== 'expressionstatement') return;
+    if (node.kind !== 'propertylookup') return;
+    const propertylookupNode = node as PropertyLookup;
+    if (propertylookupNode.what.kind !== 'variable') return;
+    if (!propertylookupNode.what.loc) return;
+    // ===
+    const objectStartOffset = propertylookupNode.what.loc.start.offset;
+    const objectEndOffset = propertylookupNode.what.loc.end.offset;
+
+    const whatVariableNode = propertylookupNode.what as Variable;
+    if (typeof whatVariableNode.name !== 'string') return;
+    // ===
+    const objectName = whatVariableNode.name;
+
+    let memberName: string | undefined = undefined;
+    let memberStartOffset: number | undefined = undefined;
+    let memberEndOffset: number | undefined = undefined;
+    if (propertylookupNode.offset.kind === 'identifier') {
+      const offsetIdentiferNode = propertylookupNode.offset as Identifier;
+      if (!offsetIdentiferNode.loc) return;
+      // In the case of `$obj->|`.
+      if (offsetIdentiferNode.name === '') {
+        memberName = '';
+        memberStartOffset = objectEndOffset + '->'.length - 1;
+        memberEndOffset = objectEndOffset + '->'.length;
+      } else {
+        // In the case of `$obj->dummy`, `dummy` information is entered.
+        memberName = offsetIdentiferNode.name;
+        memberStartOffset = offsetIdentiferNode.loc.start.offset;
+        memberEndOffset = offsetIdentiferNode.loc.end.offset;
+      }
+    } else {
+      // In the case of `$obj->|`.
+      memberName = '';
+      memberStartOffset = objectEndOffset + '->'.length - 1;
+      memberEndOffset = objectEndOffset + '->'.length;
+    }
+
+    items.push({
+      object: {
+        name: objectName,
+        startOffset: objectStartOffset,
+        endOffset: objectEndOffset,
       },
       member: {
         name: memberName,

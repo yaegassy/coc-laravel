@@ -7,12 +7,23 @@ const _config = workspace.getConfiguration('laravel');
  */
 export const config = {
   completion: {
-    phpFunctionEnable: _config.get<boolean>('completion.phpFunctionEnable', true),
-    phpClassEnable: _config.get<boolean>('completion.phpClassEnable', true),
-    phpConstantEnable: _config.get<boolean>('completion.phpConstantEnable', true),
+    get phpFunctionEnable() {
+      return _config.get<boolean>('completion.phpFunctionEnable', true);
+    },
+    get phpClassEnable() {
+      return _config.get<boolean>('completion.phpClassEnable', true);
+    },
+    get phpScopeResolutionEnable() {
+      return _config.get<boolean>('completion.phpScopeResolutionEnable', true);
+    },
+    get phpConstantEnable() {
+      return _config.get<boolean>('completion.phpConstantEnable', true);
+    },
     get phpVariableEnable() {
-      const defaultValue = true;
-      return _config.get<boolean>('completion.phpVariableEnable', defaultValue);
+      return _config.get<boolean>('completion.phpVariableEnable', true);
+    },
+    get phpObjectMemberEnable() {
+      return _config.get<boolean>('completion.phpObjectMemberEnable', true);
     },
   },
 };

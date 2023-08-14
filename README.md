@@ -41,6 +41,7 @@ This coc-extension will provide various completion features and more features fo
     - PHP Function completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1643359916)
     - PHP Class completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1671277304)
     - PHP Scope Resolution completion (e.g. `DateTime::|`) | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1674415047)
+    - PHP Object Member completion (e.g. `$obj->|`) | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1678240483)
     - PHP Variable completion | [DEMO](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1676733936)
     - PHP Constant completion | [DESCRIPTION](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1671281861)
     - PHP Keyword completion | [DESCRIPTION](https://github.com/yaegassy/coc-laravel/issues/1#issuecomment-1671284071)
@@ -147,6 +148,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.completion.phpFunctionEnable`: Enable php function completion, default: `true`
 - `laravel.completion.phpClassEnable`: Enable php class completion, default: `true`
 - `laravel.completion.phpScopeResolutionEnable`: Enable php scope resolution completion, default: `true`
+- `laravel.completion.phpObjectMemberEnable`: Enable php object member completion, default: `true`
 - `laravel.completion.phpVariableEnable`: Enable php variable completion, default: `true`
 - `laravel.completion.phpConstantEnable`: Enable php constant completion, default: `true`
 - `laravel.completion.phpKeywordEnable`: Enable php keyword completion, default: `true`

@@ -65,6 +65,25 @@ export type BladeWithPhpScopeResolutionItemsType = {
   scopeResolutionItems: ScopeResolutionItemType[];
 };
 
+export type PhpObjectItemType = {
+  object: {
+    name: string;
+    startOffset: number;
+    endOffset: number;
+  };
+  member: {
+    name: string;
+    startOffset: number;
+    endOffset: number;
+  };
+};
+
+export type BladeWithPhpObjectItemsType = {
+  start: number;
+  end: number;
+  objectItems: PhpObjectItemType[];
+};
+
 export type PhpRelatedBladeNodeType = 'inlinePhp' | 'phpDirective';
 
 export type PhpVariableItemType = {

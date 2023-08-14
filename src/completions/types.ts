@@ -27,6 +27,8 @@ export type CompletionItemDataType = {
   className?: string; // phpScopeResolution
   variableType?: string; // phpVariable
   originalContent?: string; // phpVariable
+  objectName?: string; // phpObjectMember
+  virtualContent?: string; // phpObjectMember
 };
 
 type CompletionItemSource =
@@ -34,4 +36,5 @@ type CompletionItemSource =
   | 'laravel-php-function'
   | 'laravel-php-class'
   | 'laravel-php-scope-resolution'
-  | 'laravel-php-variable';
+  | 'laravel-php-variable'
+  | 'laravel-php-object-member';
