@@ -39,7 +39,7 @@ export async function doCompletion(
   let wordWithExtraChars: string | undefined = undefined;
   const wordWithExtraCharsRange = doc.getWordRangeAtPosition(
     Position.create(position.line, position.character - 1),
-    '_$\\:'
+    '_\\:'
   );
   if (wordWithExtraCharsRange) {
     wordWithExtraChars = document.getText(wordWithExtraCharsRange);
@@ -113,12 +113,10 @@ echo json_encode(['classConstants' => \\$classConstants, 'staticMethods' => \\$s
   }
 
   for (const staticMethod of memberData.staticMethods) {
-    const adjustStartCharacter = position.character - wordWithExtraChars.length - className.length;
-
     const edit: TextEdit = {
       range: {
-        start: { line: position.line, character: position.character - adjustStartCharacter },
-        end: position,
+        start: position,
+        end: { line: position.line, character: position.character + staticMethod.length },
       },
       newText: new SnippetString(`${staticMethod}(\${1})`).value,
     };

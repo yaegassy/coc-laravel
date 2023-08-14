@@ -26,6 +26,7 @@
     "access": "public"
   },
   "scripts": {
+    "first": "yarn stubs && yarn laravel",
     "stubs": "rimraf stubs && git clone git@github.com:JetBrains/phpstorm-stubs.git --depth 1 stubs",
     "laravel": "rimraf laravel-project && composer create-project laravel/laravel:10.* laravel-project && cp -R resources/laravel/laravel-project.env laravel-project/.env && touch laravel-project/database/database.sqlite && cd laravel-project && ./artisan key:generate && ./artisan migrate",
     "test": "vitest run src/__tests__",
