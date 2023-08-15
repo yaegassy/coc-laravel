@@ -12,10 +12,10 @@ import {
 } from 'coc.nvim';
 
 import { runTinkerReflection } from '../../common/shared';
-import { ScopeResolutionMemberDataType } from '../../common/types';
+import { StaticClassMemberDataType } from '../../common/types';
 import { stripInitialNewline } from '../../common/utils';
 import { type PHPClassProjectManagerType } from '../../projects/types';
-import * as phpScopeResolutionCompletionService from '../services/phpScopeResolutionService';
+import * as phpStaticClassCompletionService from '../services/phpStaticClassService';
 import { CompletionItemDataType } from '../types';
 
 export async function doCompletion(
@@ -34,7 +34,7 @@ export async function doCompletion(
   const code = document.getText();
   const offset = document.offsetAt(position);
 
-  if (!phpScopeResolutionCompletionService.canCompletionFromContext(code, offset)) return [];
+  if (!phpStaticClassCompletionService.canCompletionFromContext(code, offset)) return [];
 
   let wordWithExtraChars: string | undefined = undefined;
   const wordWithExtraCharsRange = doc.getWordRangeAtPosition(
@@ -46,21 +46,16 @@ export async function doCompletion(
   }
   if (!wordWithExtraChars) return [];
 
-  const scopeResolutionItems = await getScopeResolutionItems(
-    phpClassProjectManager,
-    position,
-    wordWithExtraChars,
-    artisanPath
-  );
+  const staticClassItems = await getStaticClassItems(phpClassProjectManager, position, wordWithExtraChars, artisanPath);
 
-  if (scopeResolutionItems) {
-    items.push(...scopeResolutionItems);
+  if (staticClassItems) {
+    items.push(...staticClassItems);
   }
 
   return items;
 }
 
-async function getScopeResolutionItems(
+async function getStaticClassItems(
   phpClassProjectManager: PHPClassProjectManagerType,
   position: Position,
   wordWithExtraChars: string,
@@ -85,7 +80,7 @@ echo json_encode(['classConstants' => \\$classConstants, 'staticMethods' => \\$s
   const resJsonStr = await runTinkerReflection(reflectionCode, artisanPath);
   if (!resJsonStr) return;
 
-  const memberData = JSON.parse(resJsonStr) as ScopeResolutionMemberDataType;
+  const memberData = JSON.parse(resJsonStr) as StaticClassMemberDataType;
 
   const classStoreData = phpClassProjectManager.phpClassMapStore.get(className);
   if (!classStoreData) return [];
@@ -99,7 +94,7 @@ echo json_encode(['classConstants' => \\$classConstants, 'staticMethods' => \\$s
 
   for (const classConstant of memberData.classConstants) {
     const data: CompletionItemDataType = {
-      source: 'laravel-php-scope-resolution',
+      source: 'laravel-php-static-class',
       className,
     };
 
@@ -122,7 +117,7 @@ echo json_encode(['classConstants' => \\$classConstants, 'staticMethods' => \\$s
     };
 
     const data: CompletionItemDataType = {
-      source: 'laravel-php-scope-resolution',
+      source: 'laravel-php-static-class',
       className,
     };
 
@@ -148,7 +143,7 @@ export async function doResolveCompletionItem(
   if (!item.data) return item;
 
   const itemData = item.data as CompletionItemDataType;
-  if (itemData.source !== 'laravel-php-scope-resolution') return item;
+  if (itemData.source !== 'laravel-php-static-class') return item;
   if (!itemData.className) return item;
   const className = itemData.className;
 

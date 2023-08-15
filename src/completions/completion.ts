@@ -40,7 +40,7 @@ import * as phpConstantCompletionHandler from './handlers/phpConstantHandler';
 import * as phpFunctionCompletionHandler from './handlers/phpFunctionHandler';
 import * as phpKeywordCompletionHandler from './handlers/phpKeywordHandler';
 import * as phpObjectMemberCompletionHandler from './handlers/phpObjectMemberHandler';
-import * as phpScopeResolutionCompletionHandler from './handlers/phpScopeResolutionHandler';
+import * as phpStaticClassCompletionHandler from './handlers/phpStaticClassHandler';
 import * as phpVariableCompletionHandler from './handlers/phpVariableHandler';
 import * as routeCompletionHandler from './handlers/routeHandler';
 import * as translationCompletionHandler from './handlers/translationHandler';
@@ -281,16 +281,16 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       }
     }
 
-    // php scope resolution (DateTime::|)
-    if (config.completion.phpScopeResolutionEnable) {
-      const phpScopeResolutionCompletionItems = await phpScopeResolutionCompletionHandler.doCompletion(
+    // php static class (DateTime::|)
+    if (config.completion.phpStaticClassEnable) {
+      const phpStaticClassCompletionItems = await phpStaticClassCompletionHandler.doCompletion(
         document,
         position,
         this.projectManager.phpClassProjectManager,
         this.artisanPath
       );
-      if (phpScopeResolutionCompletionItems) {
-        items.push(...phpScopeResolutionCompletionItems);
+      if (phpStaticClassCompletionItems) {
+        items.push(...phpStaticClassCompletionItems);
       }
     }
 
@@ -432,12 +432,8 @@ class LaravelCompletionProvider implements CompletionItemProvider {
     } else if (itemData.source === 'laravel-php-class') {
       const resolveItem = await phpClassCompletionHandler.doResolveCompletionItem(item, _token, this.extensionContext);
       return resolveItem;
-    } else if (itemData.source === 'laravel-php-scope-resolution') {
-      const resolveItem = await phpScopeResolutionCompletionHandler.doResolveCompletionItem(
-        item,
-        _token,
-        this.artisanPath
-      );
+    } else if (itemData.source === 'laravel-php-static-class') {
+      const resolveItem = await phpStaticClassCompletionHandler.doResolveCompletionItem(item, _token, this.artisanPath);
       return resolveItem;
     } else if (itemData.source === 'laravel-php-variable') {
       const resolveItem = await phpVariableCompletionHandler.doResolveCompletionItem(item, _token, this.artisanPath);

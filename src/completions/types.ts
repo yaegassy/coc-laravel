@@ -21,10 +21,10 @@ export type RangeOffset = {
 
 export type CompletionItemDataType = {
   source: CompletionItemSource;
-  filePath?: string; // phpConstant, phpFunction, phpClass, phpScopeResolution
-  kind?: PHPClassItemKindEnum; // phpClass, phpScopeResolution
-  isStubs?: boolean; // phpConstant, phpFunction, phpClass, phpScopeResolution
-  className?: string; // phpScopeResolution
+  filePath?: string; // phpConstant, phpFunction, phpClass, phpStaticClass
+  kind?: PHPClassItemKindEnum; // phpClass, phpStaticClass
+  isStubs?: boolean; // phpConstant, phpFunction, phpClass, phpStaticClass
+  className?: string; // phpStaticClass
   variableType?: string; // phpVariable
   originalContent?: string; // phpVariable
   objectName?: string; // phpObjectMember
@@ -35,6 +35,6 @@ type CompletionItemSource =
   | 'laravel-php-constant'
   | 'laravel-php-function'
   | 'laravel-php-class'
-  | 'laravel-php-scope-resolution'
+  | 'laravel-php-static-class'
   | 'laravel-php-variable'
   | 'laravel-php-object-member';

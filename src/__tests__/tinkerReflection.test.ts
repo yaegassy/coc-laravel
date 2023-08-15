@@ -216,8 +216,8 @@ echo json_encode(\\$reflector->getMethods(), JSON_PRETTY_PRINT);
   });
 });
 
-describe('Scope resolution', () => {
-  test('Scope resolution | 1', async () => {
+describe('Static class', () => {
+  test('Static class | 1', async () => {
     // $ -> \\$
     const code = testUtils.stripInitialNewline(`
 \\$reflector = new ReflectionClass('DateTime');
@@ -262,7 +262,7 @@ echo json_encode(['classConstants' => \\$classConstants, 'staticMethods' => \\$s
     expect(memberItems).toMatchObject(expected);
   });
 
-  test('Scope resolution | 2', async () => {
+  test('Static class | 2', async () => {
     let code = '';
 
     const rootDir = testUtils.TEST_LV_PROJECT_PATH;
@@ -295,7 +295,7 @@ echo json_encode(\\$reflector->getConstant('DUMMY'));
     expect(classConstantValue2).toBe(expected2);
   });
 
-  test('Scope resolution | 3', async () => {
+  test('Static class | 3', async () => {
     let code = '';
 
     const rootDir = testUtils.TEST_LV_PROJECT_PATH;

@@ -1,7 +1,7 @@
 import { BladeComponentNode, BladeEchoNode, DirectiveNode, InlinePhpNode } from 'stillat-blade-parser/out/nodes/nodes';
 
 import * as phpCommon from '../../common/php';
-import { BladeWithPhpScopeResolutionItemsType } from '../../common/types';
+import { BladeWithPhpStaticClassItemsType } from '../../common/types';
 import * as bladeParser from '../../parsers/blade/parser';
 
 export function canCompletionFromContext(code: string, editorOffset: number) {
@@ -10,11 +10,11 @@ export function canCompletionFromContext(code: string, editorOffset: number) {
 
   const flags: boolean[] = [];
 
-  flags.push(isEditorOffsetInBladeEchoRegionOfPhpScopeResolutionItem(code, editorOffset));
-  flags.push(isEditorOffsetInPHPDirectiveRegionOfOfPhpScopeResolutionItem(code, editorOffset));
-  flags.push(isEditorOffsetInDirectiveWithParametersRegionOfPhpScopeResolutionItem(code, editorOffset));
-  flags.push(isEditorOffsetInInlinePhpResionOfPhpScopeResolutionItem(code, editorOffset));
-  flags.push(isEditorOffsetInPropsValueRegionOfPhpScopeResolutionItem(code, editorOffset));
+  flags.push(isEditorOffsetInBladeEchoRegionOfPhpStaticClassItem(code, editorOffset));
+  flags.push(isEditorOffsetInPHPDirectiveRegionOfOfPhpStaticClassItem(code, editorOffset));
+  flags.push(isEditorOffsetInDirectiveWithParametersRegionOfPhpStaticClassItem(code, editorOffset));
+  flags.push(isEditorOffsetInInlinePhpResionOfPhpStaticClassItem(code, editorOffset));
+  flags.push(isEditorOffsetInPropsValueRegionOfPhpStaticClassItem(code, editorOffset));
 
   if (flags.includes(true)) {
     return true;
@@ -23,11 +23,11 @@ export function canCompletionFromContext(code: string, editorOffset: number) {
   }
 }
 
-export function isEditorOffsetInBladeEchoRegionOfPhpScopeResolutionItem(code: string, editorOffset: number) {
+export function isEditorOffsetInBladeEchoRegionOfPhpStaticClassItem(code: string, editorOffset: number) {
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpScopeResolutionItemsType[] = [];
+  const contextRanges: BladeWithPhpStaticClassItemsType[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof BladeEchoNode) {
@@ -36,12 +36,12 @@ export function isEditorOffsetInBladeEchoRegionOfPhpScopeResolutionItem(code: st
       // blade echo
       const phpCode = '<?php echo' + node.content;
 
-      const items = phpCommon.getScopeResolutionItemsFromPhpCode(phpCode);
+      const items = phpCommon.getStaticClassItemsFromPhpCode(phpCode);
 
-      const contextRange: BladeWithPhpScopeResolutionItemsType = {
+      const contextRange: BladeWithPhpStaticClassItemsType = {
         start: node.offset.start,
         end: node.offset.end,
-        scopeResolutionItems: items,
+        staticClassItems: items,
       };
 
       contextRanges.push(contextRange);
@@ -53,7 +53,7 @@ export function isEditorOffsetInBladeEchoRegionOfPhpScopeResolutionItem(code: st
 
   for (const contextRange of contextRanges) {
     if (contextRange.start <= editorOffset && contextRange.end >= editorOffset) {
-      for (const i of contextRange.scopeResolutionItems) {
+      for (const i of contextRange.staticClassItems) {
         // In the case of `DateTime::|`
         if (i.member.startOffset > i.member.endOffset) {
           if (i.member.endOffset + contextRange.start - adjustOffset === editorOffset) {
@@ -75,11 +75,11 @@ export function isEditorOffsetInBladeEchoRegionOfPhpScopeResolutionItem(code: st
   return false;
 }
 
-export function isEditorOffsetInPHPDirectiveRegionOfOfPhpScopeResolutionItem(code: string, editorOffset: number) {
+export function isEditorOffsetInPHPDirectiveRegionOfOfPhpStaticClassItem(code: string, editorOffset: number) {
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpScopeResolutionItemsType[] = [];
+  const contextRanges: BladeWithPhpStaticClassItemsType[] = [];
 
   let adjustOffset = 0;
 
@@ -95,12 +95,12 @@ export function isEditorOffsetInPHPDirectiveRegionOfOfPhpScopeResolutionItem(cod
         const phpCode = '<?php' + node.documentContent;
         adjustOffset = 2;
 
-        const items = phpCommon.getScopeResolutionItemsFromPhpCode(phpCode);
+        const items = phpCommon.getStaticClassItemsFromPhpCode(phpCode);
 
-        const contextRange: BladeWithPhpScopeResolutionItemsType = {
+        const contextRange: BladeWithPhpStaticClassItemsType = {
           start: node.offset.start,
           end: endPhpDirectiveNode.offset.end,
-          scopeResolutionItems: items,
+          staticClassItems: items,
         };
 
         contextRanges.push(contextRange);
@@ -109,12 +109,12 @@ export function isEditorOffsetInPHPDirectiveRegionOfOfPhpScopeResolutionItem(cod
 
         adjustOffset = 1;
 
-        const items = phpCommon.getScopeResolutionItemsFromPhpCode(phpCode);
+        const items = phpCommon.getStaticClassItemsFromPhpCode(phpCode);
 
-        const contextRange: BladeWithPhpScopeResolutionItemsType = {
+        const contextRange: BladeWithPhpStaticClassItemsType = {
           start: node.offset.start,
           end: node.offset.end,
-          scopeResolutionItems: items,
+          staticClassItems: items,
         };
 
         contextRanges.push(contextRange);
@@ -124,7 +124,7 @@ export function isEditorOffsetInPHPDirectiveRegionOfOfPhpScopeResolutionItem(cod
 
   for (const contextRange of contextRanges) {
     if (contextRange.start <= editorOffset && contextRange.end >= editorOffset) {
-      for (const i of contextRange.scopeResolutionItems) {
+      for (const i of contextRange.staticClassItems) {
         // In the case of `DateTime::|`
         if (i.member.startOffset > i.member.endOffset) {
           if (i.member.endOffset + contextRange.start - adjustOffset === editorOffset) {
@@ -146,11 +146,11 @@ export function isEditorOffsetInPHPDirectiveRegionOfOfPhpScopeResolutionItem(cod
   return false;
 }
 
-export function isEditorOffsetInInlinePhpResionOfPhpScopeResolutionItem(code: string, editorOffset: number) {
+export function isEditorOffsetInInlinePhpResionOfPhpStaticClassItem(code: string, editorOffset: number) {
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpScopeResolutionItemsType[] = [];
+  const contextRanges: BladeWithPhpStaticClassItemsType[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof InlinePhpNode) {
@@ -159,12 +159,12 @@ export function isEditorOffsetInInlinePhpResionOfPhpScopeResolutionItem(code: st
 
       const phpCode = node.sourceContent;
 
-      const items = phpCommon.getScopeResolutionItemsFromPhpCode(phpCode);
+      const items = phpCommon.getStaticClassItemsFromPhpCode(phpCode);
 
-      const contextRange: BladeWithPhpScopeResolutionItemsType = {
+      const contextRange: BladeWithPhpStaticClassItemsType = {
         start: node.startPosition.offset,
         end: node.endPosition.offset,
-        scopeResolutionItems: items,
+        staticClassItems: items,
       };
 
       contextRanges.push(contextRange);
@@ -173,7 +173,7 @@ export function isEditorOffsetInInlinePhpResionOfPhpScopeResolutionItem(code: st
 
   for (const contextRange of contextRanges) {
     if (contextRange.start <= editorOffset && contextRange.end >= editorOffset) {
-      for (const i of contextRange.scopeResolutionItems) {
+      for (const i of contextRange.staticClassItems) {
         // In the case of `DateTime::|`
         if (i.member.startOffset > i.member.endOffset) {
           if (i.member.endOffset + contextRange.start === editorOffset) {
@@ -195,14 +195,11 @@ export function isEditorOffsetInInlinePhpResionOfPhpScopeResolutionItem(code: st
   return false;
 }
 
-export function isEditorOffsetInDirectiveWithParametersRegionOfPhpScopeResolutionItem(
-  code: string,
-  editorOffset: number
-) {
+export function isEditorOffsetInDirectiveWithParametersRegionOfPhpStaticClassItem(code: string, editorOffset: number) {
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpScopeResolutionItemsType[] = [];
+  const contextRanges: BladeWithPhpStaticClassItemsType[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof DirectiveNode) {
@@ -231,12 +228,12 @@ export function isEditorOffsetInDirectiveWithParametersRegionOfPhpScopeResolutio
 
         const phpCode = '<?php ' + node.directiveParameters.replace(/^\(/, '').replace(/\)$/, '') + ' ?>';
 
-        const items = phpCommon.getScopeResolutionItemsFromPhpCode(phpCode);
+        const items = phpCommon.getStaticClassItemsFromPhpCode(phpCode);
 
-        const contextRange: BladeWithPhpScopeResolutionItemsType = {
+        const contextRange: BladeWithPhpStaticClassItemsType = {
           start: node.directiveParametersPosition.start.offset,
           end: node.directiveParametersPosition.end.offset,
-          scopeResolutionItems: items,
+          staticClassItems: items,
         };
 
         contextRanges.push(contextRange);
@@ -248,7 +245,7 @@ export function isEditorOffsetInDirectiveWithParametersRegionOfPhpScopeResolutio
 
   for (const contextRange of contextRanges) {
     if (contextRange.start <= editorOffset && contextRange.end >= editorOffset) {
-      for (const i of contextRange.scopeResolutionItems) {
+      for (const i of contextRange.staticClassItems) {
         // In the case of `DateTime::|`
         if (i.member.startOffset > i.member.endOffset) {
           if (i.member.endOffset + contextRange.start - adjustOffset === editorOffset) {
@@ -270,11 +267,11 @@ export function isEditorOffsetInDirectiveWithParametersRegionOfPhpScopeResolutio
   return false;
 }
 
-export function isEditorOffsetInPropsValueRegionOfPhpScopeResolutionItem(code: string, editorOffset: number) {
+export function isEditorOffsetInPropsValueRegionOfPhpStaticClassItem(code: string, editorOffset: number) {
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpScopeResolutionItemsType[] = [];
+  const contextRanges: BladeWithPhpStaticClassItemsType[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof BladeComponentNode) {
@@ -287,12 +284,12 @@ export function isEditorOffsetInPropsValueRegionOfPhpScopeResolutionItem(code: s
         if (!parameter.valuePosition.end?.offset) continue;
 
         const phpCode = '<?php ' + parameter.value + ' ?>';
-        const items = phpCommon.getScopeResolutionItemsFromPhpCode(phpCode);
+        const items = phpCommon.getStaticClassItemsFromPhpCode(phpCode);
 
-        const contextRange: BladeWithPhpScopeResolutionItemsType = {
+        const contextRange: BladeWithPhpStaticClassItemsType = {
           start: parameter.valuePosition.start.offset,
           end: parameter.valuePosition.end.offset,
-          scopeResolutionItems: items,
+          staticClassItems: items,
         };
 
         contextRanges.push(contextRange);
@@ -304,7 +301,7 @@ export function isEditorOffsetInPropsValueRegionOfPhpScopeResolutionItem(code: s
 
   for (const contextRange of contextRanges) {
     if (contextRange.start <= editorOffset && contextRange.end >= editorOffset) {
-      for (const i of contextRange.scopeResolutionItems) {
+      for (const i of contextRange.staticClassItems) {
         // In the case of `DateTime::|`
         if (i.member.startOffset > i.member.endOffset) {
           if (i.member.endOffset + contextRange.start - adjustOffset === editorOffset) {

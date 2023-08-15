@@ -17,7 +17,7 @@ import {
   Variable,
 } from 'php-parser';
 
-import { PhpObjectItemType, ScopeResolutionItemType } from '../common/types';
+import { PhpObjectItemType, StaticClassItemType } from '../common/types';
 import * as phpParser from '../parsers/php/parser';
 import { PHPClassItemKindEnum } from '../projects/types';
 
@@ -288,11 +288,11 @@ export function getClassItemDocumantationFromPhpCode(code: string, className: st
   return documantations.join('');
 }
 
-export function getScopeResolutionItemsFromPhpCode(code: string) {
+export function getStaticClassItemsFromPhpCode(code: string) {
   const ast = phpParser.getAstByParseCode(code);
   if (!ast) return [];
 
-  const items: ScopeResolutionItemType[] = [];
+  const items: StaticClassItemType[] = [];
 
   phpParser.walk((node, parent) => {
     if (!parent) return;

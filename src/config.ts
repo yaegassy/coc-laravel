@@ -13,8 +13,8 @@ export const config = {
     get phpClassEnable() {
       return _config.get<boolean>('completion.phpClassEnable', true);
     },
-    get phpScopeResolutionEnable() {
-      return _config.get<boolean>('completion.phpScopeResolutionEnable', true);
+    get phpStaticClassEnable() {
+      return _config.get<boolean>('completion.phpStaticClassEnable', true);
     },
     get phpConstantEnable() {
       return _config.get<boolean>('completion.phpConstantEnable', true);

@@ -41,7 +41,7 @@ export type ArgumentParameterType = {
   typehint?: string;
 };
 
-export type ScopeResolutionItemType = {
+export type StaticClassItemType = {
   class: {
     name: string;
     startOffset: number;
@@ -54,15 +54,15 @@ export type ScopeResolutionItemType = {
   };
 };
 
-export type ScopeResolutionMemberDataType = {
+export type StaticClassMemberDataType = {
   classConstants: string[];
   staticMethods: string[];
 };
 
-export type BladeWithPhpScopeResolutionItemsType = {
+export type BladeWithPhpStaticClassItemsType = {
   start: number;
   end: number;
-  scopeResolutionItems: ScopeResolutionItemType[];
+  staticClassItems: StaticClassItemType[];
 };
 
 export type PhpObjectItemType = {

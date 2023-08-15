@@ -214,7 +214,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
   expect(documantaion).toBe(expected);
 });
 
-describe('Check scope resolution items', () => {
+describe('Check static class member items', () => {
   test('Even if the member name has not been entered yet, it can be successfully retrieved as items.', async () => {
     const code = testUtils.stripInitialNewline(`
 <?php
@@ -224,7 +224,7 @@ Dummy\\Foo\\Bar::
     const ast = phpParser.getAstByParseCode(code);
     if (!ast) return;
 
-    const items = phpCommon.getScopeResolutionItemsFromPhpCode(code);
+    const items = phpCommon.getStaticClassItemsFromPhpCode(code);
 
     const expected = [
       {
@@ -235,8 +235,8 @@ Dummy\\Foo\\Bar::
         },
         member: {
           name: '',
-          startOffset: 22,
-          endOffset: 22,
+          startOffset: 20,
+          endOffset: 21,
         },
       },
     ];

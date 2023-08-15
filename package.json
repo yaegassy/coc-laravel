@@ -278,10 +278,10 @@
           "default": true,
           "description": "Enable php class completion."
         },
-        "laravel.completion.phpScopeResolutionEnable": {
+        "laravel.completion.phpStaticClassMemberEnable": {
           "type": "boolean",
           "default": true,
-          "description": "Enable php scope resolution completion."
+          "description": "Enable php static class member completion."
         },
         "laravel.completion.phpObjectMemberEnable": {
           "type": "boolean",
