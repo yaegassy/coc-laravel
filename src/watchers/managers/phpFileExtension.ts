@@ -49,6 +49,7 @@ class PHPFileExtentionWatcherManager {
   viewReferenceGlobPattern?: string;
   translationGlobPattern?: string;
   livewireGlobPattern?: string;
+  appGlobPatternPattern?: string;
 
   constructor(
     projectManager: ProjectManagerType,
@@ -70,6 +71,7 @@ class PHPFileExtentionWatcherManager {
       this.classBasedViewGlobPattern = `**/${relativeAppPath}/View/Components/**/*.php`;
       this.viewReferenceGlobPattern = `**/{routes,${relativeAppPath}/Http/{Controllers,Livewire},${relativeAppPath}/View/Components,${relativeAppPath}/Livewire}/**/*.php`;
       this.livewireGlobPattern = `**/{bootstrap/cache/livewire-components.php,${relativeAppPath}/Http/Livewire/**/*.php,${relativeAppPath}/Livewire/**/*.php}`;
+      this.appGlobPatternPattern = `**/${relativeAppPath}/**/*.php`;
     }
 
     if (viewPath) {
@@ -117,6 +119,10 @@ class PHPFileExtentionWatcherManager {
       if (this.livewireGlobPattern && minimatch(e.path, this.livewireGlobPattern)) {
         this.projectManager.livewireProjectManager.set([e.path]);
       }
+
+      if (this.appGlobPatternPattern && minimatch(e.path, this.appGlobPatternPattern)) {
+        this.projectManager.phpClassProjectManager.set([e.path]);
+      }
     });
   }
 
@@ -142,6 +148,10 @@ class PHPFileExtentionWatcherManager {
       if (this.livewireGlobPattern && minimatch(e.path, this.livewireGlobPattern)) {
         this.projectManager.livewireProjectManager.set([e.path]);
       }
+
+      if (this.appGlobPatternPattern && minimatch(e.path, this.appGlobPatternPattern)) {
+        this.projectManager.phpClassProjectManager.set([e.path]);
+      }
     });
   }
 
@@ -166,6 +176,10 @@ class PHPFileExtentionWatcherManager {
 
       if (this.livewireGlobPattern && minimatch(e.path, this.livewireGlobPattern)) {
         this.projectManager.livewireProjectManager.restart();
+      }
+
+      if (this.appGlobPatternPattern && minimatch(e.path, this.appGlobPatternPattern)) {
+        this.projectManager.phpClassProjectManager.set([e.path]);
       }
     });
   }

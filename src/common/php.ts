@@ -207,6 +207,24 @@ export function getFunctionItemStartOffsetFromPhpCode(code: string, name: string
   return offsets[0];
 }
 
+export function getClassNamesFromPhpCode(code: string) {
+  const names: string[] = [];
+
+  const ast = phpParser.getAstByParseCode(code);
+  if (!ast) return [];
+
+  phpParser.walk((node) => {
+    if (node.kind !== 'class' && node.kind !== 'interface' && node.kind !== 'trait' && node.kind !== 'enum') return;
+    const declarationNode = node as DeclarationNode;
+    if (!declarationNode.loc) return;
+    if (typeof declarationNode.name !== 'object') return;
+    const identifierNode = declarationNode.name as Identifier;
+    names.push(identifierNode.name);
+  }, ast);
+
+  return names;
+}
+
 export function getClassItemStartOffsetFromPhpCode(code: string, className: string, classItemKindName: string) {
   const offsets: number[] = [];
 

@@ -1,4 +1,4 @@
-import { ExtensionContext, OutputChannel, workspace } from 'coc.nvim';
+import { ExtensionContext, OutputChannel, Uri, workspace } from 'coc.nvim';
 
 import fs from 'fs';
 import path from 'path';
@@ -150,8 +150,8 @@ export class PHPClassProjectManager {
         const targetPHPCode = await fs.promises.readFile(r.path, { encoding: 'utf8' });
 
         const namespaces = phpCommon.getNamespaceFromPHPCode(targetPHPCode);
-        const shotName = r.name.replace(namespaces[0], '').replace(/^\\/, '');
-        const classItemKind = phpCommon.getClassItemKindFromPHPCodeByName(targetPHPCode, shotName);
+        const shortName = r.name.replace(namespaces[0], '').replace(/^\\/, '');
+        const classItemKind = phpCommon.getClassItemKindFromPHPCodeByName(targetPHPCode, shortName);
         if (!classItemKind) continue;
 
         phpClasses.push({
@@ -181,6 +181,42 @@ export class PHPClassProjectManager {
     return this.initialized;
   }
 
+  async set(files: string[]) {
+    const phpClasses: PHPClassType[] = [];
+
+    for (const f of files) {
+      const relativeFilePath = this.getRelativePosixFilePath(f, this.workspaceRoot);
+
+      try {
+        const targetPHPCode = await fs.promises.readFile(f, { encoding: 'utf8' });
+        const namespaces = phpCommon.getNamespaceFromPHPCode(targetPHPCode);
+
+        const classNames = phpCommon.getClassNamesFromPhpCode(targetPHPCode);
+        if (classNames.length === 0) continue;
+
+        for (const name of classNames) {
+          const classItemKind = phpCommon.getClassItemKindFromPHPCodeByName(targetPHPCode, name);
+          if (!classItemKind) continue;
+
+          phpClasses.push({
+            name: namespaces[0] + '\\' + name,
+            path: relativeFilePath,
+            kind: classItemKind,
+            isStubs: false,
+          });
+        }
+      } catch (e: any) {
+        this.outputChannel.appendLine(`[PHPClass:parse_autoload_file_error] ${JSON.stringify(e)}`);
+      }
+    }
+
+    if (phpClasses.length > 0) {
+      for (const c of phpClasses) {
+        this.phpClassMapStore.set(c.name, c);
+      }
+    }
+  }
+
   async restart() {
     this.phpClassMapStore.clear();
 
@@ -193,5 +229,11 @@ export class PHPClassProjectManager {
 
   list() {
     return this.phpClassMapStore.entries();
+  }
+
+  getRelativePosixFilePath(absoluteFilePath: string, rootPath: string) {
+    const rootUri = Uri.parse(rootPath).toString();
+    const abusoluteFileUri = Uri.parse(absoluteFilePath).toString();
+    return abusoluteFileUri.replace(rootUri + '/', '');
   }
 }

@@ -97,6 +97,21 @@ function password(string $label, string $placeholder = '', bool|string $required
   expect(names).toMatchObject(expected);
 });
 
+test('Get class names from php code', async () => {
+  const code = testUtils.stripInitialNewline(`
+<?php
+class DummyClass {}
+interface DummyInterface {}
+trait DummyTrait {}
+enum DummyEnum {}
+`);
+
+  const names = phpCommon.getClassNamesFromPhpCode(code);
+
+  const expected = ['DummyClass', 'DummyInterface', 'DummyTrait', 'DummyEnum'];
+  expect(names).toMatchObject(expected);
+});
+
 test('Get class item kind from php code by name', async () => {
   const code = testUtils.stripInitialNewline(`
 <?php
