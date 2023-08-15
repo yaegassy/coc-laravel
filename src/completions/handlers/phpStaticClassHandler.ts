@@ -127,6 +127,7 @@ echo json_encode(['classConstants' => \\$classConstants, 'staticMethods' => \\$s
       insertTextFormat: InsertTextFormat.Snippet,
       commitCharacters: [':'],
       textEdit: edit,
+      sortText: staticMethod.startsWith('_') ? `zzz_${staticMethod}` : staticMethod,
       data,
     });
   }

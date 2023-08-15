@@ -91,6 +91,7 @@ function getPHPConstantItems(
       kind: CompletionItemKind.Constant,
       insertTextFormat: InsertTextFormat.PlainText,
       textEdit: edit,
+      sortText: phpConstant[0].startsWith('_') ? `zzz_${phpConstant[0]}` : phpConstant[0],
       data,
     });
   }
