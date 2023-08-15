@@ -1,4 +1,4 @@
-import { ExtensionContext, FileSystemWatcher, workspace } from 'coc.nvim';
+import { ExtensionContext, FileSystemWatcher, window, workspace } from 'coc.nvim';
 
 import path from 'path';
 
@@ -51,27 +51,54 @@ class VendorComposerWatcherManager {
   async onDidCreate() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.watcher.onDidCreate(async (_e) => {
+      window.showInformationMessage('[coc-laravel] (update) Project reinitialization...');
+
       await this.projectManager.phpClassProjectManager.restart();
       await this.projectManager.phpFunctionProjectManager.restart();
       await this.projectManager.phpConstantProjectManager.restart();
+
+      // Since the most time-consuming part is phpClassProjectManager
+      // initialization, use the onReady of phpClassProjectManager
+      // initialization to display the message
+      await this.projectManager.phpClassProjectManager.onReady(() => {
+        window.showInformationMessage('[coc-laravel] (success) Project reinitialization succeeded!');
+      });
     });
   }
 
   async onDidChange() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.watcher.onDidChange(async (_e) => {
+      window.showInformationMessage('[coc-laravel] (update) Project reinitialization...');
+
       await this.projectManager.phpClassProjectManager.restart();
       await this.projectManager.phpFunctionProjectManager.restart();
       await this.projectManager.phpConstantProjectManager.restart();
+
+      // Since the most time-consuming part is phpClassProjectManager
+      // initialization, use the onReady of phpClassProjectManager
+      // initialization to display the message
+      await this.projectManager.phpClassProjectManager.onReady(() => {
+        window.showInformationMessage('[coc-laravel] (success) Project reinitialization succeeded!');
+      });
     });
   }
 
   async onDidDelete() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.watcher.onDidDelete(async (_e) => {
+      window.showInformationMessage('[coc-laravel] (update) Project reinitialization...');
+
       await this.projectManager.phpClassProjectManager.restart();
       await this.projectManager.phpFunctionProjectManager.restart();
       await this.projectManager.phpConstantProjectManager.restart();
+
+      // Since the most time-consuming part is phpClassProjectManager
+      // initialization, use the onReady of phpClassProjectManager
+      // initialization to display the message
+      await this.projectManager.phpClassProjectManager.onReady(() => {
+        window.showInformationMessage('[coc-laravel] (success) Project reinitialization succeeded!');
+      });
     });
   }
 }
