@@ -48,7 +48,13 @@ export async function doCompletion(
     wordWithExtraChars = document.getText(wordWithExtraCharsRange);
   }
 
-  const phpUseStatementClassItems = getUseStatementPHPClassItems(code, phpClassProjectManager, position);
+  const phpUseStatementClassItems = getUseStatementPHPClassItems(
+    code,
+    phpClassProjectManager,
+    position,
+    offset,
+    wordWithExtraChars
+  );
   if (phpUseStatementClassItems.length > 0) {
     items.push(...phpUseStatementClassItems);
   }
@@ -128,11 +134,21 @@ function getPHPClassItems(
 function getUseStatementPHPClassItems(
   code: string,
   phpClassProjectManager: PHPClassProjectManagerType,
-  position: Position
+  position: Position,
+  editorOffset: number,
+  wordWithExtraChars?: string
 ) {
   const items: CompletionItem[] = [];
 
-  const virtualPhpEvalCode = bladeCommon.generateVirtualPhpEvalCode(code);
+  let evalCode = code;
+  if (wordWithExtraChars) {
+    const beforeInputString = code.slice(0, editorOffset - wordWithExtraChars.length);
+    const afterInputString = code.slice(editorOffset, code.length - 1);
+    const dummyString = "'__DUMMY__';";
+    evalCode = beforeInputString + dummyString + afterInputString;
+  }
+
+  const virtualPhpEvalCode = bladeCommon.generateVirtualPhpEvalCode(evalCode);
   if (!virtualPhpEvalCode) return [];
 
   const useItems = phpParser.getUseItems('<?php\n' + virtualPhpEvalCode);
