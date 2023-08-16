@@ -3,7 +3,7 @@ import path from 'path';
 import { Array as ArrayNode, Bin, Entry, Return, String as StringNode, Variable } from 'php-parser';
 
 import * as phpParser from '../parsers/php/parser';
-import { ComposerJsonContentType, PhpNamespaceType } from './types';
+import { ComposerJsonContentType, PHPNamespaceType } from './types';
 
 export async function getComposerJsonContent(rootDir: string) {
   const composerJsonPath = path.join(rootDir, 'composer.json');
@@ -43,7 +43,7 @@ export function getProjectNamespacesFromComposerJson(composerJsonContent: Compos
   return projectNamespaces;
 }
 
-export function getRelativeClassFilePathFromNamespaces(namespaces: PhpNamespaceType[], namespaceClass: string) {
+export function getRelativeClassFilePathFromNamespaces(namespaces: PHPNamespaceType[], namespaceClass: string) {
   for (const namespace of namespaces) {
     for (const [k, v] of Object.entries(namespace)) {
       if (namespaceClass.startsWith(k)) {
@@ -58,7 +58,7 @@ export function getRelativeClassFilePathFromNamespaces(namespaces: PhpNamespaceT
   }
 }
 
-export function getFileNamespace(namespaces: PhpNamespaceType[], relativeFilePath: string) {
+export function getFileNamespace(namespaces: PHPNamespaceType[], relativeFilePath: string) {
   const fileName = path.basename(relativeFilePath);
 
   for (const namespace of namespaces) {

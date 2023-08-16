@@ -17,7 +17,7 @@ import {
   Variable,
 } from 'php-parser';
 
-import { PHPSymbolNameDataType, PHPUseItemType, PhpObjectItemType, StaticClassItemType } from '../common/types';
+import { PHPSymbolNameDataType, PHPUseItemType, PHPObjectItemType, StaticClassItemType } from '../common/types';
 import * as phpParser from '../parsers/php/parser';
 import { PHPClassItemKindEnum } from '../projects/types';
 
@@ -372,7 +372,7 @@ export function getObjectItemsFromPhpCode(code: string) {
   const ast = phpParser.getAstByParseCode(code);
   if (!ast) return [];
 
-  const items: PhpObjectItemType[] = [];
+  const items: PHPObjectItemType[] = [];
 
   phpParser.walk((node, parent) => {
     if (!parent) return;

@@ -4,13 +4,13 @@ import { DirectiveNode, InlinePhpNode } from 'stillat-blade-parser/out/nodes/nod
 
 import * as phpParser from '../parsers/php/parser';
 import * as bladeParser from '../parsers/blade/parser';
-import { PhpRelatedBladeNodeType, PhpVariableItemType } from './types';
+import { PHPRelatedBladeNodeType, PHPVariableItemType } from './types';
 
 export function getVariableItemsWithBladeRangeOffsetsFromBladeDoc(
   bladeDoc: BladeDocument,
-  bladeNodeTypeString: PhpRelatedBladeNodeType
+  bladeNodeTypeString: PHPRelatedBladeNodeType
 ) {
-  const items: PhpVariableItemType[] = [];
+  const items: PHPVariableItemType[] = [];
 
   for (const bladeNode of bladeDoc.getAllNodes()) {
     let bladeStartOffset: number | undefined = undefined;
@@ -98,7 +98,7 @@ export function getVariableItemsWithBladeRangeOffsetsFromBladeDoc(
   return items;
 }
 
-export function getAdjustOffsetAtBladeNodeTypeString(bladeNodeTypeString: PhpRelatedBladeNodeType) {
+export function getAdjustOffsetAtBladeNodeTypeString(bladeNodeTypeString: PHPRelatedBladeNodeType) {
   let adjustOffset: number;
 
   switch (bladeNodeTypeString) {
@@ -118,7 +118,7 @@ export function getAdjustOffsetAtBladeNodeTypeString(bladeNodeTypeString: PhpRel
   return adjustOffset;
 }
 
-export function getVariableItemsFromEditorOffset(phpVariableItems: PhpVariableItemType[], editorOffset: number) {
+export function getVariableItemsFromEditorOffset(phpVariableItems: PHPVariableItemType[], editorOffset: number) {
   const items: { name: string; type: string }[] = [];
 
   for (const v of phpVariableItems) {

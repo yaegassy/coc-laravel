@@ -3,7 +3,7 @@ import { BladeComponentNode, BladeEchoNode, DirectiveNode, InlinePhpNode } from 
 
 import * as bladeParser from '../parsers/blade/parser';
 import * as phpParser from '../parsers/php/parser';
-import { BladeWithPhpNodesRange, RangeOffset } from './types';
+import { BladeWithPHPNodesRange, RangeOffset } from './types';
 
 //
 // Can php function comletion related
@@ -13,7 +13,7 @@ export function isEditorOffsetInBladeEchoRegionOfPhpNodeKind(code: string, edito
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpNodesRange[] = [];
+  const contextRanges: BladeWithPHPNodesRange[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof BladeEchoNode) {
@@ -35,7 +35,7 @@ export function isEditorOffsetInBladeEchoRegionOfPhpNodeKind(code: string, edito
         }
       }, phpAst);
 
-      const contextRange: BladeWithPhpNodesRange = {
+      const contextRange: BladeWithPHPNodesRange = {
         startOffset: node.offset.start,
         endOffset: node.offset.end,
         phpNodes: phpNodes,
@@ -75,7 +75,7 @@ export function isEditorOffsetInPHPDirectiveRegionOfPhpNodeKind(
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpNodesRange[] = [];
+  const contextRanges: BladeWithPHPNodesRange[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof DirectiveNode) {
@@ -100,7 +100,7 @@ export function isEditorOffsetInPHPDirectiveRegionOfPhpNodeKind(
           }
         }, phpAst);
 
-        const contextRange: BladeWithPhpNodesRange = {
+        const contextRange: BladeWithPHPNodesRange = {
           startOffset: node.offset.start,
           endOffset: endPhpDirectiveNode.offset.end,
           phpNodes: phpNodes,
@@ -123,7 +123,7 @@ export function isEditorOffsetInPHPDirectiveRegionOfPhpNodeKind(
           }
         }, phpAst);
 
-        const contextRange: BladeWithPhpNodesRange = {
+        const contextRange: BladeWithPHPNodesRange = {
           startOffset: node.offset.start,
           endOffset: node.offset.end,
           phpNodes: phpNodes,
@@ -158,7 +158,7 @@ export function isEditorOffsetInInlinePHPRegionOfPhpNodeKind(code: string, edito
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpNodesRange[] = [];
+  const contextRanges: BladeWithPHPNodesRange[] = [];
 
   let adjustOffset = 0;
 
@@ -195,7 +195,7 @@ export function isEditorOffsetInInlinePHPRegionOfPhpNodeKind(code: string, edito
         }
       }, phpAst);
 
-      const contextRange: BladeWithPhpNodesRange = {
+      const contextRange: BladeWithPHPNodesRange = {
         startOffset: node.startPosition.offset,
         endOffset: node.endPosition.offset,
         phpNodes: phpNodes,
@@ -230,7 +230,7 @@ export function isEditorOffsetInDirectiveWithParametersRegionOfPhpNodeKind(
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpNodesRange[] = [];
+  const contextRanges: BladeWithPHPNodesRange[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof DirectiveNode) {
@@ -272,7 +272,7 @@ export function isEditorOffsetInDirectiveWithParametersRegionOfPhpNodeKind(
           }
         }, phpAst);
 
-        const contextRange: BladeWithPhpNodesRange = {
+        const contextRange: BladeWithPHPNodesRange = {
           startOffset: node.directiveParametersPosition.start.offset,
           endOffset: node.directiveParametersPosition.end.offset,
           phpNodes: phpNodes,
@@ -310,7 +310,7 @@ export function isEditorOffsetInPropsValueRegionOfPhpNodeKind(code: string, edit
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpNodesRange[] = [];
+  const contextRanges: BladeWithPHPNodesRange[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof BladeComponentNode) {
@@ -337,7 +337,7 @@ export function isEditorOffsetInPropsValueRegionOfPhpNodeKind(code: string, edit
           }
         }, phpAst);
 
-        const contextRange: BladeWithPhpNodesRange = {
+        const contextRange: BladeWithPHPNodesRange = {
           startOffset: parameter.valuePosition.start.offset,
           endOffset: parameter.valuePosition.end.offset,
           phpNodes: phpNodes,

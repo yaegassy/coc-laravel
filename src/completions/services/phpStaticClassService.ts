@@ -1,7 +1,7 @@
 import { BladeComponentNode, BladeEchoNode, DirectiveNode, InlinePhpNode } from 'stillat-blade-parser/out/nodes/nodes';
 
 import * as phpCommon from '../../common/php';
-import { BladeWithPhpStaticClassItemsType } from '../../common/types';
+import { BladeWithPHPStaticClassItemsType } from '../../common/types';
 import * as bladeParser from '../../parsers/blade/parser';
 
 export function canCompletionFromContext(code: string, editorOffset: number) {
@@ -27,7 +27,7 @@ export function isEditorOffsetInBladeEchoRegionOfPhpStaticClassItem(code: string
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpStaticClassItemsType[] = [];
+  const contextRanges: BladeWithPHPStaticClassItemsType[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof BladeEchoNode) {
@@ -38,7 +38,7 @@ export function isEditorOffsetInBladeEchoRegionOfPhpStaticClassItem(code: string
 
       const items = phpCommon.getStaticClassItemsFromPhpCode(phpCode);
 
-      const contextRange: BladeWithPhpStaticClassItemsType = {
+      const contextRange: BladeWithPHPStaticClassItemsType = {
         start: node.offset.start,
         end: node.offset.end,
         staticClassItems: items,
@@ -79,7 +79,7 @@ export function isEditorOffsetInPHPDirectiveRegionOfOfPhpStaticClassItem(code: s
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpStaticClassItemsType[] = [];
+  const contextRanges: BladeWithPHPStaticClassItemsType[] = [];
 
   let adjustOffset = 0;
 
@@ -97,7 +97,7 @@ export function isEditorOffsetInPHPDirectiveRegionOfOfPhpStaticClassItem(code: s
 
         const items = phpCommon.getStaticClassItemsFromPhpCode(phpCode);
 
-        const contextRange: BladeWithPhpStaticClassItemsType = {
+        const contextRange: BladeWithPHPStaticClassItemsType = {
           start: node.offset.start,
           end: endPhpDirectiveNode.offset.end,
           staticClassItems: items,
@@ -111,7 +111,7 @@ export function isEditorOffsetInPHPDirectiveRegionOfOfPhpStaticClassItem(code: s
 
         const items = phpCommon.getStaticClassItemsFromPhpCode(phpCode);
 
-        const contextRange: BladeWithPhpStaticClassItemsType = {
+        const contextRange: BladeWithPHPStaticClassItemsType = {
           start: node.offset.start,
           end: node.offset.end,
           staticClassItems: items,
@@ -150,7 +150,7 @@ export function isEditorOffsetInInlinePhpResionOfPhpStaticClassItem(code: string
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpStaticClassItemsType[] = [];
+  const contextRanges: BladeWithPHPStaticClassItemsType[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof InlinePhpNode) {
@@ -161,7 +161,7 @@ export function isEditorOffsetInInlinePhpResionOfPhpStaticClassItem(code: string
 
       const items = phpCommon.getStaticClassItemsFromPhpCode(phpCode);
 
-      const contextRange: BladeWithPhpStaticClassItemsType = {
+      const contextRange: BladeWithPHPStaticClassItemsType = {
         start: node.startPosition.offset,
         end: node.endPosition.offset,
         staticClassItems: items,
@@ -199,7 +199,7 @@ export function isEditorOffsetInDirectiveWithParametersRegionOfPhpStaticClassIte
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpStaticClassItemsType[] = [];
+  const contextRanges: BladeWithPHPStaticClassItemsType[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof DirectiveNode) {
@@ -230,7 +230,7 @@ export function isEditorOffsetInDirectiveWithParametersRegionOfPhpStaticClassIte
 
         const items = phpCommon.getStaticClassItemsFromPhpCode(phpCode);
 
-        const contextRange: BladeWithPhpStaticClassItemsType = {
+        const contextRange: BladeWithPHPStaticClassItemsType = {
           start: node.directiveParametersPosition.start.offset,
           end: node.directiveParametersPosition.end.offset,
           staticClassItems: items,
@@ -271,7 +271,7 @@ export function isEditorOffsetInPropsValueRegionOfPhpStaticClassItem(code: strin
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpStaticClassItemsType[] = [];
+  const contextRanges: BladeWithPHPStaticClassItemsType[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof BladeComponentNode) {
@@ -286,7 +286,7 @@ export function isEditorOffsetInPropsValueRegionOfPhpStaticClassItem(code: strin
         const phpCode = '<?php ' + parameter.value + ' ?>';
         const items = phpCommon.getStaticClassItemsFromPhpCode(phpCode);
 
-        const contextRange: BladeWithPhpStaticClassItemsType = {
+        const contextRange: BladeWithPHPStaticClassItemsType = {
           start: parameter.valuePosition.start.offset,
           end: parameter.valuePosition.end.offset,
           staticClassItems: items,

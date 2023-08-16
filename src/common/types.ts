@@ -57,15 +57,15 @@ export type StaticClassMemberDataType = {
   staticMethods: string[];
 };
 
-export type BladeWithPhpStaticClassItemsType = {
+export type BladeWithPHPStaticClassItemsType = {
   start: number;
   end: number;
   staticClassItems: StaticClassItemType[];
 };
 
-export type PhpNamespaceType = { [key: string]: string };
+export type PHPNamespaceType = { [key: string]: string };
 
-export type PhpObjectItemType = {
+export type PHPObjectItemType = {
   object: {
     name: string;
     startOffset: number;
@@ -78,22 +78,22 @@ export type PhpObjectItemType = {
   };
 };
 
-export type BladeWithPhpObjectItemsType = {
+export type BladeWithPHPObjectItemsType = {
   start: number;
   end: number;
-  objectItems: PhpObjectItemType[];
+  objectItems: PHPObjectItemType[];
 };
 
-export type PhpRelatedBladeNodeType = 'inlinePhp' | 'phpDirective';
+export type PHPRelatedBladeNodeType = 'inlinePhp' | 'phpDirective';
 
-export type PhpVariableItemType = {
+export type PHPVariableItemType = {
   name: string;
   type: string;
   start: number;
   end: number;
   bladeNodeStart?: number;
   bladeNodeEnd?: number;
-  bladeNodeType?: PhpRelatedBladeNodeType;
+  bladeNodeType?: PHPRelatedBladeNodeType;
 };
 
 export type PHPUseItemType = {

@@ -3,7 +3,7 @@ import { BladeComponentNode, BladeEchoNode, DirectiveNode, InlinePhpNode } from 
 import * as phpCommon from '../../common/php';
 import * as bladeParser from '../../parsers/blade/parser';
 
-import { BladeWithPhpObjectItemsType } from '../../common/types';
+import { BladeWithPHPObjectItemsType } from '../../common/types';
 
 export function canCompletionFromContext(code: string, editorOffset: number) {
   const bladeDoc = bladeParser.getBladeDocument(code);
@@ -28,7 +28,7 @@ export function isEditorOffsetInBladeEchoRegionOfPhpObjectItem(code: string, edi
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpObjectItemsType[] = [];
+  const contextRanges: BladeWithPHPObjectItemsType[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof BladeEchoNode) {
@@ -39,7 +39,7 @@ export function isEditorOffsetInBladeEchoRegionOfPhpObjectItem(code: string, edi
 
       const items = phpCommon.getObjectItemsFromPhpCode(phpCode);
 
-      const contextRange: BladeWithPhpObjectItemsType = {
+      const contextRange: BladeWithPHPObjectItemsType = {
         start: node.offset.start,
         end: node.offset.end,
         objectItems: items,
@@ -80,7 +80,7 @@ export function isEditorOffsetInInlinePhpResionOfPhpObjectItem(code: string, edi
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpObjectItemsType[] = [];
+  const contextRanges: BladeWithPHPObjectItemsType[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof InlinePhpNode) {
@@ -91,7 +91,7 @@ export function isEditorOffsetInInlinePhpResionOfPhpObjectItem(code: string, edi
 
       const items = phpCommon.getObjectItemsFromPhpCode(phpCode);
 
-      const contextRange: BladeWithPhpObjectItemsType = {
+      const contextRange: BladeWithPHPObjectItemsType = {
         start: node.startPosition.offset,
         end: node.endPosition.offset,
         objectItems: items,
@@ -129,7 +129,7 @@ export function isEditorOffsetInPHPDirectiveRegionOfOfPhpObjectItem(code: string
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpObjectItemsType[] = [];
+  const contextRanges: BladeWithPHPObjectItemsType[] = [];
 
   let adjustOffset = 0;
 
@@ -147,7 +147,7 @@ export function isEditorOffsetInPHPDirectiveRegionOfOfPhpObjectItem(code: string
 
         const items = phpCommon.getObjectItemsFromPhpCode(phpCode);
 
-        const contextRange: BladeWithPhpObjectItemsType = {
+        const contextRange: BladeWithPHPObjectItemsType = {
           start: node.offset.start,
           end: endPhpDirectiveNode.offset.end,
           objectItems: items,
@@ -161,7 +161,7 @@ export function isEditorOffsetInPHPDirectiveRegionOfOfPhpObjectItem(code: string
 
         const items = phpCommon.getObjectItemsFromPhpCode(phpCode);
 
-        const contextRange: BladeWithPhpObjectItemsType = {
+        const contextRange: BladeWithPHPObjectItemsType = {
           start: node.offset.start,
           end: node.offset.end,
           objectItems: items,
@@ -200,7 +200,7 @@ export function isEditorOffsetInDirectiveWithParametersRegionOfPhpObjectItem(cod
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpObjectItemsType[] = [];
+  const contextRanges: BladeWithPHPObjectItemsType[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof DirectiveNode) {
@@ -231,7 +231,7 @@ export function isEditorOffsetInDirectiveWithParametersRegionOfPhpObjectItem(cod
 
         const items = phpCommon.getObjectItemsFromPhpCode(phpCode);
 
-        const contextRange: BladeWithPhpObjectItemsType = {
+        const contextRange: BladeWithPHPObjectItemsType = {
           start: node.directiveParametersPosition.start.offset,
           end: node.directiveParametersPosition.end.offset,
           objectItems: items,
@@ -272,7 +272,7 @@ export function isEditorOffsetInPropsValueRegionOfPhpObjectItem(code: string, ed
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return false;
 
-  const contextRanges: BladeWithPhpObjectItemsType[] = [];
+  const contextRanges: BladeWithPHPObjectItemsType[] = [];
 
   for (const node of bladeDoc.getAllNodes()) {
     if (node instanceof BladeComponentNode) {
@@ -287,7 +287,7 @@ export function isEditorOffsetInPropsValueRegionOfPhpObjectItem(code: string, ed
         const phpCode = '<?php ' + parameter.value + ' ?>';
         const items = phpCommon.getObjectItemsFromPhpCode(phpCode);
 
-        const contextRange: BladeWithPhpObjectItemsType = {
+        const contextRange: BladeWithPHPObjectItemsType = {
           start: parameter.valuePosition.start.offset,
           end: parameter.valuePosition.end.offset,
           objectItems: items,

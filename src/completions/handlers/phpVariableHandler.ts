@@ -11,7 +11,7 @@ import {
 
 import * as bladeCommon from '../../common/blade';
 import { runTinkerReflection } from '../../common/shared';
-import { PhpVariableItemType } from '../../common/types';
+import { PHPVariableItemType } from '../../common/types';
 import { quoteForTerminalExecution, stripInitialNewline } from '../../common/utils';
 import * as bladeParser from '../../parsers/blade/parser';
 import * as phpVariableCompletionService from '../services/phpVariableService';
@@ -60,7 +60,7 @@ function getVariableCompletionItems(
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return [];
 
-  const phpVariableItems: PhpVariableItemType[] = [];
+  const phpVariableItems: PHPVariableItemType[] = [];
 
   const inlinePhpVariableItems = bladeCommon.getVariableItemsWithBladeRangeOffsetsFromBladeDoc(bladeDoc, 'inlinePhp');
   if (inlinePhpVariableItems.length > 0) phpVariableItems.push(...inlinePhpVariableItems);

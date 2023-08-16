@@ -5,7 +5,7 @@ import path from 'path';
 
 import { getAppPath, getArtisanPath, getViewPath } from '../../common/shared';
 import { getComposerJsonContent } from '../../common/composer';
-import { ComposerJsonContentType, PhpNamespaceType } from '../../common/types';
+import { ComposerJsonContentType, PHPNamespaceType } from '../../common/types';
 import { SUPPORTED_LANGUAGE } from '../../constant';
 
 export function register(context: ExtensionContext) {
@@ -192,7 +192,7 @@ function getProjectNamespacesFromComposerJson(composerJsonContent: ComposerJsonC
   return projectNamespaces;
 }
 
-function getFileNamespace(namespaces: PhpNamespaceType[], relativeFilePath: string) {
+function getFileNamespace(namespaces: PHPNamespaceType[], relativeFilePath: string) {
   const fileName = relativeFilePath.split('/').slice(-1)[0];
 
   for (const namespace of namespaces) {

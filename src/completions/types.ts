@@ -2,13 +2,13 @@ import { Node } from 'php-parser';
 
 import { type PHPClassItemKindEnum } from '../projects/types';
 
-export type BladeWithPhpNodesRange = {
+export type BladeWithPHPNodesRange = {
   startOffset: number;
   endOffset: number;
   phpNodes: Node[];
 };
 
-export type BladeWithPhpNodesKindRangeOffsets = {
+export type BladeWithPHPNodesKindRangeOffsets = {
   start: number;
   end: number;
   kindRangeOffsets: RangeOffset[];

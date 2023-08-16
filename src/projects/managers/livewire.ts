@@ -12,7 +12,7 @@ import {
 } from '../../common/composer';
 import * as livewireCommon from '../../common/livewire';
 import { getAppPath, getArtisanPath } from '../../common/shared';
-import { LivewireComponentMapType, PhpNamespaceType } from '../../common/types';
+import { LivewireComponentMapType, PHPNamespaceType } from '../../common/types';
 import { elapsed } from '../../common/utils';
 import * as phpParser from '../../parsers/php/parser';
 import { LivewireMapValueType } from '../types';
@@ -23,7 +23,7 @@ export class LivewireProjectManager {
   initializedAt: [number, number];
   initialized: boolean;
   livewireMapStore: Map<string, LivewireMapValueType>;
-  projectNamespaces: PhpNamespaceType[];
+  projectNamespaces: PHPNamespaceType[];
 
   private isReady: boolean = false;
   private readyCallbacks: (() => void)[] = [];

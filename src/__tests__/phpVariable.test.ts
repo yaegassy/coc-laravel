@@ -4,18 +4,7 @@ import * as bladeParser from '../parsers/blade/parser';
 import * as testUtils from './testUtils';
 
 import * as bladeCommon from '../common/blade';
-import { PhpVariableItemType } from '../common/types';
-
-type PhpRelatedBladeNodeType = 'inlinePhp' | 'phpDirective';
-
-type VariableItemType = {
-  name: string;
-  start: number;
-  end: number;
-  bladeNodeStart?: number;
-  bladeNodeEnd?: number;
-  bladeNodeType?: PhpRelatedBladeNodeType;
-};
+import { PHPVariableItemType } from '../common/types';
 
 test('Get variable data items from the blade php-related node type', async () => {
   const code = testUtils.stripInitialNewline(`
@@ -47,7 +36,7 @@ test('Get variable data items from the blade php-related node type', async () =>
   const bladeDoc = bladeParser.getBladeDocument(code);
   if (!bladeDoc) return;
 
-  const variableItems: VariableItemType[] = [];
+  const variableItems: PHPVariableItemType[] = [];
 
   const inlinePhpVariableItems = bladeCommon.getVariableItemsWithBladeRangeOffsetsFromBladeDoc(bladeDoc, 'inlinePhp');
   if (inlinePhpVariableItems.length > 0) variableItems.push(...inlinePhpVariableItems);
@@ -136,7 +125,7 @@ test('Get the adjust offset from the php-related node type of the blade', async 
 });
 
 test('Get variable data items that can be completed from the editor offset', async () => {
-  const phpVariableItems: PhpVariableItemType[] = [
+  const phpVariableItems: PHPVariableItemType[] = [
     {
       name: 'inlineVar',
       type: 'string',
