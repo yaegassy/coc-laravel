@@ -515,3 +515,241 @@ foo("foo_param1")->bar('bar_param1', 'bar_param2')->baz('baz_param1');
   expect(callNameWithChainMethods[1].methods[0].arguments![1].startOffset).toEqual(112);
   expect(callNameWithChainMethods[1].methods[0].arguments![1].endOffset).toEqual(124);
 });
+
+test('Testing get use items', async () => {
+  const code = testUtils.stripInitialNewline(`
+<?php
+use My\\Full\\ClassName;
+use My\\Full\\ClassName as Cls;
+use My\\Full\\{ClassName1};
+use My\\Full\\{ClassName2, ClassName3};
+use My\\Full\\{ClassName4 as Cls4, ClassName5 as Cls5};
+use function My\\Full\\functionName;
+use function My\\Full\\functionName as func;
+use function My\\Full\\{functionName1};
+use function My\\Full\\{functionName2, functionName3};
+use function My\\Full\\{functionName4 as func4, functionName5 as func5};
+use const My\\Full\\CONSTANT;
+use const My\\Full\\CONSTANT as CONS;
+use const My\\Full\\{CONSTANT1};
+use const My\\Full\\{CONSTANT2, CONSTANT3};
+use const My\\Full\\{CONSTANT4 as CONS4, CONSTANT5 as CONS5};
+use ArrayObject;
+`);
+
+  const expected = [
+    {
+      name: 'My\\Full\\ClassName',
+      startOffset: 10,
+      endOffset: 27,
+      groupStartOffset: 6,
+      groupEndOffset: 27,
+    },
+    {
+      name: 'My\\Full\\ClassName',
+      startOffset: 33,
+      endOffset: 57,
+      aliasName: 'Cls',
+      aliasStartOffset: 54,
+      aliasEndOffset: 57,
+      groupStartOffset: 29,
+      groupEndOffset: 57,
+    },
+    {
+      name: 'ClassName1',
+      startOffset: 72,
+      endOffset: 82,
+      groupName: 'My\\Full',
+      groupStartOffset: 59,
+      groupEndOffset: 83,
+    },
+    {
+      name: 'ClassName2',
+      startOffset: 98,
+      endOffset: 108,
+      groupName: 'My\\Full',
+      groupStartOffset: 85,
+      groupEndOffset: 121,
+    },
+    {
+      name: 'ClassName3',
+      startOffset: 110,
+      endOffset: 120,
+      groupName: 'My\\Full',
+      groupStartOffset: 85,
+      groupEndOffset: 121,
+    },
+    {
+      name: 'ClassName4',
+      startOffset: 136,
+      endOffset: 154,
+      aliasName: 'Cls4',
+      aliasStartOffset: 150,
+      aliasEndOffset: 154,
+      groupName: 'My\\Full',
+      groupStartOffset: 123,
+      groupEndOffset: 175,
+    },
+    {
+      name: 'ClassName5',
+      startOffset: 156,
+      endOffset: 174,
+      aliasName: 'Cls5',
+      aliasStartOffset: 170,
+      aliasEndOffset: 174,
+      groupName: 'My\\Full',
+      groupStartOffset: 123,
+      groupEndOffset: 175,
+    },
+    {
+      name: 'My\\Full\\functionName',
+      startOffset: 190,
+      endOffset: 210,
+      groupType: 'function',
+      groupStartOffset: 177,
+      groupEndOffset: 210,
+    },
+    {
+      name: 'My\\Full\\functionName',
+      startOffset: 225,
+      endOffset: 253,
+      aliasName: 'func',
+      aliasStartOffset: 249,
+      aliasEndOffset: 253,
+      groupType: 'function',
+      groupStartOffset: 212,
+      groupEndOffset: 253,
+    },
+    {
+      name: 'functionName1',
+      startOffset: 277,
+      endOffset: 290,
+      groupName: 'My\\Full',
+      groupType: 'function',
+      groupStartOffset: 255,
+      groupEndOffset: 291,
+    },
+    {
+      name: 'functionName2',
+      startOffset: 315,
+      endOffset: 328,
+      groupName: 'My\\Full',
+      groupType: 'function',
+      groupStartOffset: 293,
+      groupEndOffset: 344,
+    },
+    {
+      name: 'functionName3',
+      startOffset: 330,
+      endOffset: 343,
+      groupName: 'My\\Full',
+      groupType: 'function',
+      groupStartOffset: 293,
+      groupEndOffset: 344,
+    },
+    {
+      name: 'functionName4',
+      startOffset: 368,
+      endOffset: 390,
+      aliasName: 'func4',
+      aliasStartOffset: 385,
+      aliasEndOffset: 390,
+      groupName: 'My\\Full',
+      groupType: 'function',
+      groupStartOffset: 346,
+      groupEndOffset: 415,
+    },
+    {
+      name: 'functionName5',
+      startOffset: 392,
+      endOffset: 414,
+      aliasName: 'func5',
+      aliasStartOffset: 409,
+      aliasEndOffset: 414,
+      groupName: 'My\\Full',
+      groupType: 'function',
+      groupStartOffset: 346,
+      groupEndOffset: 415,
+    },
+    {
+      name: 'My\\Full\\CONSTANT',
+      startOffset: 427,
+      endOffset: 443,
+      groupType: 'const',
+      groupStartOffset: 417,
+      groupEndOffset: 443,
+    },
+    {
+      name: 'My\\Full\\CONSTANT',
+      startOffset: 455,
+      endOffset: 479,
+      aliasName: 'CONS',
+      aliasStartOffset: 475,
+      aliasEndOffset: 479,
+      groupType: 'const',
+      groupStartOffset: 445,
+      groupEndOffset: 479,
+    },
+    {
+      name: 'CONSTANT1',
+      startOffset: 500,
+      endOffset: 509,
+      groupName: 'My\\Full',
+      groupType: 'const',
+      groupStartOffset: 481,
+      groupEndOffset: 510,
+    },
+    {
+      name: 'CONSTANT2',
+      startOffset: 531,
+      endOffset: 540,
+      groupName: 'My\\Full',
+      groupType: 'const',
+      groupStartOffset: 512,
+      groupEndOffset: 552,
+    },
+    {
+      name: 'CONSTANT3',
+      startOffset: 542,
+      endOffset: 551,
+      groupName: 'My\\Full',
+      groupType: 'const',
+      groupStartOffset: 512,
+      groupEndOffset: 552,
+    },
+    {
+      name: 'CONSTANT4',
+      startOffset: 573,
+      endOffset: 591,
+      aliasName: 'CONS4',
+      aliasStartOffset: 586,
+      aliasEndOffset: 591,
+      groupName: 'My\\Full',
+      groupType: 'const',
+      groupStartOffset: 554,
+      groupEndOffset: 612,
+    },
+    {
+      name: 'CONSTANT5',
+      startOffset: 593,
+      endOffset: 611,
+      aliasName: 'CONS5',
+      aliasStartOffset: 606,
+      aliasEndOffset: 611,
+      groupName: 'My\\Full',
+      groupType: 'const',
+      groupStartOffset: 554,
+      groupEndOffset: 612,
+    },
+    {
+      name: 'ArrayObject',
+      startOffset: 618,
+      endOffset: 629,
+      groupStartOffset: 614,
+      groupEndOffset: 629,
+    },
+  ];
+
+  const actual = phpParser.getUseItems(code);
+  expect(actual).toMatchObject(expected);
+});

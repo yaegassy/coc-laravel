@@ -284,3 +284,136 @@ class DateTime implements DateTimeInterface
   const expected = { start: 69, end: 96 };
   expect(itemRangeOffset).toMatchObject(expected);
 });
+
+test('Get symbol name data from use item', async () => {
+  //
+  // use My\Full\Classname;
+  //
+  const actual1 = phpCommon.getSymbolNameDataFromUseItem({
+    name: 'My\\Full\\ClassName',
+    startOffset: 10,
+    endOffset: 27,
+    groupStartOffset: 6,
+    groupEndOffset: 27,
+  })!;
+  const expected1 = {
+    qualifiedName: 'ClassName',
+    fullQualifiedName: 'My\\Full\\ClassName',
+    namespace: 'My\\Full',
+  };
+  expect(actual1).toMatchObject(expected1);
+
+  //
+  // use My\Full\Classname as Cls;
+  //
+  const actual2 = phpCommon.getSymbolNameDataFromUseItem({
+    name: 'My\\Full\\ClassName',
+    startOffset: 33,
+    endOffset: 57,
+    aliasName: 'Cls',
+    aliasStartOffset: 54,
+    aliasEndOffset: 57,
+    groupStartOffset: 29,
+    groupEndOffset: 57,
+  })!;
+  const expected2 = {
+    qualifiedName: 'ClassName',
+    fullQualifiedName: 'My\\Full\\ClassName',
+    aliasName: 'Cls',
+    namespace: 'My\\Full',
+  };
+  expect(actual2).toMatchObject(expected2);
+
+  //
+  // use My\Full\{Classname1};
+  //
+  const actual3 = phpCommon.getSymbolNameDataFromUseItem({
+    name: 'ClassName1',
+    startOffset: 72,
+    endOffset: 82,
+    groupName: 'My\\Full',
+    groupStartOffset: 59,
+    groupEndOffset: 83,
+  })!;
+  const expected3 = {
+    qualifiedName: 'ClassName1',
+    fullQualifiedName: 'My\\Full\\ClassName1',
+    namespace: 'My\\Full',
+  };
+  expect(actual3).toMatchObject(expected3);
+
+  //
+  // use My\Full\{Classname2, ClassName3};
+  //
+  const actual4x1 = phpCommon.getSymbolNameDataFromUseItem({
+    name: 'ClassName2',
+    startOffset: 98,
+    endOffset: 108,
+    groupName: 'My\\Full',
+    groupStartOffset: 85,
+    groupEndOffset: 121,
+  })!;
+  const actual4x2 = phpCommon.getSymbolNameDataFromUseItem({
+    name: 'ClassName3',
+    startOffset: 110,
+    endOffset: 120,
+    groupName: 'My\\Full',
+    groupStartOffset: 85,
+    groupEndOffset: 121,
+  })!;
+  const expected4x1 = {
+    qualifiedName: 'ClassName2',
+    fullQualifiedName: 'My\\Full\\ClassName2',
+    namespace: 'My\\Full',
+  };
+  const expected4x2 = {
+    qualifiedName: 'ClassName3',
+    fullQualifiedName: 'My\\Full\\ClassName3',
+    namespace: 'My\\Full',
+  };
+  expect(actual4x1).toMatchObject(expected4x1);
+  expect(actual4x2).toMatchObject(expected4x2);
+
+  //
+  // use My\Full\{Classname4 as Cls4, ClassName5 as Cls5};
+  //
+  const actual5x1 = phpCommon.getSymbolNameDataFromUseItem({
+    name: 'ClassName4',
+    startOffset: 136,
+    endOffset: 154,
+    aliasName: 'Cls4',
+    aliasStartOffset: 150,
+    aliasEndOffset: 154,
+    groupName: 'My\\Full',
+    groupStartOffset: 123,
+    groupEndOffset: 175,
+  })!;
+  const actual5x2 = phpCommon.getSymbolNameDataFromUseItem({
+    name: 'ClassName5',
+    startOffset: 156,
+    endOffset: 174,
+    aliasName: 'Cls5',
+    aliasStartOffset: 170,
+    aliasEndOffset: 174,
+    groupName: 'My\\Full',
+    groupStartOffset: 123,
+    groupEndOffset: 175,
+  })!;
+  const expected5x1 = {
+    qualifiedName: 'ClassName4',
+    fullQualifiedName: 'My\\Full\\ClassName4',
+    aliasName: 'Cls4',
+    namespace: 'My\\Full',
+  };
+  const expected5x2 = {
+    qualifiedName: 'ClassName5',
+    fullQualifiedName: 'My\\Full\\ClassName5',
+    aliasName: 'Cls5',
+    namespace: 'My\\Full',
+  };
+
+  expect(actual5x1).toMatchObject(expected5x1);
+  expect(actual5x2).toMatchObject(expected5x2);
+
+  // The behavior is similar for use function and use const.
+});

@@ -15,8 +15,6 @@ export type ComposerJsonContentType = {
   };
 };
 
-export type PhpNamespaceType = { [key: string]: string };
-
 export type LivewireComponentMapType = {
   key: string;
   value: string;
@@ -65,6 +63,8 @@ export type BladeWithPhpStaticClassItemsType = {
   staticClassItems: StaticClassItemType[];
 };
 
+export type PhpNamespaceType = { [key: string]: string };
+
 export type PhpObjectItemType = {
   object: {
     name: string;
@@ -94,4 +94,24 @@ export type PhpVariableItemType = {
   bladeNodeStart?: number;
   bladeNodeEnd?: number;
   bladeNodeType?: PhpRelatedBladeNodeType;
+};
+
+export type PHPUseItemType = {
+  name: string;
+  startOffset: number;
+  endOffset: number;
+  aliasName?: string;
+  aliasStartOffset?: number;
+  aliasEndOffset?: number;
+  groupName?: string;
+  groupType?: string; // For class, groupType is undefined
+  groupStartOffset?: number;
+  groupEndOffset?: number;
+};
+
+export type PHPSymbolNameDataType = {
+  qualifiedName: string;
+  fullQualifiedName: string;
+  aliasName?: string;
+  namespace?: string;
 };

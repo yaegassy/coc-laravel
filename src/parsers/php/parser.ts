@@ -21,11 +21,12 @@ import {
   TypeReference,
   Unary,
   UnionType,
+  UseGroup,
   UseItem,
   Variable,
 } from 'php-parser';
 
-import { ArgumentParameterType } from '../../common/types';
+import { ArgumentParameterType, PHPUseItemType } from '../../common/types';
 
 export type ParameterType = {
   name: string;
@@ -853,4 +854,67 @@ function retrieveCallArgumentTypeItemFromExpression(expression: Expression) {
       }
     }
   }
+}
+
+export function getUseItems(code: string) {
+  const items: PHPUseItemType[] = [];
+
+  const ast = getAstByParseCode(code);
+  if (!ast) return [];
+
+  walk((node, parent) => {
+    if (!parent) return;
+    if (parent.kind !== 'usegroup') return;
+    const useGroupNode = parent as UseGroup;
+    if (!useGroupNode.loc) return;
+
+    let useGroupName: string | undefined = undefined;
+    if (useGroupNode.name) {
+      useGroupName = useGroupNode.name;
+    }
+
+    let useGroupType: string | undefined = undefined;
+    if (useGroupNode.type) {
+      useGroupType = useGroupNode.type;
+    }
+
+    const useGroupStartOffset = useGroupNode.loc.start.offset;
+    const useGroupEndOffset = useGroupNode.loc.end.offset;
+
+    if (node.kind !== 'useitem') return;
+    const useItemNode = node as UseItem;
+    if (!useItemNode.loc) return;
+    const useItemName = useItemNode.name;
+    const useItemStartOffset = useItemNode.loc.start.offset;
+    const useItemEndOffset = useItemNode.loc.end.offset;
+
+    let aliasName: string | undefined = undefined;
+    let aliasStartOffset: number | undefined = undefined;
+    let aliasEndOffset: number | undefined = undefined;
+    if (useItemNode.alias) {
+      if (useItemNode.alias.loc) {
+        aliasStartOffset = useItemNode.alias.loc.start.offset;
+        aliasEndOffset = useItemNode.alias.loc.end.offset;
+      }
+      if (useItemNode.alias.kind === 'identifier') {
+        const identifierNode = useItemNode.alias as Identifier;
+        aliasName = identifierNode.name;
+      }
+    }
+
+    items.push({
+      name: useItemName,
+      startOffset: useItemStartOffset,
+      endOffset: useItemEndOffset,
+      aliasName,
+      aliasStartOffset,
+      aliasEndOffset,
+      groupName: useGroupName,
+      groupType: useGroupType,
+      groupStartOffset: useGroupStartOffset,
+      groupEndOffset: useGroupEndOffset,
+    });
+  }, ast);
+
+  return items;
 }

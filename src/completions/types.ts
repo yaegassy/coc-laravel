@@ -20,7 +20,7 @@ export type RangeOffset = {
 };
 
 export type CompletionItemDataType = {
-  source: CompletionItemSource;
+  source: CompletionItemSource; // ALL
   filePath?: string; // phpConstant, phpFunction, phpClass, phpStaticClass
   kind?: PHPClassItemKindEnum; // phpClass, phpStaticClass
   isStubs?: boolean; // phpConstant, phpFunction, phpClass, phpStaticClass
@@ -29,6 +29,9 @@ export type CompletionItemDataType = {
   originalContent?: string; // phpVariable
   objectName?: string; // phpObjectMember
   virtualContent?: string; // phpObjectMember
+  namespace?: string; // phpClass, phpFunction
+  qualifiedName?: string; // phpClass, phpFunction
+  fullQualifiedName?: string; // phpClass, phpFunction
 };
 
 type CompletionItemSource =

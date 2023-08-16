@@ -11,9 +11,12 @@ import {
   workspace,
 } from 'coc.nvim';
 
+import * as bladeCommon from '../../common/blade';
+import * as phpCommon from '../../common/php';
 import { runTinkerReflection } from '../../common/shared';
 import { StaticClassMemberDataType } from '../../common/types';
 import { stripInitialNewline } from '../../common/utils';
+import * as phpParser from '../../parsers/php/parser';
 import { type PHPClassProjectManagerType } from '../../projects/types';
 import * as phpStaticClassCompletionService from '../services/phpStaticClassService';
 import { CompletionItemDataType } from '../types';
@@ -46,7 +49,13 @@ export async function doCompletion(
   }
   if (!wordWithExtraChars) return [];
 
-  const staticClassItems = await getStaticClassItems(phpClassProjectManager, position, wordWithExtraChars, artisanPath);
+  const staticClassItems = await getStaticClassItems(
+    phpClassProjectManager,
+    position,
+    wordWithExtraChars,
+    artisanPath,
+    code
+  );
 
   if (staticClassItems) {
     items.push(...staticClassItems);
@@ -59,14 +68,36 @@ async function getStaticClassItems(
   phpClassProjectManager: PHPClassProjectManagerType,
   position: Position,
   wordWithExtraChars: string,
-  artisanPath: string
+  artisanPath: string,
+  code: string
 ) {
   const items: CompletionItem[] = [];
 
-  const className = wordWithExtraChars.split('::')[0];
+  let fullQualifiedClassName: string | undefined = undefined;
+  fullQualifiedClassName = wordWithExtraChars.split('::')[0];
+
+  // If the entered class string matches the symbol name in the use statement,
+  // overwrite className
+  const virtualPhpEvalCode = bladeCommon.generateVirtualPhpEvalCode(code);
+  if (virtualPhpEvalCode) {
+    const useItems = phpParser.getUseItems('<?php\n' + virtualPhpEvalCode);
+    for (const item of useItems) {
+      // For class, groupType is undefined
+      if (item.groupType) continue;
+
+      const symbolNameData = phpCommon.getSymbolNameDataFromUseItem(item);
+      if (!symbolNameData) continue;
+
+      if (symbolNameData.aliasName && wordWithExtraChars === symbolNameData.aliasName + '::') {
+        fullQualifiedClassName = symbolNameData.fullQualifiedName;
+      } else if (wordWithExtraChars === symbolNameData.qualifiedName + '::') {
+        fullQualifiedClassName = symbolNameData.fullQualifiedName;
+      }
+    }
+  }
 
   const reflectionCode = stripInitialNewline(`
-\\$reflector = new ReflectionClass('${className}');
+\\$reflector = new ReflectionClass('${fullQualifiedClassName}');
 \\$classConstants = array_keys(\\$reflector->getConstants());
 \\$staticMethods = array_values(
     array_filter(
@@ -82,8 +113,8 @@ echo json_encode(['classConstants' => \\$classConstants, 'staticMethods' => \\$s
 
   const memberData = JSON.parse(resJsonStr) as StaticClassMemberDataType;
 
-  const classStoreData = phpClassProjectManager.phpClassMapStore.get(className);
-  if (!classStoreData) return [];
+  const storeData = phpClassProjectManager.phpClassMapStore.get(fullQualifiedClassName);
+  if (!storeData) return [];
 
   items.push({
     label: 'class',
@@ -95,7 +126,7 @@ echo json_encode(['classConstants' => \\$classConstants, 'staticMethods' => \\$s
   for (const classConstant of memberData.classConstants) {
     const data: CompletionItemDataType = {
       source: 'laravel-php-static-class',
-      className,
+      className: fullQualifiedClassName,
     };
 
     items.push({
@@ -118,7 +149,7 @@ echo json_encode(['classConstants' => \\$classConstants, 'staticMethods' => \\$s
 
     const data: CompletionItemDataType = {
       source: 'laravel-php-static-class',
-      className,
+      className: fullQualifiedClassName,
     };
 
     items.push({
