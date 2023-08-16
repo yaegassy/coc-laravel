@@ -14,8 +14,10 @@ import {
 import fs from 'fs';
 import path from 'path';
 
+import * as bladeCommon from '../../common/blade';
 import * as phpCommon from '../../common/php';
 import { STUBS_VENDOR_NAME } from '../../constant';
+import * as phpParser from '../../parsers/php/parser';
 import { type PHPClassProjectManagerType } from '../../projects/types';
 import * as phpClassCompletionService from '../services/phpClassService';
 import { CompletionItemDataType } from '../types';
@@ -44,6 +46,17 @@ export async function doCompletion(
   );
   if (wordWithExtraCharsRange) {
     wordWithExtraChars = document.getText(wordWithExtraCharsRange);
+  }
+
+  const phpUseStatementClassItems = getUseStatementPHPClassItems(
+    code,
+    phpClassProjectManager,
+    position,
+    offset,
+    wordWithExtraChars
+  );
+  if (phpUseStatementClassItems.length > 0) {
+    items.push(...phpUseStatementClassItems);
   }
 
   const phpClassItems = getPHPClassItems(phpClassProjectManager, position, wordWithExtraChars, context);
@@ -118,6 +131,74 @@ function getPHPClassItems(
   return items;
 }
 
+function getUseStatementPHPClassItems(
+  code: string,
+  phpClassProjectManager: PHPClassProjectManagerType,
+  position: Position,
+  editorOffset: number,
+  wordWithExtraChars?: string
+) {
+  const items: CompletionItem[] = [];
+
+  let evalCode = code;
+  if (wordWithExtraChars) {
+    const beforeInputString = code.slice(0, editorOffset - wordWithExtraChars.length);
+    const afterInputString = code.slice(editorOffset, code.length - 1);
+    const dummyString = "'__DUMMY__';";
+    evalCode = beforeInputString + dummyString + afterInputString;
+  }
+
+  const virtualPhpEvalCode = bladeCommon.generateVirtualPhpEvalCode(evalCode);
+  if (!virtualPhpEvalCode) return [];
+
+  const useItems = phpParser.getUseItems('<?php\n' + virtualPhpEvalCode);
+  if (useItems.length === 0) return [];
+
+  for (const item of useItems) {
+    // For class, groupType is undefined
+    if (item.groupType) continue;
+
+    const symbolNameData = phpCommon.getSymbolNameDataFromUseItem(item);
+    if (!symbolNameData) continue;
+
+    const storeData = phpClassProjectManager.phpClassMapStore.get(symbolNameData.fullQualifiedName);
+    if (!storeData) continue;
+
+    const edit: TextEdit = {
+      range: {
+        start: position,
+        end: position,
+      },
+      newText: symbolNameData.aliasName ? symbolNameData.aliasName : symbolNameData.qualifiedName,
+    };
+
+    const data: CompletionItemDataType = {
+      source: 'laravel-php-class',
+      filePath: storeData.path,
+      isStubs: storeData.isStubs,
+      kind: storeData.kind,
+      qualifiedName: symbolNameData.qualifiedName,
+      fullQualifiedName: symbolNameData.fullQualifiedName,
+      namespace: symbolNameData.namespace,
+    };
+
+    const kind = phpClassCompletionService.getCompletionItemKindAtClassItemKind(storeData.kind);
+
+    items.push({
+      label: symbolNameData.aliasName ? symbolNameData.aliasName : symbolNameData.qualifiedName,
+      labelDetails: symbolNameData.namespace
+        ? { description: `[${symbolNameData.namespace}]` }
+        : { description: '[from use statement]' },
+      kind,
+      insertTextFormat: InsertTextFormat.PlainText,
+      textEdit: edit,
+      data,
+    });
+  }
+
+  return items;
+}
+
 export async function doResolveCompletionItem(
   item: CompletionItem,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -146,17 +227,26 @@ export async function doResolveCompletionItem(
 
   const targetPHPCode = await fs.promises.readFile(absoluteItemDataFilePath, { encoding: 'utf8' });
 
-  const itemShortName = item.label.includes('\\') ? item.label.split('\\').pop() : item.label;
-  if (!itemShortName) return item;
+  let itemQualifiedName: string | undefined = undefined;
+  if (itemData.qualifiedName) {
+    itemQualifiedName = itemData.qualifiedName;
+  } else {
+    itemQualifiedName = item.label.includes('\\') ? item.label.split('\\').pop() : item.label;
+  }
+  if (!itemQualifiedName) return item;
 
   const itemKindName = phpCommon.getClassItemKindName(itemData.kind);
 
-  const itemStartOffset = phpCommon.getClassItemStartOffsetFromPhpCode(targetPHPCode, itemShortName, itemKindName);
+  const itemStartOffset = phpCommon.getClassItemStartOffsetFromPhpCode(targetPHPCode, itemQualifiedName, itemKindName);
   if (!itemStartOffset) return item;
 
   const defineString = phpCommon.getDefinitionStringByStartOffsetFromPhpCode(targetPHPCode, itemStartOffset);
 
-  const itemDocumentation = phpCommon.getClassItemDocumantationFromPhpCode(targetPHPCode, itemShortName, itemKindName);
+  const itemDocumentation = phpCommon.getClassItemDocumantationFromPhpCode(
+    targetPHPCode,
+    itemQualifiedName,
+    itemKindName
+  );
 
   let documentationValue = '';
   documentationValue += '```php\n<?php\n';

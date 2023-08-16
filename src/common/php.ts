@@ -17,7 +17,7 @@ import {
   Variable,
 } from 'php-parser';
 
-import { PhpObjectItemType, StaticClassItemType } from '../common/types';
+import { PHPSymbolNameDataType, PHPUseItemType, PhpObjectItemType, StaticClassItemType } from '../common/types';
 import * as phpParser from '../parsers/php/parser';
 import { PHPClassItemKindEnum } from '../projects/types';
 
@@ -429,6 +429,27 @@ export function getObjectItemsFromPhpCode(code: string) {
   }, ast);
 
   return items;
+}
+
+export function getSymbolNameDataFromUseItem(item: PHPUseItemType) {
+  const qualifiedName = item.name.includes('\\') ? item.name.split('\\').pop() : item.name;
+  if (!qualifiedName) return;
+
+  const aliasName = item.aliasName;
+
+  const fullQualifiedName = item.groupName ? item.groupName + '\\' + item.name : item.name;
+  const namespace = fullQualifiedName.includes('\\')
+    ? fullQualifiedName.split('\\').slice(0, -1).join('\\')
+    : undefined;
+
+  const phpSymbolNameData: PHPSymbolNameDataType = {
+    qualifiedName,
+    fullQualifiedName,
+    aliasName,
+    namespace,
+  };
+
+  return phpSymbolNameData;
 }
 
 /**
