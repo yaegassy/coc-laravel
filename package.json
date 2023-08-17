@@ -496,6 +496,10 @@
         "title": "(Develop) Show project stats"
       },
       {
+        "command": "laravel.project.finder",
+        "title": "(Develop) Run project finder"
+      },
+      {
         "command": "laravel.stubs.download",
         "title": "Download stubs"
       },

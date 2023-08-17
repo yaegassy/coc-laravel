@@ -3,6 +3,7 @@ import { ExtensionContext, OutputChannel } from 'coc.nvim';
 import { type ProjectManagerType } from '../projects/types';
 
 import * as artisanRunCommandFeature from './features/artisanRun';
+import * as projectFinderCommandFeature from './features/projectFinder';
 import * as projectRestartCommandFeature from './features/projectRestart';
 import * as projectStatsCommandFeature from './features/projectStats';
 import * as showOutputCommandFeature from './features/showOutput';
@@ -21,6 +22,7 @@ export async function register(
   artisanRunCommandFeature.register(context);
   projectStatsCommandFeature.register(context, projectManager);
   projectRestartCommandFeature.register(context, projectManager);
+  projectFinderCommandFeature.register(context, projectManager);
   viewFindAllReferencesCommandFeature.register(context, projectManager);
   stubsDownloadCommandFeature.register(context);
   stubsVersionCommandFeature.register(context);

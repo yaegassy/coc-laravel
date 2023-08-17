@@ -169,6 +169,7 @@ For more information, check this coc.nvim's wiki.
 
 - `laravel.project.restart`: Run project restart
 - `laravel.project.stats`: (Develop) Show project stats
+- `laravel.project.finder`: (Develop) Run project finder
 - `laravel.stubs.download`: Download stubs
 - `laravel.stubs.version`: Show the version of stubs
 - `laravel.artisan.run`: Run artisan command

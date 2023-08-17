@@ -107,7 +107,9 @@ async function runStats(picked: PickedItemEnum, projectManager: ProjectManagerTy
 
 async function doRender(contents: string) {
   await workspace.nvim
-    .command('belowright vnew blade-stats | setlocal buftype=nofile bufhidden=hide noswapfile filetype=markdown')
+    .command(
+      'belowright vnew laravel-project-stats | setlocal buftype=nofile bufhidden=hide noswapfile filetype=markdown'
+    )
     .then(async () => {
       const buf = await workspace.nvim.buffer;
       buf.setLines(contents.split('\n'), { start: 0, end: -1 });
