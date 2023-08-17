@@ -10,7 +10,6 @@ import * as definitionFeature from './definitions/definition';
 import * as diagnosticFeature from './diagnostics/diagnostic';
 import * as hoverFeature from './hovers/hover';
 import * as projectManagerFeature from './projects/manager';
-import { ProjectManagerType } from './projects/types';
 import * as referenceFeature from './references/reference';
 import * as watcherFeature from './watchers/watcher';
 
@@ -32,35 +31,30 @@ export async function activate(context: ExtensionContext): Promise<void> {
     window.showInformationMessage('[coc-laravel] Project initialization...');
   }
 
-  async function initialize(projectManager: ProjectManagerType) {
-    await commandFeature.register(context, projectManager, outputChannel);
-    await completionFeature.register(context, projectManager, outputChannel);
-    await definitionFeature.register(context, projectManager, outputChannel);
-    await referenceFeature.register(context, projectManager, outputChannel);
-    await hoverFeature.register(context, projectManager, outputChannel);
-    await diagnosticFeature.register(context, projectManager, outputChannel);
-    await codeActionFeature.register(context, outputChannel);
-    await watcherFeature.register(context, projectManager, outputChannel);
-  }
+  const projectManager = await projectManagerFeature.register(context, outputChannel);
+  if (!projectManager) return;
 
-  projectManagerFeature.register(context, outputChannel).then(async (projectManager) => {
-    if (projectManager) {
-      setTimeout(async () => {
-        await initialize(projectManager);
-      }, 300);
+  await commandFeature.register(context, projectManager, outputChannel);
+  await completionFeature.register(context, projectManager, outputChannel);
+  await definitionFeature.register(context, projectManager, outputChannel);
+  await referenceFeature.register(context, projectManager, outputChannel);
+  await hoverFeature.register(context, projectManager, outputChannel);
+  await diagnosticFeature.register(context, projectManager, outputChannel);
+  await codeActionFeature.register(context, outputChannel);
+  await watcherFeature.register(context, projectManager, outputChannel);
 
-      setTimeout(async () => {
-        outputChannel.appendLine('[Success] Project initialization succeeded');
-
-        if (workspace.getConfiguration('laravel').get<boolean>('project.startupMessageEnable')) {
-          window.showInformationMessage('[coc-laravel] Project initialization succeeded');
-        }
-      }, 500);
-    } else {
-      outputChannel.appendLine('[Failed] Project initialization failed');
-      if (workspace.getConfiguration('laravel').get<boolean>('project.startupMessageEnable')) {
-        window.showErrorMessage('[coc-laravel] Project initialization failed');
-      }
+  Promise.all([
+    projectManager.bladeProjectManager.initialize(),
+    projectManager.viewReferenceProjectManager.initialize(),
+    projectManager.translationProjectManager.initialize(),
+    projectManager.phpClassProjectManager.initialize(),
+    projectManager.phpFunctionProjectManager.initialize(),
+    projectManager.phpConstantProjectManager.initialize(),
+    projectManager.livewireProjectManager.initialize(),
+  ]).then(() => {
+    outputChannel.appendLine('[Success] Project initialization succeeded');
+    if (workspace.getConfiguration('laravel').get<boolean>('project.startupMessageEnable')) {
+      window.showInformationMessage('[coc-laravel] Project initialization succeeded');
     }
   });
 }
