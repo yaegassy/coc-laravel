@@ -8,6 +8,7 @@ import * as phpCommon from '../../common/php';
 import * as projectCommon from '../../common/project';
 import * as stubsCommon from '../../common/stubs';
 import { elapsed } from '../../common/utils';
+import { config } from '../../config';
 import { STUBS_VENDOR_NAME } from '../../constant';
 import { PHPFunctionType } from '../types';
 
@@ -55,6 +56,8 @@ export class PHPFunctionProjectManager {
   }
 
   async initialize() {
+    if (!config.completion.phpFunctionEnable) return;
+
     this.outputChannel.appendLine('[PHPFunction] Initializing...');
 
     const phpFunctions: PHPFunctionType[] = [];
