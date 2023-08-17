@@ -12,9 +12,10 @@ import * as hoverFeature from './hovers/hover';
 import * as projectManagerFeature from './projects/manager';
 import * as referenceFeature from './references/reference';
 import * as watcherFeature from './watchers/watcher';
+import { config } from './config';
 
 export async function activate(context: ExtensionContext): Promise<void> {
-  if (!workspace.getConfiguration('laravel').get<boolean>('enable')) return;
+  if (!config.enable) return;
 
   if (!fs.existsSync(context.storagePath)) {
     fs.mkdirSync(context.storagePath, { recursive: true });
@@ -27,7 +28,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   }
 
   outputChannel.appendLine('Project initialization...');
-  if (workspace.getConfiguration('laravel').get<boolean>('project.startupMessageEnable')) {
+  if (config.project.startupMessageEnable) {
     window.showInformationMessage('[coc-laravel] Project initialization...');
   }
 
@@ -53,7 +54,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     projectManager.livewireProjectManager.initialize(),
   ]).then(() => {
     outputChannel.appendLine('[Success] Project initialization succeeded');
-    if (workspace.getConfiguration('laravel').get<boolean>('project.startupMessageEnable')) {
+    if (config.project.startupMessageEnable) {
       window.showInformationMessage('[coc-laravel] Project initialization succeeded');
     }
   });

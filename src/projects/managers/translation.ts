@@ -8,6 +8,7 @@ import { Array as ArrayNode, Entry, Return, String as StringNode } from 'php-par
 import { getArtisanPath, runTinker } from '../../common/shared';
 import { elapsed } from '../../common/utils';
 import * as parser from '../../parsers/php/parser';
+import { config } from '../../config';
 
 export class TranslationProjectManager {
   mapStore: Map<string, string>;
@@ -51,6 +52,8 @@ export class TranslationProjectManager {
   }
 
   async initialize() {
+    if (!config.completion.translationEnable) return;
+
     this.outputChannel.appendLine('[Translation] Initializing...');
 
     const artisanPath = getArtisanPath();

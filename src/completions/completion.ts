@@ -222,7 +222,7 @@ class LaravelCompletionProvider implements CompletionItemProvider {
     }
 
     // translation
-    if (workspace.getConfiguration('laravel').get('completion.translationEnable')) {
+    if (config.completion.translationEnable) {
       const translationCompletionItems = await translationCompletionHandler.doCompletion(
         document,
         position,

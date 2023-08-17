@@ -6,6 +6,12 @@ const _config = workspace.getConfiguration('laravel');
  * Settings that are frequently referenced from multiple locations are added here
  */
 export const config = {
+  enable: _config.get<boolean>('enable', true),
+  project: {
+    get startupMessageEnable() {
+      return _config.get<boolean>('project.startupMessageEnable', true);
+    },
+  },
   completion: {
     get phpFunctionEnable() {
       return _config.get<boolean>('completion.phpFunctionEnable', true);
@@ -24,6 +30,9 @@ export const config = {
     },
     get phpObjectMemberEnable() {
       return _config.get<boolean>('completion.phpObjectMemberEnable', true);
+    },
+    get translationEnable() {
+      return _config.get<boolean>('completion.translationEnable', true);
     },
   },
 };
