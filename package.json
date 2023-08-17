@@ -26,9 +26,10 @@
     "access": "public"
   },
   "scripts": {
-    "first": "yarn stubs && yarn laravel",
+    "first": "yarn stubs && yarn laravel:main && yarn laravel:ide-helper",
     "stubs": "rimraf stubs && git clone git@github.com:JetBrains/phpstorm-stubs.git --depth 1 stubs",
-    "laravel": "rimraf laravel-project && composer create-project laravel/laravel:10.* laravel-project && cp -R resources/laravel/laravel-project.env laravel-project/.env && touch laravel-project/database/database.sqlite && cd laravel-project && ./artisan key:generate && ./artisan migrate",
+    "laravel:main": "rimraf laravel-project && composer create-project laravel/laravel:10.* laravel-project && cp -R resources/laravel/laravel-project.env laravel-project/.env && touch laravel-project/database/database.sqlite && cd laravel-project && ./artisan key:generate && ./artisan migrate",
+    "laravel:ide-helper": "cd laravel-project && composer require --dev barryvdh/laravel-ide-helper && php artisan ide-helper:generate && php artisan ide-helper:meta && php artisan ide-helper:models -N",
     "test": "vitest run src/__tests__",
     "test:watch": "vitest src/__tests__",
     "lint": "eslint src --ext ts",
