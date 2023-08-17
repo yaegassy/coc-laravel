@@ -59,7 +59,7 @@
     "prettier": "^2.8.8",
     "rimraf": "^5.0.1",
     "typescript": "~5.0.4",
-    "vitest": "^0.33.0"
+    "vitest": "^0.34.2"
   },
   "activationEvents": [
     "onLanguage:php",
