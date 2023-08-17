@@ -1,64 +1,137 @@
-import { ExtensionContext, commands, workspace } from 'coc.nvim';
+import { ExtensionContext, commands, window, workspace } from 'coc.nvim';
 
 import { SUPPORTED_LANGUAGE } from '../../constant';
 import { type ProjectManagerType } from '../../projects/types';
 
-export async function register(context: ExtensionContext, projectManagers: ProjectManagerType) {
+enum PickedItemEnum {
+  Cancel = -1,
+  All = 0,
+  Blade = 1,
+  ViewReference = 2,
+  Component = 3,
+  Livewire = 4,
+  Translation = 5,
+  PHPClass = 6,
+  PHPFunction = 7,
+  PHPConstant = 8,
+}
+
+const PICKER_ITEMS = [
+  'ALL',
+  'blade',
+  'viewReference',
+  'component',
+  'livewire',
+  'translate',
+  'phpClass',
+  'phpFunction',
+  'phpConstant',
+];
+
+export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
   context.subscriptions.push(
     commands.registerCommand('laravel.project.stats', async () => {
       const { document } = await workspace.getCurrentState();
       if (!SUPPORTED_LANGUAGE.includes(document.languageId)) return;
 
-      let outputText = '';
+      const picked: PickedItemEnum = await window.showMenuPicker(PICKER_ITEMS, `Select`);
+      if (picked === PickedItemEnum.Cancel) return;
 
-      const bladeProjectList = Array.from(projectManagers.bladeProjectManager.bladeFilelist());
-      const blaceProjectContent =
-        '### Blade\n\n' + '```json\n' + JSON.stringify(bladeProjectList, null, 2) + '\n```\n\n';
-
-      const viewReferenceProjectList = Array.from(projectManagers.viewReferenceProjectManager.list());
-      const viewReferenceContent =
-        '### View Reference\n\n' + '```json\n' + JSON.stringify(viewReferenceProjectList, null, 2) + '\n```\n\n';
-
-      const componentProjectList = Array.from(projectManagers.bladeProjectManager.componentList());
-      const componentProjectContent =
-        '### Component\n\n' + '```json\n' + JSON.stringify(componentProjectList, null, 2) + '\n```\n\n';
-
-      const livewireProjectList = Array.from(projectManagers.livewireProjectManager.list());
-      const livewireProjectContent =
-        '### Livewire\n\n' + '```json\n' + JSON.stringify(livewireProjectList, null, 2) + '\n```\n\n';
-
-      const translationProjectList = Array.from(projectManagers.translationProjectManager.list());
-      const translationProjectContent =
-        '### Translation\n\n' + '```json\n' + JSON.stringify(translationProjectList, null, 2) + '\n```\n\n';
-
-      const phpClassProjectList = Array.from(projectManagers.phpClassProjectManager.list());
-      const phpClassProjectContent =
-        '### PHP Class\n\n' + '```json\n' + JSON.stringify(phpClassProjectList, null, 2) + '\n```\n\n';
-
-      const phpFunctionProjectList = Array.from(projectManagers.phpFunctionProjectManager.list());
-      const phpFunctionProjectContent =
-        '### PHP Function\n\n' + '```json\n' + JSON.stringify(phpFunctionProjectList, null, 2) + '\n```\n\n';
-
-      const phpConstantProjectList = Array.from(projectManagers.phpConstantProjectManager.list());
-      const phpConstantProjectContent =
-        '### PHP Constant\n\n' + '```json\n' + JSON.stringify(phpConstantProjectList, null, 2) + '\n```\n\n';
-
-      outputText +=
-        blaceProjectContent +
-        viewReferenceContent +
-        componentProjectContent +
-        livewireProjectContent +
-        translationProjectContent +
-        phpClassProjectContent +
-        phpFunctionProjectContent +
-        phpConstantProjectContent;
-
-      await workspace.nvim
-        .command('belowright vnew blade-stats | setlocal buftype=nofile bufhidden=hide noswapfile filetype=markdown')
-        .then(async () => {
-          const buf = await workspace.nvim.buffer;
-          buf.setLines(outputText.split('\n'), { start: 0, end: -1 });
-        });
+      runStats(picked, projectManager);
     })
   );
+}
+
+async function runStats(picked: PickedItemEnum, projectManager: ProjectManagerType) {
+  let contents = '';
+  switch (picked) {
+    case PickedItemEnum.All:
+      contents = summaryContent(contents, projectManager);
+      contents = targetContent(contents, 'Blade', Array.from(projectManager.bladeProjectManager.bladeFilelist()));
+      contents = targetContent(
+        contents,
+        'View Reference',
+        Array.from(projectManager.viewReferenceProjectManager.list())
+      );
+      contents = targetContent(contents, 'Component', Array.from(projectManager.bladeProjectManager.componentList()));
+      contents = targetContent(contents, 'Livewire', Array.from(projectManager.livewireProjectManager.list()));
+      contents = targetContent(contents, 'Translation', Array.from(projectManager.translationProjectManager.list()));
+      contents = targetContent(contents, 'PHP Class', Array.from(projectManager.phpClassProjectManager.list()));
+      contents = targetContent(contents, 'PHP Function', Array.from(projectManager.phpFunctionProjectManager.list()));
+      contents = targetContent(contents, 'PHP Constant', Array.from(projectManager.phpConstantProjectManager.list()));
+      break;
+
+    case PickedItemEnum.Blade:
+      contents = targetContent(contents, 'Blade', Array.from(projectManager.bladeProjectManager.bladeFilelist()));
+      break;
+
+    case PickedItemEnum.ViewReference:
+      contents = targetContent(
+        contents,
+        'View Reference',
+        Array.from(projectManager.viewReferenceProjectManager.list())
+      );
+      break;
+
+    case PickedItemEnum.Component:
+      contents = targetContent(contents, 'Component', Array.from(projectManager.bladeProjectManager.componentList()));
+      break;
+
+    case PickedItemEnum.Livewire:
+      contents = targetContent(contents, 'Livewire', Array.from(projectManager.livewireProjectManager.list()));
+      break;
+
+    case PickedItemEnum.Translation:
+      contents = targetContent(contents, 'Translation', Array.from(projectManager.translationProjectManager.list()));
+      break;
+
+    case PickedItemEnum.PHPClass:
+      contents = targetContent(contents, 'PHP Class', Array.from(projectManager.phpClassProjectManager.list()));
+      break;
+
+    case PickedItemEnum.PHPFunction:
+      contents = targetContent(contents, 'PHP Function', Array.from(projectManager.phpFunctionProjectManager.list()));
+      break;
+
+    case PickedItemEnum.PHPConstant:
+      contents = targetContent(contents, 'PHP Constant', Array.from(projectManager.phpConstantProjectManager.list()));
+      break;
+
+    default:
+      break;
+  }
+
+  if (contents.length === 0) return;
+  doRender(contents);
+}
+
+async function doRender(contents: string) {
+  await workspace.nvim
+    .command('belowright vnew blade-stats | setlocal buftype=nofile bufhidden=hide noswapfile filetype=markdown')
+    .then(async () => {
+      const buf = await workspace.nvim.buffer;
+      buf.setLines(contents.split('\n'), { start: 0, end: -1 });
+    });
+}
+
+function summaryContent(contents: string, projectManager: ProjectManagerType) {
+  contents += '### Summary\n\n';
+
+  contents += `- Blade: ${projectManager.bladeProjectManager.bladeMapStore.size}\n`;
+  contents += `- View Reference: ${projectManager.viewReferenceProjectManager.viewReferenceMapStore.size}\n`;
+  contents += `- Component: ${projectManager.bladeProjectManager.componentMapStore.size}\n`;
+  contents += `- Livewire: ${projectManager.livewireProjectManager.livewireMapStore.size}\n`;
+  contents += `- Translation: ${projectManager.translationProjectManager.mapStore.size}\n`;
+  contents += `- PHP Class: ${projectManager.phpClassProjectManager.phpClassMapStore.size}\n`;
+  contents += `- PHP Function: ${projectManager.phpFunctionProjectManager.phpFunctionMapStore.size}\n`;
+  contents += `- PHP Constant: ${projectManager.phpConstantProjectManager.phpConstantMapStore.size}\n`;
+  contents += `\n`;
+
+  return contents;
+}
+
+function targetContent(contents: string, label: string, storeList: any[]) {
+  contents += `### ${label}\n\n` + '```json\n' + JSON.stringify(storeList, null, 2) + '\n```\n\n';
+
+  return contents;
 }
