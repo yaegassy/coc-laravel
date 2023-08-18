@@ -1,6 +1,6 @@
 import { LinesTextDocument, Position, workspace } from 'coc.nvim';
 
-import * as bladeParser from '../../parsers/blade/parser';
+import * as bladeCommon from '../../common/blade';
 import { type BladeProjectsManagerType } from '../../projects/types';
 
 export async function doHover(
@@ -18,7 +18,7 @@ export async function doHover(
   if (!text) return null;
 
   const code = document.getText();
-  const isComponentRegion = bladeParser.isComponentRegion(code, position);
+  const isComponentRegion = bladeCommon.isEditorPositionInComponentRegion(code, position);
   if (!isComponentRegion) return null;
 
   const component = bladeProjectManager.componentMapStore.get(text);

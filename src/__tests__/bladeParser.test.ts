@@ -3,6 +3,7 @@ import { expect, test } from 'vitest';
 import { BladeDocument } from 'stillat-blade-parser/out/document/bladeDocument';
 import { BladeComponentNode, BladeEchoNode, DirectiveNode } from 'stillat-blade-parser/out/nodes/nodes';
 import { Position as ParserPosition, Range as ParserRange } from 'stillat-blade-parser/out/nodes/position';
+import * as bladeCommon from '../common/blade';
 
 import * as testUtils from './testUtils';
 
@@ -376,4 +377,24 @@ test('Various parsing examples of blade component', () => {
     line: 21,
     offset: 611,
   });
+});
+
+test('Is editor offset in blade php region', async () => {
+  const code = testUtils.stripInitialNewline(`
+<x-input-label for="name" :value="__('Name')" />
+@if (session('status') === 'verification-link-sent')
+@endif
+{{  }}
+<?php
+  echo "test";
+?>
+`);
+
+  const editorOffset = 33;
+  const res = await bladeCommon.isEditorOffsetInBladePhpRelatedRegion(code, editorOffset);
+
+  console.log(res);
+
+  // dummy
+  expect(true).toBe(true);
 });

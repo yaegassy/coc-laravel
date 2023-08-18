@@ -13,6 +13,42 @@ export const config = {
     },
   },
   completion: {
+    get configEnable() {
+      return _config.get<boolean>('completion.configEnable', true);
+    },
+    get envEnable() {
+      return _config.get<boolean>('completion.envEnable', true);
+    },
+    get validationEnable() {
+      return _config.get<boolean>('completion.validationEnable', true);
+    },
+    get routeEnable() {
+      return _config.get<boolean>('completion.routeEnable', true);
+    },
+    get viewEnable() {
+      return _config.get<boolean>('completion.viewEnable', true);
+    },
+    get middlewareEnable() {
+      return _config.get<boolean>('completion.middlewareEnable', true);
+    },
+    get guardEnable() {
+      return _config.get<boolean>('completion.guardEnable', true);
+    },
+    get translationEnable() {
+      return _config.get<boolean>('completion.translationEnable', true);
+    },
+    get componentEnable() {
+      return _config.get<boolean>('completion.componentEnable', true);
+    },
+    get methodParameterEnable() {
+      return _config.get<boolean>('completion.methodParameterEnable', true);
+    },
+    get directiveEnable() {
+      return _config.get<boolean>('completion.directiveEnable', true);
+    },
+    get livewireEnable() {
+      return _config.get<boolean>('completion.livewireEnable', true);
+    },
     get phpFunctionEnable() {
       return _config.get<boolean>('completion.phpFunctionEnable', true);
     },
@@ -31,8 +67,8 @@ export const config = {
     get phpObjectMemberEnable() {
       return _config.get<boolean>('completion.phpObjectMemberEnable', true);
     },
-    get translationEnable() {
-      return _config.get<boolean>('completion.translationEnable', true);
+    get phpKeywordEnable() {
+      return _config.get<boolean>('completion.phpKeywordEnable', true);
     },
   },
 };

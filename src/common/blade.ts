@@ -1,10 +1,15 @@
 import { Assign, Boolean as BooleanNode, Variable } from 'php-parser';
 import { BladeDocument } from 'stillat-blade-parser/out/document/bladeDocument';
-import { DirectiveNode, InlinePhpNode } from 'stillat-blade-parser/out/nodes/nodes';
+import { DirectiveNode, InlinePhpNode, BladeEchoNode, BladeComponentNode } from 'stillat-blade-parser/out/nodes/nodes';
 
 import * as phpParser from '../parsers/php/parser';
 import * as bladeParser from '../parsers/blade/parser';
 import { PHPRelatedBladeNodeType, PHPVariableItemType } from './types';
+
+interface EditorPosition {
+  line: number;
+  character: number;
+}
 
 export function getVariableItemsWithBladeRangeOffsetsFromBladeDoc(
   bladeDoc: BladeDocument,
@@ -162,4 +167,122 @@ export function generateVirtualPhpEvalCode(code: string) {
   }
 
   return virtualPhpCode;
+}
+
+export function isEditorPositionInComponentRegion(code: string, editorPostion: EditorPosition) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return undefined;
+
+  const flags: boolean[] = [];
+
+  bladeDoc.getAllNodes().forEach((node) => {
+    if (node instanceof BladeComponentNode) {
+      if (node.startPosition && node.endPosition) {
+        if (
+          node.startPosition.line - 1 <= editorPostion.line &&
+          node.startPosition.char - 1 <= editorPostion.character &&
+          node.endPosition.line - 1 >= editorPostion.line &&
+          node.endPosition.char - 1 >= editorPostion.character
+        ) {
+          flags.push(true);
+        }
+      }
+    }
+  });
+
+  if (flags.includes(true)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+export async function isEditorOffsetInBladePhpRelatedRegion(code: string, editorOffset: number) {
+  const bladeDoc = bladeParser.getBladeDocument(code);
+  if (!bladeDoc) return false;
+
+  const flags: boolean[] = [];
+  for (const node of bladeDoc.getAllNodes()) {
+    if (node instanceof BladeEchoNode) {
+      if (!node.startPosition) continue;
+      if (!node.endPosition) continue;
+      const startOffset = node.startPosition.offset;
+      const endOffset = node.endPosition.offset;
+
+      flags.push(isOffsetInRange(editorOffset, startOffset, endOffset));
+    } else if (node instanceof DirectiveNode) {
+      if (node.directiveName === 'php') {
+        const endPhpDirectiveNode = node.getFinalClosingDirective();
+        if (endPhpDirectiveNode.directiveName === 'endphp') {
+          if (!node.offset) continue;
+          if (!endPhpDirectiveNode.offset?.end) continue;
+          const startOffset = node.offset.start;
+          const endOffset = endPhpDirectiveNode.offset.end;
+
+          flags.push(isOffsetInRange(editorOffset, startOffset, endOffset));
+        } else if (endPhpDirectiveNode.directiveName === 'php') {
+          if (!node.offset) continue;
+          const startOffset = node.offset.start;
+          const endOffset = node.offset.end;
+
+          flags.push(isOffsetInRange(editorOffset, startOffset, endOffset));
+        }
+      } else if (
+        node.directiveName === 'if' ||
+        node.directiveName === 'elseif' ||
+        node.directiveName === 'unless' ||
+        node.directiveName === 'isset' ||
+        node.directiveName === 'empty' ||
+        node.directiveName === 'switch' ||
+        node.directiveName === 'for' ||
+        node.directiveName === 'foreach' ||
+        node.directiveName === 'forelse' ||
+        node.directiveName === 'while' ||
+        node.directiveName === 'continue' ||
+        node.directiveName === 'break' ||
+        node.directiveName === 'checked' ||
+        node.directiveName === 'selected' ||
+        node.directiveName === 'disabled' ||
+        node.directiveName === 'readonly' ||
+        node.directiveName === 'required'
+      ) {
+        if (!node.directiveParametersPosition) continue;
+        if (!node.directiveParametersPosition.start?.offset) continue;
+        if (!node.directiveParametersPosition.end?.offset) continue;
+        const startOffset = node.directiveParametersPosition.start.offset;
+        const endOffset = node.directiveParametersPosition.end.offset;
+
+        flags.push(isOffsetInRange(editorOffset, startOffset, endOffset));
+      }
+    } else if (node instanceof InlinePhpNode) {
+      if (!node.startPosition) continue;
+      if (!node.endPosition) continue;
+      const startOffset = node.startPosition.offset;
+      const endOffset = node.endPosition.offset;
+
+      flags.push(isOffsetInRange(editorOffset, startOffset, endOffset));
+    } else if (node instanceof BladeComponentNode) {
+      if (!node.hasParameters) continue;
+      for (const parameter of node.parameters) {
+        if (!parameter.isExpression) continue;
+        if (!parameter.valuePosition) continue;
+        if (!parameter.valuePosition.start?.offset) continue;
+        if (!parameter.valuePosition.end?.offset) continue;
+        const startOffset = parameter.valuePosition.start.offset;
+        const endOffset = parameter.valuePosition.end.offset;
+
+        flags.push(isOffsetInRange(editorOffset, startOffset, endOffset));
+      }
+    }
+  }
+
+  if (flags.includes(true)) return true;
+  return false;
+}
+
+function isOffsetInRange(offset: number, startOffset: number, endOffset: number) {
+  if (startOffset <= offset && endOffset >= offset) {
+    return true;
+  }
+  return false;
 }

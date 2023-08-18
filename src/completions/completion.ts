@@ -13,7 +13,9 @@ import {
   workspace,
 } from 'coc.nvim';
 
+import * as bladeCommon from '../common/blade';
 import { getArtisanPath, getViewPath } from '../common/shared';
+import { elapsed } from '../common/utils';
 import { config } from '../config';
 import { DOCUMENT_SELECTOR, SUPPORTED_LANGUAGE } from '../constant';
 import { type ProjectManagerType } from '../projects/types';
@@ -128,240 +130,221 @@ class LaravelCompletionProvider implements CompletionItemProvider {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context?: CompletionContext
   ) {
-    const items: CompletionItem[] | CompletionList = [];
+    const start = process.hrtime();
 
+    const items: CompletionItem[] | CompletionList = [];
     const isIncompletes: boolean[] = [];
 
-    // config
-    if (workspace.getConfiguration('laravel').get('completion.configEnable')) {
+    const code = document.getText();
+    const offset = document.offsetAt(position);
+
+    let isOffsetInPhpRelatedRegion: boolean = false;
+    if (document.languageId === 'blade') {
+      isOffsetInPhpRelatedRegion = await bladeCommon.isEditorOffsetInBladePhpRelatedRegion(code, offset);
+    }
+
+    // config [php, blade]
+    if (config.completion.configEnable) {
       const configCompletionItems = await configCompletionHandler.doCompletion(document, position);
-      if (configCompletionItems) {
-        items.push(...configCompletionItems);
-      }
+      if (configCompletionItems) items.push(...configCompletionItems);
 
-      const bladeConfigCompletionItems = await bladeConfigCompletionHandler.doCompletion(document, position);
-      if (bladeConfigCompletionItems) {
-        items.push(...bladeConfigCompletionItems);
+      if (isOffsetInPhpRelatedRegion) {
+        const bladeConfigCompletionItems = await bladeConfigCompletionHandler.doCompletion(document, position);
+        if (bladeConfigCompletionItems) items.push(...bladeConfigCompletionItems);
       }
     }
 
-    // env
-    if (workspace.getConfiguration('laravel').get('completion.envEnable')) {
+    // env [php, blade]
+    if (config.completion.envEnable) {
       const envCompletionItems = await envCompletionHandler.doCompletion(document, position);
-      if (envCompletionItems) {
-        items.push(...envCompletionItems);
-      }
+      if (envCompletionItems) items.push(...envCompletionItems);
 
-      const bladeEnvCompletionItems = await bladeEnvCompletionHandler.doCompletion(document, position);
-      if (bladeEnvCompletionItems) {
-        items.push(...bladeEnvCompletionItems);
+      if (isOffsetInPhpRelatedRegion) {
+        const bladeEnvCompletionItems = await bladeEnvCompletionHandler.doCompletion(document, position);
+        if (bladeEnvCompletionItems) items.push(...bladeEnvCompletionItems);
       }
     }
 
-    // validation
-    if (workspace.getConfiguration('laravel').get('completion.validationEnable')) {
+    // validation [php]
+    if (config.completion.validationEnable) {
       const validationCompletionItems = await validationCompletionHandler.doCompletion(document, position);
-      if (validationCompletionItems) {
-        items.push(...validationCompletionItems);
-      }
+      if (validationCompletionItems) items.push(...validationCompletionItems);
     }
 
-    // route
-    if (workspace.getConfiguration('laravel').get('completion.routeEnable')) {
+    // route [php, blade]
+    if (config.completion.routeEnable) {
       const routeCompletionItems = await routeCompletionHandler.doCompletion(document, position);
-      if (routeCompletionItems) {
-        items.push(...routeCompletionItems);
-      }
+      if (routeCompletionItems) items.push(...routeCompletionItems);
 
-      const bladeRouteCompletionItems = await bladeRouteCompletionHandler.doCompletion(document, position);
-      if (bladeRouteCompletionItems) {
-        items.push(...bladeRouteCompletionItems);
+      if (isOffsetInPhpRelatedRegion) {
+        const bladeRouteCompletionItems = await bladeRouteCompletionHandler.doCompletion(document, position);
+        if (bladeRouteCompletionItems) items.push(...bladeRouteCompletionItems);
       }
     }
 
-    // view
-    if (workspace.getConfiguration('laravel').get('completion.viewEnable')) {
+    // view [php, blade]
+    if (config.completion.viewEnable) {
       const viewCompletionItems = await viewCompletionHandler.doCompletion(
         document,
         position,
         this.projectManager.bladeProjectManager
       );
-      if (viewCompletionItems) {
-        items.push(...viewCompletionItems);
-      }
+      if (viewCompletionItems) items.push(...viewCompletionItems);
 
       const bladeViewCompletionItems = await bladeViewCompletionHanlder.doCompletion(
         document,
         position,
         this.projectManager.bladeProjectManager
       );
-      if (bladeViewCompletionItems) {
-        items.push(...bladeViewCompletionItems);
-      }
+      if (bladeViewCompletionItems) items.push(...bladeViewCompletionItems);
     }
 
-    // middleware
-    if (workspace.getConfiguration('laravel').get('completion.middlewareEnable')) {
+    // middleware [php]
+    if (config.completion.middlewareEnable) {
       const middlewareCompletionItems = await middlewareCompletionHandler.doCompletion(document, position);
-      if (middlewareCompletionItems) {
-        items.push(...middlewareCompletionItems);
-      }
+      if (middlewareCompletionItems) items.push(...middlewareCompletionItems);
     }
 
-    // guard
-    if (workspace.getConfiguration('laravel').get('completion.guardEnable')) {
+    // guard [php, blade]
+    if (config.completion.guardEnable) {
       const guardCompletionItems = await guardCompletionHandler.doCompletion(document, position);
-      if (guardCompletionItems) {
-        items.push(...guardCompletionItems);
-      }
+      if (guardCompletionItems) items.push(...guardCompletionItems);
 
       const bladeGuardCompletionItems = await bladeGuardCompletionHandler.doCompletion(document, position);
-      if (bladeGuardCompletionItems) {
-        items.push(...bladeGuardCompletionItems);
-      }
+      if (bladeGuardCompletionItems) items.push(...bladeGuardCompletionItems);
     }
 
-    // translation
+    // translation [php, blade]
     if (config.completion.translationEnable) {
       const translationCompletionItems = await translationCompletionHandler.doCompletion(
         document,
         position,
         this.projectManager.translationProjectManager
       );
-      if (translationCompletionItems) {
-        items.push(...translationCompletionItems);
-      }
+      if (translationCompletionItems) items.push(...translationCompletionItems);
 
       const bladeTranslationCompletionItems = await bladeTranslationCompletionHandler.doCompletion(
         document,
         position,
         this.projectManager.translationProjectManager
       );
-      if (bladeTranslationCompletionItems) {
-        items.push(...bladeTranslationCompletionItems);
+      if (bladeTranslationCompletionItems) items.push(...bladeTranslationCompletionItems);
+    }
+
+    // component (tag) [blade]
+    if (config.completion.componentEnable) {
+      // falsy
+      if (!isOffsetInPhpRelatedRegion) {
+        const componentCompletionItems = await bladeComponentCompletionHandler.doCompletion(
+          document,
+          position,
+          this.projectManager.bladeProjectManager
+        );
+        if (componentCompletionItems) items.push(...componentCompletionItems);
       }
     }
 
-    // component
-    if (workspace.getConfiguration('laravel').get('completion.componentEnable')) {
-      const componentCompletionItems = await bladeComponentCompletionHandler.doCompletion(
-        document,
-        position,
-        this.projectManager.bladeProjectManager
-      );
-      if (componentCompletionItems) {
-        items.push(...componentCompletionItems);
-      }
-    }
-
-    // php function
+    // php function [blade]
     if (config.completion.phpFunctionEnable) {
-      const phpFunctionCompletionItems = await phpFunctionCompletionHandler.doCompletion(
-        document,
-        position,
-        this.projectManager.phpFunctionProjectManager,
-        context
-      );
-      if (phpFunctionCompletionItems) {
-        items.push(...phpFunctionCompletionItems);
+      if (isOffsetInPhpRelatedRegion) {
+        const phpFunctionCompletionItems = await phpFunctionCompletionHandler.doCompletion(
+          document,
+          position,
+          this.projectManager.phpFunctionProjectManager,
+          context
+        );
+        if (phpFunctionCompletionItems) items.push(...phpFunctionCompletionItems);
       }
     }
 
-    // php class (class, interface, trait, enum)
-    // TODO: trait?: prefix contain `use |`
+    // php class (class, interface, trait, enum) [blade]
     if (config.completion.phpClassEnable) {
-      const phpClassCompletionItems = await phpClassCompletionHandler.doCompletion(
-        document,
-        position,
-        this.projectManager.phpClassProjectManager,
-        context
-      );
-      if (phpClassCompletionItems) {
-        items.push(...phpClassCompletionItems);
+      if (isOffsetInPhpRelatedRegion) {
+        const phpClassCompletionItems = await phpClassCompletionHandler.doCompletion(
+          document,
+          position,
+          this.projectManager.phpClassProjectManager,
+          context
+        );
+        if (phpClassCompletionItems) items.push(...phpClassCompletionItems);
       }
     }
 
-    // php static class (DateTime::|)
+    // php static class (DateTime::|) [blade]
     if (config.completion.phpStaticClassEnable) {
-      const phpStaticClassCompletionItems = await phpStaticClassCompletionHandler.doCompletion(
-        document,
-        position,
-        this.projectManager.phpClassProjectManager,
-        this.artisanPath
-      );
-      if (phpStaticClassCompletionItems) {
-        items.push(...phpStaticClassCompletionItems);
+      if (isOffsetInPhpRelatedRegion) {
+        const phpStaticClassCompletionItems = await phpStaticClassCompletionHandler.doCompletion(
+          document,
+          position,
+          this.projectManager.phpClassProjectManager,
+          this.artisanPath
+        );
+        if (phpStaticClassCompletionItems) items.push(...phpStaticClassCompletionItems);
       }
     }
 
-    // php object member ($obj->|)
+    // php object member ($obj->|) [blade]
     if (config.completion.phpObjectMemberEnable) {
-      const phpObjectMemberCompletionItems = await phpObjectMemberCompletionHandler.doCompletion(
-        document,
-        position,
-        this.artisanPath
-      );
-      if (phpObjectMemberCompletionItems) {
-        items.push(...phpObjectMemberCompletionItems);
+      if (isOffsetInPhpRelatedRegion) {
+        const phpObjectMemberCompletionItems = await phpObjectMemberCompletionHandler.doCompletion(
+          document,
+          position,
+          this.artisanPath
+        );
+        if (phpObjectMemberCompletionItems) items.push(...phpObjectMemberCompletionItems);
       }
     }
 
-    // php variable
+    // php variable [blade]
     if (config.completion.phpVariableEnable) {
-      const phpVariableCompletionItems = await phpVariableCompletionHandler.doCompletion(document, position);
-      if (phpVariableCompletionItems) {
-        items.push(...phpVariableCompletionItems);
+      if (isOffsetInPhpRelatedRegion) {
+        const phpVariableCompletionItems = await phpVariableCompletionHandler.doCompletion(document, position);
+        if (phpVariableCompletionItems) items.push(...phpVariableCompletionItems);
       }
     }
 
-    // php constant
+    // php constant [blade]
     if (config.completion.phpConstantEnable) {
-      const phpConstantCompletionItems = await phpConstantCompletionHandler.doCompletion(
-        document,
-        position,
-        this.projectManager.phpConstantProjectManager
-      );
-      if (phpConstantCompletionItems) {
-        items.push(...phpConstantCompletionItems);
+      if (isOffsetInPhpRelatedRegion) {
+        const phpConstantCompletionItems = await phpConstantCompletionHandler.doCompletion(
+          document,
+          position,
+          this.projectManager.phpConstantProjectManager
+        );
+        if (phpConstantCompletionItems) items.push(...phpConstantCompletionItems);
       }
     }
 
-    // php keyword
-    if (workspace.getConfiguration('laravel').get('completion.phpKeywordEnable')) {
-      const phpKeywordCompletionItems = await phpKeywordCompletionHandler.doCompletion(document, position);
-      if (phpKeywordCompletionItems) {
-        items.push(...phpKeywordCompletionItems);
+    // php keyword [blade]
+    if (config.completion.phpKeywordEnable) {
+      if (isOffsetInPhpRelatedRegion) {
+        const phpKeywordCompletionItems = await phpKeywordCompletionHandler.doCompletion(document, position);
+        if (phpKeywordCompletionItems) items.push(...phpKeywordCompletionItems);
       }
     }
 
-    // method parameter
-    if (workspace.getConfiguration('laravel').get('completion.methodParameterEnable')) {
+    // method parameter [blade]
+    if (config.completion.methodParameterEnable) {
       const methodParameterCompletionItems = await bladeMethodParameterHandler.doCompletion(document, position);
-      if (methodParameterCompletionItems) {
-        items.push(...methodParameterCompletionItems);
-      }
+      if (methodParameterCompletionItems) items.push(...methodParameterCompletionItems);
     }
 
-    // directive
-    if (
-      workspace.getConfiguration('laravel').get('completion.directiveEnable') &&
-      !this.isCocBladeCompletionEnableDirective
-    ) {
+    // directive [blade]
+    if (config.completion.directiveEnable && !this.isCocBladeCompletionEnableDirective) {
       const bladeDirectiveCompletionItems = await bladeDirectiveCompletionHandler.doCompletion(document, position);
-      if (bladeDirectiveCompletionItems) {
-        items.push(...bladeDirectiveCompletionItems);
-      }
+      if (bladeDirectiveCompletionItems) items.push(...bladeDirectiveCompletionItems);
     }
 
-    // livewire
-    if (workspace.getConfiguration('laravel').get('completion.livewireEnable')) {
-      const livewireTagCompletionItems = await livewireTagCompletionHandler.doCompletion(
-        document,
-        position,
-        this.projectManager.livewireProjectManager
-      );
-      if (livewireTagCompletionItems) {
-        items.push(...livewireTagCompletionItems);
+    // livewire [blade]
+    if (config.completion.livewireEnable) {
+      // falsy
+      if (!isOffsetInPhpRelatedRegion) {
+        const livewireTagCompletionItems = await livewireTagCompletionHandler.doCompletion(
+          document,
+          position,
+          this.projectManager.livewireProjectManager
+        );
+        if (livewireTagCompletionItems) items.push(...livewireTagCompletionItems);
       }
 
       const livewireActionCompletionItems = await livewireActionCompletionHandler.doCompletion(
@@ -393,16 +376,18 @@ class LaravelCompletionProvider implements CompletionItemProvider {
         items.push(...livewireDirectiveCompletionItems);
       }
 
-      const livewirePropertyCompletionItems = await livewirePropertyHandler.doCompletion(
-        document,
-        position,
-        this.projectManager.livewireProjectManager,
-        this.viewPath
-      );
-      if (livewirePropertyCompletionItems) {
-        items.push(...livewirePropertyCompletionItems);
+      if (isOffsetInPhpRelatedRegion) {
+        const livewirePropertyCompletionItems = await livewirePropertyHandler.doCompletion(
+          document,
+          position,
+          this.projectManager.livewireProjectManager,
+          this.viewPath
+        );
+        if (livewirePropertyCompletionItems) items.push(...livewirePropertyCompletionItems);
       }
     }
+
+    console.log(`=DEBUG=: ${elapsed(start)}`);
 
     if (isIncompletes.includes(true)) {
       return CompletionList.create(items, true);
