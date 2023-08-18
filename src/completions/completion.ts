@@ -15,7 +15,6 @@ import {
 
 import * as bladeCommon from '../common/blade';
 import { getArtisanPath, getViewPath } from '../common/shared';
-import { elapsed } from '../common/utils';
 import { config } from '../config';
 import { DOCUMENT_SELECTOR, SUPPORTED_LANGUAGE } from '../constant';
 import { type ProjectManagerType } from '../projects/types';
@@ -130,8 +129,6 @@ class LaravelCompletionProvider implements CompletionItemProvider {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context?: CompletionContext
   ) {
-    const start = process.hrtime();
-
     const items: CompletionItem[] | CompletionList = [];
     const isIncompletes: boolean[] = [];
 
@@ -386,8 +383,6 @@ class LaravelCompletionProvider implements CompletionItemProvider {
         if (livewirePropertyCompletionItems) items.push(...livewirePropertyCompletionItems);
       }
     }
-
-    console.log(`=DEBUG=: ${elapsed(start)}`);
 
     if (isIncompletes.includes(true)) {
       return CompletionList.create(items, true);
