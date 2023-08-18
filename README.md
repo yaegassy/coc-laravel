@@ -148,11 +148,17 @@ For more information, check this coc.nvim's wiki.
 - `laravel.completion.translationEnable`: Enable translation completion, default: `true`
 - `laravel.completion.componentEnable`: Enable component completion, default: `true`
 - `laravel.completion.phpFunctionEnable`: Enable php function completion, default: `true`
+- `laravel.completion.phpFunction.stubsEnable`: Enable stubs in phpFunction completion, default: `true`
+- `laravel.completion.phpFunction.vendorEnable`: Enable vendor in phpFunction completion, default: `true`
 - `laravel.completion.phpClassEnable`: Enable php class completion, default: `true`
+- `laravel.completion.phpClass.stubsEnable`: Enable stubs in phpClass completion, default: `true`
+- `laravel.completion.phpClass.vendorEnable`: Enable vendor in phpClass completion, default: `true`
+- `laravel.completion.phpConstantEnable`: Enable php constant completion, default: `true`
+- `laravel.completion.phpConstant.stubsEnable`: Enable stubs in phpConstant completion, default: `true`
+- `laravel.completion.phpConstant.vendorEnable`: Enable vendor in phpConstant completion, default: `true`
 - `laravel.completion.phpStaticClassEnable`: Enable php static class completion, default: `true`
 - `laravel.completion.phpObjectMemberEnable`: Enable php object member completion, default: `true`
 - `laravel.completion.phpVariableEnable`: Enable php variable completion, default: `true`
-- `laravel.completion.phpConstantEnable`: Enable php constant completion, default: `true`
 - `laravel.completion.phpKeywordEnable`: Enable php keyword completion, default: `true`
 - `laravel.completion.methodParameterEnable`: Enable method parameter completion, default: `true`
 - `laravel.completion.livewireEnable`: Enable livewire completion, default: `true`

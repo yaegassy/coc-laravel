@@ -70,5 +70,29 @@ export const config = {
     get phpKeywordEnable() {
       return _config.get<boolean>('completion.phpKeywordEnable', true);
     },
+    phpFunction: {
+      get stubsEnable() {
+        return _config.get<boolean>('completion.phpFunction.stubsEnable', true);
+      },
+      get vendorEnable() {
+        return _config.get<boolean>('completion.phpFunction.vendorEnable', true);
+      },
+    },
+    phpClass: {
+      get stubsEnable() {
+        return _config.get<boolean>('completion.phpClass.stubsEnable', true);
+      },
+      get vendorEnable() {
+        return _config.get<boolean>('completion.phpClass.vendorEnable', true);
+      },
+    },
+    phpConstant: {
+      get stubsEnable() {
+        return _config.get<boolean>('completion.phpConstant.stubsEnable', true);
+      },
+      get vendorEnable() {
+        return _config.get<boolean>('completion.phpConstant.vendorEnable', true);
+      },
+    },
   },
 };

@@ -274,10 +274,45 @@
           "default": true,
           "description": "Enable php function completion."
         },
+        "laravel.completion.phpFunction.stubsEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable stubs in phpFunction completion."
+        },
+        "laravel.completion.phpFunction.vendorEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable vendor in phpFunction completion."
+        },
         "laravel.completion.phpClassEnable": {
           "type": "boolean",
           "default": true,
           "description": "Enable php class completion."
+        },
+        "laravel.completion.phpClass.stubsEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable stubs in phpClass completion."
+        },
+        "laravel.completion.phpClass.vendorEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable vendor in phpClass completion."
+        },
+        "laravel.completion.phpConstantEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable php constant completion."
+        },
+        "laravel.completion.phpConstant.stubsEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable stubs in phpConstant completion."
+        },
+        "laravel.completion.phpConstant.vendorEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable vendor in phpConstant completion."
         },
         "laravel.completion.phpStaticClassMemberEnable": {
           "type": "boolean",
@@ -293,11 +328,6 @@
           "type": "boolean",
           "default": true,
           "description": "Enable php variable completion."
-        },
-        "laravel.completion.phpConstantEnable": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable php constant completion."
         },
         "laravel.completion.phpKeywordEnable": {
           "type": "boolean",

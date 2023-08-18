@@ -66,92 +66,98 @@ export class PHPFunctionProjectManager {
     // builtin
     //
 
-    const useStubs = workspace.getConfiguration('laravel').get<string[]>('stubs.useStubs', []);
+    if (config.completion.phpFunction.stubsEnable) {
+      const useStubs = workspace.getConfiguration('laravel').get<string[]>('stubs.useStubs', []);
 
-    const stubsMapFilePath = path.resolve(
-      path.join(this.context.storagePath, STUBS_VENDOR_NAME, 'PhpStormStubsMap.php')
-    );
+      const stubsMapFilePath = path.resolve(
+        path.join(this.context.storagePath, STUBS_VENDOR_NAME, 'PhpStormStubsMap.php')
+      );
 
-    let existsStubsMapFilePath = false;
-    try {
-      await fs.promises.stat(stubsMapFilePath);
-      existsStubsMapFilePath = true;
-    } catch {}
-    if (!existsStubsMapFilePath) return;
+      let existsStubsMapFilePath = false;
+      try {
+        await fs.promises.stat(stubsMapFilePath);
+        existsStubsMapFilePath = true;
+      } catch {}
+      if (!existsStubsMapFilePath) return;
 
-    const stubsMapPHPCode = await fs.promises.readFile(stubsMapFilePath, { encoding: 'utf8' });
+      const stubsMapPHPCode = await fs.promises.readFile(stubsMapFilePath, { encoding: 'utf8' });
 
-    const builtinFunctionContextList = stubsCommon.getContextListFromStubMapPHPCode(stubsMapPHPCode, 'FUNCTIONS');
-    if (!builtinFunctionContextList) return;
+      const builtinFunctionContextList = stubsCommon.getContextListFromStubMapPHPCode(stubsMapPHPCode, 'FUNCTIONS');
+      if (!builtinFunctionContextList) return;
 
-    const builtinFunctions = builtinFunctionContextList.filter((c) => stubsCommon.isAllowStubFile(c.path, useStubs));
+      const builtinFunctions = builtinFunctionContextList.filter((c) => stubsCommon.isAllowStubFile(c.path, useStubs));
 
-    for (const f of builtinFunctions) {
-      phpFunctions.push({
-        name: f.name,
-        path: f.path,
-        isStubs: true,
-      });
+      for (const f of builtinFunctions) {
+        phpFunctions.push({
+          name: f.name,
+          path: f.path,
+          isStubs: true,
+        });
+      }
     }
 
     //
     // autoloadedFunctions
     //
 
-    const composerAutoloadFilesPHPPath = path.join(this.workspaceRoot, 'vendor', 'composer', 'autoload_files.php');
+    if (config.completion.phpFunction.vendorEnable) {
+      const composerAutoloadFilesPHPPath = path.join(this.workspaceRoot, 'vendor', 'composer', 'autoload_files.php');
 
-    let existsComposerAutoloadFilesPHPPath = false;
-    try {
-      await fs.promises.stat(composerAutoloadFilesPHPPath);
-      existsComposerAutoloadFilesPHPPath = true;
-    } catch {}
-    if (!existsComposerAutoloadFilesPHPPath) return;
-
-    const composerAutoloadFilesPHPCode = await fs.promises.readFile(composerAutoloadFilesPHPPath, { encoding: 'utf8' });
-
-    const abusoluteFileResources = composerCommon.getAbusoluteFileResourcesAtVendorComposerTargetFileOfphpCode(
-      composerAutoloadFilesPHPCode,
-      this.workspaceRoot
-    );
-
-    const excludeVendors = workspace.getConfiguration('laravel').get<string[]>('project.excludeVendors', []);
-
-    for (const r of abusoluteFileResources) {
-      const relativeFilePath = r.path.replace(this.workspaceRoot, '').replace(/^\//, '');
-      if (projectCommon.isExcludeVendor(relativeFilePath, excludeVendors)) continue;
-
-      let existsRelativeFilePath = false;
+      let existsComposerAutoloadFilesPHPPath = false;
       try {
-        await fs.promises.stat(relativeFilePath);
-        existsRelativeFilePath = true;
+        await fs.promises.stat(composerAutoloadFilesPHPPath);
+        existsComposerAutoloadFilesPHPPath = true;
       } catch {}
-      if (!existsRelativeFilePath) continue;
+      if (!existsComposerAutoloadFilesPHPPath) return;
 
-      // Some of the PATHs read do not exist or cause errors
-      try {
-        const targetPHPCode = await fs.promises.readFile(r.path, { encoding: 'utf8' });
+      const composerAutoloadFilesPHPCode = await fs.promises.readFile(composerAutoloadFilesPHPPath, {
+        encoding: 'utf8',
+      });
 
-        const namespaces = phpCommon.getNamespaceFromPHPCode(targetPHPCode);
+      const abusoluteFileResources = composerCommon.getAbusoluteFileResourcesAtVendorComposerTargetFileOfphpCode(
+        composerAutoloadFilesPHPCode,
+        this.workspaceRoot
+      );
 
-        const autoloadedFunctions = phpCommon.getFunctionFromPHPCode(targetPHPCode);
-        if (autoloadedFunctions.length === 0) continue;
-        for (const c of autoloadedFunctions) {
-          if (namespaces.length > 0) {
-            phpFunctions.push({
-              name: namespaces[0] + '\\' + c,
-              path: relativeFilePath,
-              isStubs: false,
-            });
-          } else {
-            phpFunctions.push({
-              name: c,
-              path: relativeFilePath,
-              isStubs: false,
-            });
+      const excludeVendors = workspace.getConfiguration('laravel').get<string[]>('project.excludeVendors', []);
+
+      for (const r of abusoluteFileResources) {
+        const relativeFilePath = r.path.replace(this.workspaceRoot, '').replace(/^\//, '');
+        if (projectCommon.isExcludeVendor(relativeFilePath, excludeVendors)) continue;
+
+        let existsRelativeFilePath = false;
+        try {
+          await fs.promises.stat(relativeFilePath);
+          existsRelativeFilePath = true;
+        } catch {}
+        if (!existsRelativeFilePath) continue;
+
+        // Some of the PATHs read do not exist or cause errors
+        try {
+          const targetPHPCode = await fs.promises.readFile(r.path, { encoding: 'utf8' });
+
+          const namespaces = phpCommon.getNamespaceFromPHPCode(targetPHPCode);
+
+          const autoloadedFunctions = phpCommon.getFunctionFromPHPCode(targetPHPCode);
+          if (autoloadedFunctions.length === 0) continue;
+          for (const c of autoloadedFunctions) {
+            if (namespaces.length > 0) {
+              phpFunctions.push({
+                name: namespaces[0] + '\\' + c,
+                path: relativeFilePath,
+                isStubs: false,
+              });
+            } else {
+              phpFunctions.push({
+                name: c,
+                path: relativeFilePath,
+                isStubs: false,
+              });
+            }
           }
+        } catch (e: any) {
+          this.outputChannel.appendLine(`[PHPFunction:initialize:parse_file_error] ${JSON.stringify(e)}`);
         }
-      } catch (e: any) {
-        this.outputChannel.appendLine(`[PHPFunction:parse_autoload_file_error] ${JSON.stringify(e)}`);
       }
     }
 
