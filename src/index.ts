@@ -1,4 +1,4 @@
-import { ExtensionContext, window, workspace } from 'coc.nvim';
+import { ExtensionContext, window } from 'coc.nvim';
 
 import fs from 'fs';
 
@@ -6,13 +6,13 @@ import * as codeActionFeature from './codeActions/codeAction';
 import * as commandFeature from './commands/command';
 import { getArtisanPath } from './common/shared';
 import * as completionFeature from './completions/completion';
+import { config } from './config';
 import * as definitionFeature from './definitions/definition';
 import * as diagnosticFeature from './diagnostics/diagnostic';
 import * as hoverFeature from './hovers/hover';
 import * as projectManagerFeature from './projects/manager';
 import * as referenceFeature from './references/reference';
 import * as watcherFeature from './watchers/watcher';
-import { config } from './config';
 
 export async function activate(context: ExtensionContext): Promise<void> {
   if (!config.enable) return;
