@@ -50,7 +50,7 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
           start: { line: position.line, character: adjustStartCharacter },
           end: position,
         },
-        newText: key,
+        newText: configItems[key].name,
       };
 
       items.push({
