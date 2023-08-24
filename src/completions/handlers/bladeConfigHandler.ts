@@ -51,7 +51,6 @@ export async function doCompletion(document: LinesTextDocument, position: Positi
     items.push({
       label: configItems[key].name,
       kind: CompletionItemKind.Value,
-      insertText: configItems[key].name,
       detail: String(configItems[key].value),
       textEdit: edit,
     });
