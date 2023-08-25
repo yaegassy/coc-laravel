@@ -14,6 +14,7 @@ enum PickedItemEnum {
   PHPClass = 6,
   PHPFunction = 7,
   PHPConstant = 8,
+  EloquentModel = 9,
 }
 
 const PICKER_ITEMS = [
@@ -26,6 +27,7 @@ const PICKER_ITEMS = [
   'phpClass',
   'phpFunction',
   'phpConstant',
+  'eloquentModel',
 ];
 
 export async function register(context: ExtensionContext, projectManager: ProjectManagerType) {
@@ -59,6 +61,11 @@ async function runStats(picked: PickedItemEnum, projectManager: ProjectManagerTy
       contents = targetContent(contents, 'PHP Class', Array.from(projectManager.phpClassProjectManager.list()));
       contents = targetContent(contents, 'PHP Function', Array.from(projectManager.phpFunctionProjectManager.list()));
       contents = targetContent(contents, 'PHP Constant', Array.from(projectManager.phpConstantProjectManager.list()));
+      contents = targetContent(
+        contents,
+        'Eloquent Model',
+        Array.from(projectManager.eloquentModelProjectManager.list())
+      );
       break;
 
     case PickedItemEnum.Blade:
@@ -97,6 +104,14 @@ async function runStats(picked: PickedItemEnum, projectManager: ProjectManagerTy
       contents = targetContent(contents, 'PHP Constant', Array.from(projectManager.phpConstantProjectManager.list()));
       break;
 
+    case PickedItemEnum.EloquentModel:
+      contents = targetContent(
+        contents,
+        'Eloquent Model',
+        Array.from(projectManager.eloquentModelProjectManager.list())
+      );
+      break;
+
     default:
       break;
   }
@@ -127,6 +142,7 @@ function summaryContent(contents: string, projectManager: ProjectManagerType) {
   contents += `- PHP Class: ${projectManager.phpClassProjectManager.phpClassMapStore.size}\n`;
   contents += `- PHP Function: ${projectManager.phpFunctionProjectManager.phpFunctionMapStore.size}\n`;
   contents += `- PHP Constant: ${projectManager.phpConstantProjectManager.phpConstantMapStore.size}\n`;
+  contents += `- Eloquent Model: ${projectManager.eloquentModelProjectManager.eloquentModelMapStore.size}\n`;
   contents += `\n`;
 
   return contents;

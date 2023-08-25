@@ -70,6 +70,9 @@ export const config = {
     get phpKeywordEnable() {
       return _config.get<boolean>('completion.phpKeywordEnable', true);
     },
+    get eloquentModelFieldEnable() {
+      return _config.get<boolean>('completion.eloquentModelFieldEnable', true);
+    },
     phpFunction: {
       get stubsEnable() {
         return _config.get<boolean>('completion.phpFunction.stubsEnable', true);

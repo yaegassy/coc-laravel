@@ -393,8 +393,5 @@ test('Is editor offset in blade php region', async () => {
   const editorOffset = 33;
   const res = await bladeCommon.isEditorOffsetInBladePhpRelatedRegion(code, editorOffset);
 
-  console.log(res);
-
-  // dummy
-  expect(true).toBe(true);
+  expect(res).toBe(true);
 });

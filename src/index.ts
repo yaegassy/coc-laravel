@@ -52,6 +52,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     projectManager.phpFunctionProjectManager.initialize(),
     projectManager.phpConstantProjectManager.initialize(),
     projectManager.livewireProjectManager.initialize(),
+    projectManager.eloquentModelProjectManager.initialize(),
   ]).then(() => {
     outputChannel.appendLine('[Success] Project initialization succeeded');
     if (config.project.startupMessageEnable) {

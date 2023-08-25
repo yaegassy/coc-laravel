@@ -657,7 +657,7 @@ export function getCallStaticLookupNameWithChainFrom(expressionStatementNode: Ex
       if (callNode.arguments.length > 0) {
         for (const arg of callNode.arguments) {
           const argumentItem = retrieveCallArgumentTypeItemFromExpression(arg);
-          if (argumentItem) {
+          if (argumentItem != null) {
             if (arg.loc) {
               const argStartOffset = arg.loc.start.offset;
               const argEndOffset = arg.loc.end.offset;
@@ -746,7 +746,7 @@ export function getCallNameNameWithChainFrom(expressionStatementNode: Expression
         if (callNode.arguments.length > 0) {
           for (const arg of callNode.arguments) {
             const argumentItem = retrieveCallArgumentTypeItemFromExpression(arg);
-            if (argumentItem) {
+            if (argumentItem != null) {
               if (arg.loc) {
                 const argStartOffset = arg.loc.start.offset;
                 const argEndOffset = arg.loc.end.offset;
@@ -765,7 +765,7 @@ export function getCallNameNameWithChainFrom(expressionStatementNode: Expression
       if (callNode.arguments.length > 0) {
         for (const arg of callNode.arguments) {
           const argumentItem = retrieveCallArgumentTypeItemFromExpression(arg);
-          if (argumentItem) {
+          if (argumentItem != null) {
             if (arg.loc) {
               const argStartOffset = arg.loc.start.offset;
               const argEndOffset = arg.loc.end.offset;

@@ -115,3 +115,24 @@ export type PHPSymbolNameDataType = {
   aliasName?: string;
   namespace?: string;
 };
+
+export type IdeHelperModelType = {
+  name: string; // qualifiedName
+  helperClassName: string;
+  namespace: string;
+  commentblockValue: string;
+};
+
+export type EloquentModelPropertyType = {
+  name: string;
+  typeString: string;
+};
+
+export type EloquentModelType = {
+  name: string; // qualifiedName
+  fullQualifiedName: string;
+  helperClassName: string;
+  namespace: string;
+  tableName: string;
+  properties: EloquentModelPropertyType[];
+};

@@ -28,6 +28,7 @@ import * as bladeRouteCompletionHandler from './handlers/bladeRouteHandler';
 import * as bladeTranslationCompletionHandler from './handlers/bladeTranslationHandler';
 import * as bladeViewCompletionHanlder from './handlers/bladeViewHandler';
 import * as configCompletionHandler from './handlers/configHandler';
+import * as eloquentModelFieldCompletionHandler from './handlers/eloquentModelFieldHandler';
 import * as envCompletionHandler from './handlers/envHandler';
 import * as guardCompletionHandler from './handlers/guardHandler';
 import * as livewireActionCompletionHandler from './handlers/livewireActionHandler';
@@ -83,8 +84,8 @@ export async function register(
         '<', // component,
         ':', // guard, php related
         '.', // route, view
-        '"', // config, validation, env, route, view, middleware
-        "'", // config, validation, env, route, view, middleware
+        '"', // config, validation, env, route, view, middleware, eloquentModelField
+        "'", // config, validation, env, route, view, middleware, eloquentModelField
         '|', // validation
       ]
     )
@@ -382,6 +383,16 @@ class LaravelCompletionProvider implements CompletionItemProvider {
         );
         if (livewirePropertyCompletionItems) items.push(...livewirePropertyCompletionItems);
       }
+    }
+
+    // eloquentModelField [php]
+    if (config.completion.eloquentModelFieldEnable) {
+      const eloquentModelFieldCompletionItems = await eloquentModelFieldCompletionHandler.doCompletion(
+        document,
+        position,
+        this.projectManager.eloquentModelProjectManager
+      );
+      if (eloquentModelFieldCompletionItems) items.push(...eloquentModelFieldCompletionItems);
     }
 
     if (isIncompletes.includes(true)) {

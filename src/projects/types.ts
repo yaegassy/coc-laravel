@@ -1,4 +1,5 @@
 import { BladeProjectsManager } from './managers/blade';
+import { EloquentModelProjectManager } from './managers/eloquentModel';
 import { LivewireProjectManager } from './managers/livewire';
 import { PHPClassProjectManager } from './managers/phpClass';
 import { PHPConstantProjectManager } from './managers/phpConstant';
@@ -15,6 +16,7 @@ export type PHPFunctionProjectManagerType = PHPFunctionProjectManager;
 export type PHPConstantProjectManagerType = PHPConstantProjectManager;
 export type ViewReferenceProjectManagerType = ViewReferenceProjectManager;
 export type LivewireProjectManagerType = LivewireProjectManager;
+export type EloquentModelProjectManagerType = EloquentModelProjectManager;
 
 export type ProjectManagerType = {
   bladeProjectManager: BladeProjectsManagerType;
@@ -24,6 +26,7 @@ export type ProjectManagerType = {
   phpConstantProjectManager: PHPConstantProjectManagerType;
   viewReferenceProjectManager: ViewReferenceProjectManagerType;
   livewireProjectManager: LivewireProjectManagerType;
+  eloquentModelProjectManager: EloquentModelProjectManagerType;
 };
 
 export type PropsType = {

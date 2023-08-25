@@ -2,6 +2,7 @@ import { ExtensionContext, OutputChannel, workspace } from 'coc.nvim';
 
 import { SUPPORTED_LANGUAGE } from '../constant';
 import { BladeProjectsManager } from './managers/blade';
+import { EloquentModelProjectManager } from './managers/eloquentModel';
 import { LivewireProjectManager } from './managers/livewire';
 import { PHPClassProjectManager } from './managers/phpClass';
 import { PHPConstantProjectManager } from './managers/phpConstant';
@@ -22,6 +23,7 @@ export async function register(context: ExtensionContext, outputChannel: OutputC
   const phpFunctionProjectManager = new PHPFunctionProjectManager(context, workspace.root, outputChannel);
   const phpConstantProjectManager = new PHPConstantProjectManager(context, workspace.root, outputChannel);
   const livewireProjectManager = new LivewireProjectManager(workspace.root, outputChannel);
+  const eloquentModelProjectManager = new EloquentModelProjectManager(workspace.root, outputChannel);
 
   const projectManagers: ProjectManagerType = {
     bladeProjectManager,
@@ -31,6 +33,7 @@ export async function register(context: ExtensionContext, outputChannel: OutputC
     phpConstantProjectManager,
     phpClassProjectManager,
     livewireProjectManager,
+    eloquentModelProjectManager,
   };
 
   return projectManagers;

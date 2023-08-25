@@ -49,7 +49,8 @@ class PHPFileExtentionWatcherManager {
   viewReferenceGlobPattern?: string;
   translationGlobPattern?: string;
   livewireGlobPattern?: string;
-  appGlobPatternPattern?: string;
+  appGlobPattern?: string;
+  ideHelperModelsGlobPattern?: string;
 
   constructor(
     projectManager: ProjectManagerType,
@@ -71,7 +72,7 @@ class PHPFileExtentionWatcherManager {
       this.classBasedViewGlobPattern = `**/${relativeAppPath}/View/Components/**/*.php`;
       this.viewReferenceGlobPattern = `**/{routes,${relativeAppPath}/Http/{Controllers,Livewire},${relativeAppPath}/View/Components,${relativeAppPath}/Livewire}/**/*.php`;
       this.livewireGlobPattern = `**/{bootstrap/cache/livewire-components.php,${relativeAppPath}/Http/Livewire/**/*.php,${relativeAppPath}/Livewire/**/*.php}`;
-      this.appGlobPatternPattern = `**/${relativeAppPath}/**/*.php`;
+      this.appGlobPattern = `**/${relativeAppPath}/**/*.php`;
     }
 
     if (viewPath) {
@@ -85,6 +86,8 @@ class PHPFileExtentionWatcherManager {
 
       this.translationGlobPattern = `**/${relativeLangPath}/${locale}/**/*.php`;
     }
+
+    this.ideHelperModelsGlobPattern = `**/_ide_helper_models.php`;
   }
 
   async initialize() {
@@ -120,8 +123,12 @@ class PHPFileExtentionWatcherManager {
         this.projectManager.livewireProjectManager.set([e.path]);
       }
 
-      if (this.appGlobPatternPattern && minimatch(e.path, this.appGlobPatternPattern)) {
+      if (this.appGlobPattern && minimatch(e.path, this.appGlobPattern)) {
         this.projectManager.phpClassProjectManager.set([e.path]);
+      }
+
+      if (this.ideHelperModelsGlobPattern && minimatch(e.path, this.ideHelperModelsGlobPattern)) {
+        this.projectManager.eloquentModelProjectManager.restart();
       }
     });
   }
@@ -149,8 +156,12 @@ class PHPFileExtentionWatcherManager {
         this.projectManager.livewireProjectManager.set([e.path]);
       }
 
-      if (this.appGlobPatternPattern && minimatch(e.path, this.appGlobPatternPattern)) {
+      if (this.appGlobPattern && minimatch(e.path, this.appGlobPattern)) {
         this.projectManager.phpClassProjectManager.set([e.path]);
+      }
+
+      if (this.ideHelperModelsGlobPattern && minimatch(e.path, this.ideHelperModelsGlobPattern)) {
+        this.projectManager.eloquentModelProjectManager.restart();
       }
     });
   }
@@ -178,8 +189,12 @@ class PHPFileExtentionWatcherManager {
         this.projectManager.livewireProjectManager.restart();
       }
 
-      if (this.appGlobPatternPattern && minimatch(e.path, this.appGlobPatternPattern)) {
+      if (this.appGlobPattern && minimatch(e.path, this.appGlobPattern)) {
         this.projectManager.phpClassProjectManager.set([e.path]);
+      }
+
+      if (this.ideHelperModelsGlobPattern && minimatch(e.path, this.ideHelperModelsGlobPattern)) {
+        this.projectManager.eloquentModelProjectManager.restart();
       }
     });
   }
