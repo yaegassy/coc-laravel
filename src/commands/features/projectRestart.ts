@@ -13,7 +13,7 @@ export async function register(context: ExtensionContext, projectManager: Projec
       if (config.completion.phpFunctionEnable) await projectManager.phpFunctionProjectManager.restart();
       if (config.completion.phpClassEnable) await projectManager.phpClassProjectManager.restart();
       if (config.completion.phpConstantEnable) await projectManager.phpConstantProjectManager.restart();
-      if (config.completion.eloquentModelEnable) await projectManager.eloquentModelProjectManager.restart();
+      if (config.completion.eloquentModelFieldEnable) await projectManager.eloquentModelProjectManager.restart();
 
       window.showInformationMessage('SUCCESS');
     })
