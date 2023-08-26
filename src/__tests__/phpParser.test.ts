@@ -13,7 +13,7 @@ test('Determine if the FormRequest class is an inherited class', () => {
 
 declare(strict_types=1);
 
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\\Foundation\\Http\\FormRequest;
 
 class LoginRequest extends FormRequest
 {
@@ -272,11 +272,11 @@ test('Determine if the name class is an inherited class', () => {
   const code = testUtils.stripInitialNewline(`
 <?php
 
-namespace App\View\Components;
+namespace App\\View\\Components;
 
 use Closure;
-use Illuminate\Contracts\View\View;
-use Illuminate\View\Component;
+use Illuminate\\Contracts\\View\\View;
+use Illuminate\\View\\Component;
 
 class Sample extends Component
 {
@@ -310,11 +310,11 @@ test('Get public properties of constructor', () => {
   const code = testUtils.stripInitialNewline(`
 <?php
 
-namespace App\View\Components;
+namespace App\\View\\Components;
 
 use Closure;
-use Illuminate\Contracts\View\View;
-use Illuminate\View\Component;
+use Illuminate\\Contracts\\View\\View;
+use Illuminate\\View\\Component;
 
 class Sample extends Component
 {

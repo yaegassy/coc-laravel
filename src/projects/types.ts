@@ -1,3 +1,4 @@
+import { LivewireComponentMethodType, LivewireComponentPropertyType } from '../common/types';
 import { BladeProjectsManager } from './managers/blade';
 import { EloquentModelProjectManager } from './managers/eloquentModel';
 import { LivewireProjectManager } from './managers/livewire';
@@ -6,8 +7,6 @@ import { PHPConstantProjectManager } from './managers/phpConstant';
 import { PHPFunctionProjectManager } from './managers/phpFunction';
 import { TranslationProjectManager } from './managers/translation';
 import { ViewReferenceProjectManager } from './managers/viewReference';
-
-import { LivewireComponentMethodType, LivewireComponentPropertyType } from '../common/types';
 
 export type BladeProjectsManagerType = BladeProjectsManager;
 export type TranslationProjectManagerType = TranslationProjectManager;
@@ -72,25 +71,6 @@ export type PHPClassType = {
   path: string;
   kind: PHPClassItemKindEnum;
   isStubs: boolean;
-};
-
-export type CallViewFunctionType = {
-  value: string;
-  range: {
-    start: {
-      line: number;
-      character: number;
-    };
-    end: {
-      line: number;
-      character: number;
-    };
-  };
-};
-
-export type ViewReferenceMapValueType = {
-  path: string;
-  callViewFunctions: CallViewFunctionType[];
 };
 
 export type LivewireMapValueType = {

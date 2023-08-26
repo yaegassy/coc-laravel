@@ -1,15 +1,13 @@
-import fs from 'fs';
 import { Call, Name, String as StringNode } from 'php-parser';
 
-import * as phpParser from '../../parsers/php/parser';
-import { CallViewFunctionType, ViewReferenceMapValueType } from '../types';
+import * as phpParser from '../parsers/php/parser';
+import { CallViewFunctionType } from './types';
 
-export async function getViewReferenceMapValue(file: string) {
-  const code = await fs.promises.readFile(file, { encoding: 'utf8' });
-  const ast = phpParser.getAst(code);
-  if (!ast) return;
-
+export function getCallViewFunctionsFromPHPCode(code: string) {
   const callViewFuncs: CallViewFunctionType[] = [];
+
+  const ast = phpParser.getAstByParseCode(code);
+  if (!ast) return [];
 
   phpParser.walk((node) => {
     if (node.kind !== 'call') return;
@@ -41,14 +39,5 @@ export async function getViewReferenceMapValue(file: string) {
     });
   }, ast);
 
-  if (callViewFuncs.length >= 1) {
-    const referenceMapValue: ViewReferenceMapValueType = {
-      path: file,
-      callViewFunctions: callViewFuncs,
-    };
-
-    return referenceMapValue;
-  }
-
-  return undefined;
+  return callViewFuncs;
 }

@@ -1,11 +1,12 @@
 import { OutputChannel, Uri } from 'coc.nvim';
 
 import fg from 'fast-glob';
+import fs from 'fs';
 
 import { getAppPath, getArtisanPath } from '../../common/shared';
+import { ViewReferenceMapValueType } from '../../common/types';
 import { elapsed } from '../../common/utils';
-import * as viewReferenceProjectService from '../services/viewReference';
-import { ViewReferenceMapValueType } from '../types';
+import * as viewReferenceCommon from '../../common/viewReference';
 
 export class ViewReferenceProjectManager {
   workspaceRoot: string;
@@ -77,8 +78,22 @@ export class ViewReferenceProjectManager {
 
   async set(files: string[]) {
     for (const file of files) {
-      const viewReferenceMapValue = await viewReferenceProjectService.getViewReferenceMapValue(file);
-      if (!viewReferenceMapValue) continue;
+      let existsFile = false;
+      try {
+        await fs.promises.stat(file);
+        existsFile = true;
+      } catch {}
+      if (!existsFile) continue;
+      const code = await fs.promises.readFile(file, { encoding: 'utf8' });
+
+      const callViewFunctions = viewReferenceCommon.getCallViewFunctionsFromPHPCode(code);
+      if (callViewFunctions.length === 0) continue;
+
+      const viewReferenceMapValue: ViewReferenceMapValueType = {
+        path: file,
+        callViewFunctions,
+      };
+
       const relativeFilePath = this.getRelativePosixFilePath(file, this.workspaceRoot);
       this.viewReferenceMapStore.set(relativeFilePath, viewReferenceMapValue);
     }
