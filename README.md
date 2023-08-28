@@ -160,6 +160,7 @@ For more information, check this coc.nvim's wiki.
 - `laravel.completion.phpObjectMemberEnable`: Enable php object member completion, default: `true`
 - `laravel.completion.phpVariableEnable`: Enable php variable completion, default: `true`
 - `laravel.completion.phpKeywordEnable`: Enable php keyword completion, default: `true`
+- `laravel.completion.eloquentModelFieldEnable`: Enable eloquent model field completion, default: `true`
 - `laravel.completion.methodParameterEnable`: Enable method parameter completion, default: `true`
 - `laravel.completion.livewireEnable`: Enable livewire completion, default: `true`
 - `laravel.livewire.wireClickAttributes`: List of click related action to be added to `wire:xxxx`, default: `["click", "click.prefetch"]`
