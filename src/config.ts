@@ -73,6 +73,9 @@ export const config = {
     get eloquentModelFieldEnable() {
       return _config.get<boolean>('completion.eloquentModelFieldEnable', true);
     },
+    get viewReferenceVariableEnable() {
+      return _config.get<boolean>('completion.viewReferenceVariableEnable', true);
+    },
     phpFunction: {
       get stubsEnable() {
         return _config.get<boolean>('completion.phpFunction.stubsEnable', true);

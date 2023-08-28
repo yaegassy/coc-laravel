@@ -27,6 +27,7 @@ import * as bladeMethodParameterHandler from './handlers/bladeMethodParameterHan
 import * as bladeRouteCompletionHandler from './handlers/bladeRouteHandler';
 import * as bladeTranslationCompletionHandler from './handlers/bladeTranslationHandler';
 import * as bladeViewCompletionHanlder from './handlers/bladeViewHandler';
+import * as bladeViewReferenceVariableCompletionHandler from './handlers/bladeViewReferenceVariableHandler';
 import * as configCompletionHandler from './handlers/configHandler';
 import * as eloquentModelFieldCompletionHandler from './handlers/eloquentModelFieldHandler';
 import * as envCompletionHandler from './handlers/envHandler';
@@ -79,7 +80,7 @@ export async function register(
       [
         '>', //  php object member
         '\\', //  php related
-        '$', // livewire property completion, php related
+        '$', // livewire property completion, php related, viewReferenceVariable
         '@', // directive,
         '<', // component,
         ':', // guard, php related
@@ -395,6 +396,20 @@ class LaravelCompletionProvider implements CompletionItemProvider {
       if (eloquentModelFieldCompletionItems) items.push(...eloquentModelFieldCompletionItems);
     }
 
+    // viewReferenceVariable [blade]
+    if (config.completion.viewReferenceVariableEnable) {
+      if (isOffsetInPhpRelatedRegion) {
+        const bladeReferenceVariableCompletionItems = await bladeViewReferenceVariableCompletionHandler.doCompletion(
+          document,
+          position,
+          this.projectManager.bladeProjectManager,
+          this.projectManager.viewReferenceProjectManager
+        );
+        if (bladeReferenceVariableCompletionItems) items.push(...bladeReferenceVariableCompletionItems);
+      }
+    }
+
+    // FIN
     if (isIncompletes.includes(true)) {
       return CompletionList.create(items, true);
     }

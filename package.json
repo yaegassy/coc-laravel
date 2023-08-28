@@ -339,6 +339,11 @@
           "default": true,
           "description": "Enable eloquent model field completion."
         },
+        "laravel.completion.viewReferenceVariableEnable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable view reference variable completion."
+        },
         "laravel.completion.methodParameterEnable": {
           "type": "boolean",
           "default": true,
