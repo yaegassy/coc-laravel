@@ -1,4 +1,4 @@
-import { ExtensionContext, Location, Position, Uri, commands, workspace } from 'coc.nvim';
+import { Document, ExtensionContext, Location, Position, Range, Uri, commands, workspace } from 'coc.nvim';
 
 import path from 'path';
 
@@ -26,11 +26,21 @@ export async function register(context: ExtensionContext, projectManager: Projec
         if (v.callViewFunctions.length === 0) continue;
 
         for (const callViewFunction of v.callViewFunctions) {
-          if (callViewFunction.value !== bladePathName) continue;
+          if (callViewFunction.name !== bladePathName) continue;
+
+          let refDocument: Document | undefined;
+          try {
+            refDocument = await workspace.openTextDocument(v.path);
+          } catch (e) {}
+          if (!refDocument) continue;
+
+          const startPostion = refDocument.textDocument.positionAt(callViewFunction.startOffset);
+          const endPostion = refDocument.textDocument.positionAt(callViewFunction.endOffset);
+          const range = Range.create(startPostion, endPostion);
 
           refs.push({
             uri: Uri.parse(v.path).toString(),
-            range: callViewFunction.range,
+            range,
           });
         }
       }

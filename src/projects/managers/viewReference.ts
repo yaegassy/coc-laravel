@@ -4,7 +4,7 @@ import fg from 'fast-glob';
 import fs from 'fs';
 
 import { getAppPath, getArtisanPath } from '../../common/shared';
-import { ViewReferenceMapValueType } from '../../common/types';
+import { CallViewFunctionForReferenceType, ViewReferenceMapValueType } from '../../common/types';
 import { elapsed } from '../../common/utils';
 import * as viewReferenceCommon from '../../common/viewReference';
 
@@ -86,8 +86,18 @@ export class ViewReferenceProjectManager {
       if (!existsFile) continue;
       const code = await fs.promises.readFile(file, { encoding: 'utf8' });
 
-      const callViewFunctions = viewReferenceCommon.getCallViewFunctionsFromPHPCode(code);
-      if (callViewFunctions.length === 0) continue;
+      const returnOrArrowFuncNodes = viewReferenceCommon.getReturnOrArrowFuncNodesFromPHPCode(code);
+      if (!returnOrArrowFuncNodes) return;
+
+      const callViewFunctions: CallViewFunctionForReferenceType[] = [];
+      for (const node of returnOrArrowFuncNodes) {
+        const callViewFunctionsNonChainWithMethod = viewReferenceCommon.getCallViewFunctionsNonChainWithMethod(node);
+        if (callViewFunctionsNonChainWithMethod) callViewFunctions.push(callViewFunctionsNonChainWithMethod);
+
+        const callViewFunctionsWithChainWithMethod = viewReferenceCommon.getCallViewFunctionsWithChainWithMethod(node);
+        if (callViewFunctionsWithChainWithMethod) callViewFunctions.push(callViewFunctionsWithChainWithMethod);
+      }
+      if (!callViewFunctions.length) continue;
 
       const viewReferenceMapValue: ViewReferenceMapValueType = {
         path: file,

@@ -137,21 +137,14 @@ export type EloquentModelType = {
   properties: EloquentModelPropertyType[];
 };
 
-export type CallViewFunctionType = {
-  value: string;
-  range: {
-    start: {
-      line: number;
-      character: number;
-    };
-    end: {
-      line: number;
-      character: number;
-    };
-  };
-};
-
 export type ViewReferenceMapValueType = {
   path: string;
-  callViewFunctions: CallViewFunctionType[];
+  callViewFunctions: CallViewFunctionForReferenceType[];
+};
+
+export type CallViewFunctionForReferenceType = {
+  name: string;
+  startOffset: number;
+  endOffset: number;
+  dataKeys: string[];
 };

@@ -1,4 +1,4 @@
-import { LinesTextDocument, Location, Position, Uri, workspace } from 'coc.nvim';
+import { Document, LinesTextDocument, Location, Position, Range, Uri, workspace } from 'coc.nvim';
 
 import { type ViewReferenceProjectManagerType } from '../../projects/types';
 import * as viewService from '../services/viewService';
@@ -38,11 +38,21 @@ export async function doReference(
     if (v.callViewFunctions.length === 0) continue;
 
     for (const callViewFunction of v.callViewFunctions) {
-      if (callViewFunction.value !== text) continue;
+      if (callViewFunction.name !== text) continue;
+
+      let refDocument: Document | undefined;
+      try {
+        refDocument = await workspace.openTextDocument(v.path);
+      } catch (e) {}
+      if (!refDocument) continue;
+
+      const startPostion = refDocument.textDocument.positionAt(callViewFunction.startOffset);
+      const endPostion = refDocument.textDocument.positionAt(callViewFunction.endOffset);
+      const range = Range.create(startPostion, endPostion);
 
       locations.push({
         uri: Uri.parse(v.path).toString(),
-        range: callViewFunction.range,
+        range,
       });
     }
   }
