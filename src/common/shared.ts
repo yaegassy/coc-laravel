@@ -34,7 +34,11 @@ export async function runTinker(code: string, artisanPath: string) {
       if (err) reject(undefined);
 
       if (stdout.length > 0) {
-        resolve(stdout);
+        if (stdout.includes('PHP Error:') || stdout.includes('in Psy Shell code on line')) {
+          reject(undefined);
+        } else {
+          resolve(stdout);
+        }
       } else {
         reject(stderr);
       }
@@ -102,14 +106,19 @@ export async function getAppPath(artisanPath: string) {
 }
 
 export async function getViewPath(artisanPath: string) {
-  const getViewPathPHPCode = `echo json_encode(app()->viewPath())`;
+  let viewPath: string | undefined = undefined;
+
+  const getViewPathPHPCode = `echo json_encode(config('view.paths'))`;
   const resViewPath = await runTinker(getViewPathPHPCode, artisanPath);
-  if (!resViewPath) return;
-  const viewPath = resViewPath
-    .replace(/["']/g, '')
-    .replace(/\\/g, '') // remove json quate
-    .replace(/\\\\/g, '/') // replace window path to posix path
-    .replace('\n', '');
+  if (!resViewPath || resViewPath === 'null') return;
+  try {
+    const viewPaths = JSON.parse(resViewPath) as string[];
+    viewPath = viewPaths[0]
+      .replace(/["']/g, '')
+      .replace(/\\/g, '') // remove json quate
+      .replace(/\\\\/g, '/') // replace window path to posix path
+      .replace('\n', '');
+  } catch (e) {}
 
   return viewPath;
 }
@@ -130,10 +139,4 @@ export async function getLocale(artisanPath: string) {
   const locale = resLocale.replace(/["']/g, '').replace(/\\/g, '').replace('\n', '');
 
   return locale;
-}
-
-export function getRelativePosixFilePath(absoluteFilePath: string, rootPath: string) {
-  const rootUri = Uri.parse(rootPath).toString();
-  const abusoluteFileUri = Uri.parse(absoluteFilePath).toString();
-  return abusoluteFileUri.replace(rootUri + '/', '');
 }
