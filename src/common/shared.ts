@@ -1,4 +1,4 @@
-import { workspace, Uri } from 'coc.nvim';
+import { workspace } from 'coc.nvim';
 
 import cp from 'child_process';
 import fs from 'fs';
