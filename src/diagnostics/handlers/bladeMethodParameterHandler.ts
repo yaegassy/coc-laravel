@@ -22,7 +22,7 @@ export async function doValidate(textDocument: TextDocument) {
       if (!node.directiveParametersPosition.end?.offset) continue;
 
       const methodParameter = node.directiveParameters.replace(/^\(["']/, '').replace(/["']\)$/, '');
-      if (METHOD_DIRECTIVE_PARAMETERS.includes(methodParameter)) continue;
+      if (METHOD_DIRECTIVE_PARAMETERS.includes(methodParameter.toUpperCase())) continue;
 
       const diagnostic: Diagnostic = {
         source: 'laravel',
