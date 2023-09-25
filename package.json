@@ -572,7 +572,7 @@
     "inflection": "^2.0.1",
     "minimatch": "^9.0.3",
     "php-parser": "3.1.5",
-    "stillat-blade-parser": "1.2.0",
+    "stillat-blade-parser": "1.2.1",
     "vscode-html-languageservice": "^5.0.6"
   }
 }
