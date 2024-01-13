@@ -68,9 +68,10 @@ async function getArtisanOrSailPath(entryPoint: string) {
   return cmdPath;
 }
 
-async function getArtisanListCommandsJson(artisanPath: string) {
+async function getArtisanListCommandsJson(entryPointPath: string, isSail: boolean) {
   return new Promise<string[]>((resolve) => {
-    cp.exec(`"${artisanPath}" list --format json`, (err, stdout, stderr) => {
+    const cmd = isSail ? `"${entryPointPath}" artisan list --format json` : `"${entryPointPath}" list --format json`;
+    cp.exec(cmd, (err, stdout, stderr) => {
       if (err || stderr) resolve([]);
 
       if (stdout.length > 0) {
@@ -167,15 +168,14 @@ export class ArtisanList extends BasicList {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async loadItems(_context: ListContext): Promise<ListItem[]> {
     const listItems: ListItem[] = [];
-    let entryPointPath = await getArtisanOrSailPath(this.entryPoint);
+    const entryPointPath = await getArtisanOrSailPath(this.entryPoint);
     if (!entryPointPath) return listItems;
 
+    let isSail = false;
     // Sail
-    if (entryPointPath.endsWith('sail')) {
-      entryPointPath = entryPointPath + ' artisan';
-    }
+    if (entryPointPath.endsWith('sail')) isSail = true;
 
-    const commands = await getArtisanListCommandsJson(entryPointPath);
+    const commands = await getArtisanListCommandsJson(entryPointPath, isSail);
     commands.forEach((c) => listItems.push({ label: c }));
     return listItems;
   }
